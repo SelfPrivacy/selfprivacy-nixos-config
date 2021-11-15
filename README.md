@@ -52,11 +52,11 @@ Example JSON config:
         ],
         "passwordAuthentication": true
     },
-    "username": "owner",
+    "username": "LUSER",
     "users": [
         {
-            "hashedPassword": "HASHED_PASSWORD",
-            "username": "LUSER"
+            "hashedPassword": "OTHER_USER_HASHED_PASSWORD",
+            "username": "OTHER_USER"
         }
     ]
 }
