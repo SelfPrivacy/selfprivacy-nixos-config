@@ -12,24 +12,24 @@ Example JSON config:
 ```json
 {
     "backblaze": {
-        "accountId": "KEY ID",
-        "accountKey": "KEY",
-        "bucket": "selfprivacy"
+        "accountId": "BACKBLAZE_KEY_ID",
+        "accountKey": "BACKBLAZE_ACCOUNT_KEY",
+        "bucket": "BACKBLAZE_BUCKET_NAME"
     },
     "bitwarden": {
         "enable": true
     },
     "cloudflare": {
-        "apiKey": "KEY"
+        "apiKey": "CF_TOKEN"
     },
-    "databasePassword": "PASSWORD",
-    "domain": "meow-corp.xyz",
-    "hashedMasterPassword": "HASHED PASSWORD",
-    "hostname": "meow-corp",
+    "databasePassword": "DB_PASSWORD",
+    "domain": "DOMAIN",
+    "hashedMasterPassword": "HASHED_PASSWORD",
+    "hostname": "DOMAIN",
     "nextcloud": {
         "enable": true,
-        "adminPassword": "PASS",
-        "databasePassword": "PASS"
+        "adminPassword": "PASSWORD",
+        "databasePassword": "PASSWORD"
     },
     "gitea": {
         "enable": true
@@ -44,7 +44,7 @@ Example JSON config:
         "enable": true
     },
     "timezone": "Europe/Moscow",
-    "resticPassword": "PASS",
+    "resticPassword": "PASSWORD",
     "ssh": {
         "enable": true,
         "rootSshKeys": [
@@ -55,8 +55,8 @@ Example JSON config:
     "username": "owner",
     "users": [
         {
-            "hashedPassword": "HASHED PASSWORD",
-            "username": "tester"
+            "hashedPassword": "HASHED_PASSWORD",
+            "username": "LUSER"
         }
     ]
 }
