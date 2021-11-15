@@ -4,7 +4,7 @@ let
   inherit (nixpkgs) pkgs;
   inherit pythonPkgs;
 
-  selfprivacy-api = { buildPythonPackage, flask, flask-restful, setuptools }:
+  selfprivacy-api = { buildPythonPackage, flask, flask-restful, setuptools, portalocker }:
     buildPythonPackage rec {
       pname = "selfprivacy-api";
       version = "1.1";
@@ -12,7 +12,7 @@ let
         url = "https://git.selfprivacy.org/ilchub/selfprivacy-rest-api.git";
         rev = "dbb4c1095654bba88d4f0c91b7b195d5262976b6";
       };
-      propagatedBuildInputs = [ flask flask-restful setuptools ];
+      propagatedBuildInputs = [ flask flask-restful setuptools portalocker ];
       meta = {
         description = ''
           SelfPrivacy Server Management API
