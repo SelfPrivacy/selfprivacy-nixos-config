@@ -45,9 +45,13 @@ Example JSON config:
     },
     "timezone": "Europe/Moscow",
     "resticPassword": "PASS",
-    "rootSshKeys": [
-        "ssh-ed25519 KEY user@host"
-    ],
+    "ssh": {
+        "enable": true,
+        "rootSshKeys": [
+            "ssh-ed25519 KEY user@host"
+        ],
+        "passwordAuthentication": true
+    },
     "username": "owner",
     "users": [
         {

@@ -117,11 +117,24 @@ in
       '';
       type = types.nullOr types.string;
     };
-    rootSshKeys = mkOption {
-      description = ''
+    ssh = {
+      enable = mkOption {
+        default = true;
+        type = types.nullOr types.bool;
+      };
+      rootKeys = mkOption {
+        description = ''
         Root SSH Keys
-      '';
-      type = types.nullOr (types.listOf types.string);
+        '';
+        type = types.nullOr (types.listOf types.string);
+      };
+      passwordAuthentication = mkOption {
+        description = ''
+          Password authentication for SSH
+        '';
+        default = true;
+        type = types.nullOr types.bool;
+      };
     };
     timezone = mkOption {
       description = ''

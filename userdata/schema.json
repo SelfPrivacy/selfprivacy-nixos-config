@@ -103,10 +103,21 @@
         "resticPassword": {
             "type": "string"
         },
-        "rootSshKeys": {
-            "type": "array",
-            "items": {
-                "type": "string"
+        "ssh": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "rootKeys": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "passwordAuthentication": {
+                    "type": "boolean"
+                }
             }
         },
         "users": {

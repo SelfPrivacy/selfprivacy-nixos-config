@@ -37,10 +37,10 @@
   };
   time.timeZone = config.services.userdata.timezone;
   i18n.defaultLocale = "en_GB.UTF-8";
-  users.users.root.openssh.authorizedKeys.keys = config.services.userdata.rootSshKeys;
+  users.users.root.openssh.authorizedKeys.keys = config.services.userdata.ssh.rootKeys;
   services.openssh = {
-    enable = true;
-    passwordAuthentication = true;
+    enable = config.services.userdata.ssh.enable;
+    passwordAuthentication = config.services.userdata.ssh.passwordAuthentication;
     permitRootLogin = "yes";
     openFirewall = false;
   };
