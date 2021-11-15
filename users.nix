@@ -1,12 +1,23 @@
 { pkgs, config, ... }:
+let
+  cfg = config.services.userdata;
+in
 {
   users.mutableUsers = false;
   users = {
     users = {
-      "${config.services.userdata.username}" = {
+      "${cfg.username}" = {
         isNormalUser = true;
-        hashedPassword = config.services.userdata.hashedMasterPassword;
+        hashedPassword = cfg.hashedMasterPassword;
       };
-    };
+    } // builtins.listToAttrs (builtins.map
+      (user: {
+        name = "${user.username}";
+        value = {
+          isNormalUser = true;
+          hashedPassword = user.hashedPassword;
+        };
+      })
+      cfg.users);
   };
 }

@@ -35,7 +35,7 @@
     };
     nameservers = [ "1.1.1.1" "1.0.0.1" ];
   };
-  time.timeZone = "Europe/Uzhgorod";
+  time.timeZone = config.services.userdata.timezone;
   i18n.defaultLocale = "en_GB.UTF-8";
   users.users.root.openssh.authorizedKeys.keys = config.services.userdata.rootSshKeys;
   services.openssh = {

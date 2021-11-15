@@ -8,19 +8,6 @@ let
     if cfg.direction == ""
     then ""
     else "--direction=${cfg.direction}";
-  userDef = {
-    options = {
-      username = mkOption {
-        type = types.nullOr types.string;
-      };
-      hashedPassword = mkOption {
-        type = types.nullOr types.string;
-      };
-      sshKeys = mkOption {
-        type = types.nullOr types.listOf types.string;
-      };
-    };
-  };
 in
 {
   options.services.userdata = {
@@ -134,7 +121,7 @@ in
       description = ''
         Root SSH Keys
       '';
-      type = types.nullOr types.listOf types.string;
+      type = types.nullOr (types.listOf types.string);
     };
     timezone = mkOption {
       description = ''
@@ -147,7 +134,7 @@ in
       description = ''
         Users that will be created on the server
       '';
-      type = with types; nullOr listOf attrsOf (submodule userDef);
+      type = types.nullOr (types.listOf (types.attrsOf types.anything));
     };
   };
 }

@@ -37,5 +37,7 @@ in
   '';
   users.users.pleroma = {
     extraGroups = [ "postgres" ];
+    isNormalUser = false;
+    isSystemUser = true;
   };
 }

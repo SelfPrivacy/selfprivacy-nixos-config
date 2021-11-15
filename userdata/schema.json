@@ -15,6 +15,9 @@
         "hashedMasterPassword": {
             "type": "string"
         },
+        "timezone": {
+            "type": "string"
+        },
         "backblaze": {
             "type": "object",
             "properties": {

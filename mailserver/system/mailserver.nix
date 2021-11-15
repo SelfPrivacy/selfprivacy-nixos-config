@@ -43,24 +43,24 @@ in
             stop;
           }
         '';
-      } // builtins.listToAttrs (builtins.map
-        (user: {
-          name = "${user.username}@${cfg.domain}";
-          value = {
-            hashedPassword = user.hashedPassword;
-            catchAll = [ cfg.domain ];
-            sieveScript = ''
-              require ["fileinto", "mailbox"];
-              if header :contains "Chat-Version" "1.0"
-              {  
-                fileinto :create "DeltaChat";
-                stop;
-              }
-            '';
-          };
-        })
-        cfg.users);
-    };
+      };
+    } // builtins.listToAttrs (builtins.map
+      (user: {
+        name = "${user.username}@${cfg.domain}";
+        value = {
+          hashedPassword = user.hashedPassword;
+          catchAll = [ cfg.domain ];
+          sieveScript = ''
+            require ["fileinto", "mailbox"];
+            if header :contains "Chat-Version" "1.0"
+            {  
+              fileinto :create "DeltaChat";
+              stop;
+            }
+          '';
+        };
+      })
+      cfg.users);
 
     extraVirtualAliases = {
       "admin@${cfg.domain}" = "${cfg.username}@${cfg.domain}";
