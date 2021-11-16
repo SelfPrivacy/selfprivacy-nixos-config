@@ -44,6 +44,13 @@ in
         '';
         type = types.nullOr types.str;
       };
+      enableSwagger = mkOption {
+        default = true;
+        description = ''
+          Enable Swagger UI
+        '';
+        type = types.bool;
+      };
     };
     backblaze = {
       bucket = mkOption {
@@ -132,7 +139,7 @@ in
       };
       rootKeys = mkOption {
         description = ''
-        Root SSH Keys
+          Root SSH Keys
         '';
         type = types.nullOr (types.listOf types.str);
       };

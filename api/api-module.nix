@@ -25,6 +25,13 @@ in
         SelfPrivacy API token
       '';
     };
+    enableSwagger = mkOption {
+      default = false;
+      type = types.bool;
+      description = ''
+        Enable Swagger UI
+      '';
+    };
   };
   config = lib.mkIf cfg.enable {
 
@@ -35,6 +42,7 @@ in
         HOME = "/root";
         PYTHONUNBUFFERED = "1";
         AUTH_TOKEN = cfg.token;
+        ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
       } // config.networking.proxy.envVars;
       path = [ "/var/" "/var/dkim/" pkgs.coreutils pkgs.gnutar pkgs.xz.bin pkgs.gzip pkgs.gitMinimal config.nix.package.out pkgs.nixos-rebuild pkgs.restic pkgs.mkpasswd ];
       after = [ "network-online.target" ];

@@ -3,6 +3,7 @@
   services.selfprivacy-api = {
     enable = true;
     token = config.services.userdata.api.token;
+    enableSwagger = config.services.userdata.api.enableSwagger;
   };
 
   users.users."selfprivacy-api" = {

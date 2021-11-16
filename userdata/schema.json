@@ -23,6 +23,9 @@
             "properties": {
                 "token": {
                     "type": "string"
+                },
+                "enableSwagger": {
+                    "type": "boolean"
                 }
             }
         },
