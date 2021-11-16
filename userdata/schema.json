@@ -18,6 +18,14 @@
         "timezone": {
             "type": "string"
         },
+        "api": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "backblaze": {
             "type": "object",
             "properties": {

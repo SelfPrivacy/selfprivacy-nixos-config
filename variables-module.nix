@@ -37,6 +37,14 @@ in
       '';
       type = types.nullOr types.string;
     };
+    api = {
+      token = mkOption {
+        description = ''
+          API token used to authenticate with the server
+        '';
+        type = types.nullOr types.string;
+      };
+    };
     backblaze = {
       bucket = mkOption {
         description = "Bucket name used for userdata backups";

@@ -19,6 +19,12 @@ in
         Enable SelfPrivacy API service
       '';
     };
+    token = mkOption {
+      type = types.string;
+      description = ''
+        SelfPrivacy API token
+      '';
+    };
   };
   config = lib.mkIf cfg.enable {
 
@@ -28,6 +34,7 @@ in
         inherit (config.environment.sessionVariables) NIX_PATH;
         HOME = "/root";
         PYTHONUNBUFFERED = "1";
+        AUTH_TOKEN = cfg.token;
       } // config.networking.proxy.envVars;
       path = [ "/var/" "/var/dkim/" pkgs.coreutils pkgs.gnutar pkgs.xz.bin pkgs.gzip pkgs.gitMinimal config.nix.package.out pkgs.nixos-rebuild pkgs.restic pkgs.mkpasswd ];
       after = [ "network-online.target" ];

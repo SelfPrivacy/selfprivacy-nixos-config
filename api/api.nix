@@ -1,7 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   services.selfprivacy-api = {
     enable = true;
+    token = config.services.userdata.api.token;
   };
 
   users.users."selfprivacy-api" = {
