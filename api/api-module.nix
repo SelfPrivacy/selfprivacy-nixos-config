@@ -20,7 +20,7 @@ in
       '';
     };
     token = mkOption {
-      type = types.string;
+      type = types.str;
       description = ''
         SelfPrivacy API token
       '';

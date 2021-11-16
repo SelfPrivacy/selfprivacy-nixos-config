@@ -17,59 +17,59 @@ in
     };
     hostname = mkOption {
       description = "The hostname of the server.";
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
     };
     domain = mkOption {
       description = ''
         Domain used by the server
       '';
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
     };
     username = mkOption {
       description = ''
         Username that was defined at the initial setup process
       '';
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
     };
     hashedMasterPassword = mkOption {
       description = ''
         Hash of the password that was defined at the initial setup process
       '';
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
     };
     api = {
       token = mkOption {
         description = ''
           API token used to authenticate with the server
         '';
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
       };
     };
     backblaze = {
       bucket = mkOption {
         description = "Bucket name used for userdata backups";
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
       };
       accountId = mkOption {
         description = "Backblaze B2 Account ID";
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
       };
       accountKey = mkOption {
         description = "Backblaze B2 Account Key.";
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
       };
     };
     cloudflare = {
       apiKey = mkOption {
         description = "Cloudflare API Key.";
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
       };
     };
     databasePassword = mkOption {
       description = ''
         Password for the database
       '';
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
     };
     bitwarden = {
       enable = mkOption {
@@ -92,13 +92,13 @@ in
         description = ''
           Password for the nextcloud database
         '';
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
       };
       adminPassword = mkOption {
         description = ''
           Password for the nextcloud admin user
         '';
-        type = types.nullOr types.string;
+        type = types.nullOr types.str;
       };
     };
     pleroma = {
@@ -123,7 +123,7 @@ in
       description = ''
         Password for the restic
       '';
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
     };
     ssh = {
       enable = mkOption {
@@ -134,7 +134,7 @@ in
         description = ''
         Root SSH Keys
         '';
-        type = types.nullOr (types.listOf types.string);
+        type = types.nullOr (types.listOf types.str);
       };
       passwordAuthentication = mkOption {
         description = ''
@@ -148,7 +148,7 @@ in
       description = ''
         Timezone used by the server
       '';
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
       default = "Europe/Uzhgorod";
     };
     users = mkOption {
