@@ -20,6 +20,8 @@ in
       "d /var/bitwarden 0777 bitwarden_rs bitwarden_rs -"
       "d /var/bitwarden/backup 0777 bitwarden_rs bitwarden_rs -"
       "d /var/lib/pleroma 0600 pleroma pleroma - -"
+      "d /var/lib/restic 0600 restic restic - -"
+      "f /var/lib/restic/pass 0400 restic restic - ${resticPassword}"
       "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -"
       "f /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
       "f /var/restic/restic-repo-password 0660 restic - - ${resticPass}"
