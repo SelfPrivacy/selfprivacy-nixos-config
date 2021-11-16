@@ -16,6 +16,10 @@ Example JSON config:
         "accountKey": "BACKBLAZE_ACCOUNT_KEY",
         "bucket": "BACKBLAZE_BUCKET_NAME"
     },
+    "api": {
+        "token": "API_TOKEN",
+        "enableSwagger": false
+    },
     "bitwarden": {
         "enable": true
     },
