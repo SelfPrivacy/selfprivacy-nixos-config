@@ -10,7 +10,7 @@ let
       version = "1.1";
       src = builtins.fetchGit {
         url = "https://git.selfprivacy.org/ilchub/selfprivacy-rest-api.git";
-        rev = "dbb4c1095654bba88d4f0c91b7b195d5262976b6";
+        rev = "82b7f97dcece9b879c19e32c95daafeaae0091ec";
       };
       propagatedBuildInputs = [ flask flask-restful setuptools portalocker flask-swagger flask-swagger-ui ];
       meta = {
