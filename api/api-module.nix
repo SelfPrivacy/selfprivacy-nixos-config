@@ -75,5 +75,44 @@ in
         RestartSec = "5";
       };
     };
+    # One shot systemd service to rebuild NixOS using nixos-rebuild
+    systemd.services.sp-nixos-rebuild = {
+      description = "Upgrade NixOS using nixos-rebuild";
+      environment = config.nix.envVars // {
+        inherit (config.environment.sessionVariables) NIX_PATH;
+        HOME = "/root";
+      } // config.networking.proxy.envVars;
+      path = [ pkgs.coreutils pkgs.gnutar pkgs.xz.bin pkgs.gzip pkgs.gitMinimal config.nix.package.out pkgs.nixos-rebuild ];
+      serviceConfig = {
+        User = "root";
+        ExecStart = "${pkgs.nixos-rebuild}/bin/nixos-rebuild switch";
+      };
+    };
+    # One shot systemd service to upgrade NixOS using nixos-rebuild
+    systemd.services.sp-nixos-upgrade = {
+      description = "Upgrade NixOS using nixos-rebuild";
+      environment = config.nix.envVars // {
+        inherit (config.environment.sessionVariables) NIX_PATH;
+        HOME = "/root";
+      } // config.networking.proxy.envVars;
+      path = [ pkgs.coreutils pkgs.gnutar pkgs.xz.bin pkgs.gzip pkgs.gitMinimal config.nix.package.out pkgs.nixos-rebuild ];
+      serviceConfig = {
+        User = "root";
+        ExecStart = "${pkgs.nixos-rebuild}/bin/nixos-rebuild switch --upgrade";
+      };
+    };
+    # One shot systemd service to rollback NixOS using nixos-rebuild
+    systemd.services.sp-nixos-rollback = {
+      description = "Rollback NixOS using nixos-rebuild";
+      environment = config.nix.envVars // {
+        inherit (config.environment.sessionVariables) NIX_PATH;
+        HOME = "/root";
+      } // config.networking.proxy.envVars;
+      path = [ pkgs.coreutils pkgs.gnutar pkgs.xz.bin pkgs.gzip pkgs.gitMinimal config.nix.package.out pkgs.nixos-rebuild ];
+      serviceConfig = {
+        User = "root";
+        ExecStart = "${pkgs.nixos-rebuild}/bin/nixos-rebuild switch --rollback";
+      };
+    };
   };
 }
