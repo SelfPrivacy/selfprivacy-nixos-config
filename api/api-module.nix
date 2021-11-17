@@ -3,7 +3,6 @@
 with lib;
 
 let
-  selfprivacy-api = pkgs.callPackage ./api-package.nix { };
   cfg = config.services.selfprivacy-api;
   directionArg =
     if cfg.direction == ""
@@ -70,7 +69,7 @@ in
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
         User = "root";
-        ExecStart = "${selfprivacy-api}/bin/app.py";
+        ExecStart = "${pkgs.selfprivacy-api}/bin/app.py";
         Restart = "always";
         RestartSec = "5";
       };

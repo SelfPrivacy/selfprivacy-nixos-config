@@ -1,4 +1,8 @@
 { config, pkgs, lib, ... }:
+let
+  url-overlay = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo/archive/1.0.tar.gz";
+  nix-overlay = (import (builtins.fetchTarball url-overlay));
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -25,6 +29,8 @@
     ./videomeet/jitsi.nix
     ./git/gitea.nix
   ];
+
+  nixpkgs.overlays = [ (nix-overlay) ];
 
   boot.cleanTmpDir = true;
   networking = {
