@@ -15,7 +15,7 @@ in
         extraDomainNames = [ "${cfg.domain}" ];
         group = "acmerecievers";
         dnsProvider = "cloudflare";
-        credentialsFile = "/var/cloudflareCredentials.ini";
+        credentialsFile = "/var/lib/cloudflare/Credentials.ini";
       };
     };
   };
