@@ -142,6 +142,7 @@ in
           Root SSH Keys
         '';
         type = types.nullOr (types.listOf types.str);
+        default = [];
       };
       passwordAuthentication = mkOption {
         description = ''
