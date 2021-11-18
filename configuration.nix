@@ -9,7 +9,6 @@ in
 
     ./variables-module.nix
     ./variables.nix
-    ./vscode.nix
     ./files.nix
     ./users.nix
     ./mailserver/system/mailserver.nix
