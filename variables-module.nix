@@ -163,6 +163,7 @@ in
         Users that will be created on the server
       '';
       type = types.nullOr (types.listOf (types.attrsOf types.anything));
+      default = [];
     };
   };
 }
