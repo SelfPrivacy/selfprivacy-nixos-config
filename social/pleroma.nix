@@ -14,10 +14,10 @@ in
       user = "pleroma";
       group = "pleroma";
       configs = [
-        builtins.replaceStrings
+        (builtins.replaceStrings
         [ "$DOMAIN" "$LUSER" "$DB_PASSWORD" ]
         [ cfg.domain cfg.username cfg.databasePassword ]
-        (builtins.readFile ./config.exs)
+        (builtins.readFile ./config.exs))
       ];
     };
     postgresql = {
