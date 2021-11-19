@@ -50,8 +50,8 @@ in
     openFirewall = false;
   };
   programs.ssh = {
-    pubkeyAcceptedKeyTypes = [ "ssh-ed25519" ];
-    hostKeyAlgorithms = [ "ssh-ed25519" ];
+    pubkeyAcceptedKeyTypes = [ "ssh-ed25519" "ssh-rsa" ];
+    hostKeyAlgorithms = [ "ssh-ed25519" "ssh-rsa" ];
   };
   environment.systemPackages = with pkgs; [
     git
