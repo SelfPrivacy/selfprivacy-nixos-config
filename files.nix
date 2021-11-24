@@ -14,6 +14,12 @@ in
         CLOUDFLARE_DNS_API_TOKEN=${cfg.cloudflare.apiKey}
         CLOUDFLARE_ZONE_API_TOKEN=${cfg.cloudflare.apiKey}
       '';
+      rcloneConfig = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] ''
+      [backblaze]
+      type = b2
+      account = cfg.backblaze.accountId;
+      key = cfg.backblaze.accountKey;
+      '';
     in
     [
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 bitwarden_rs bitwarden_rs -" else "")
@@ -21,6 +27,7 @@ in
       (if cfg.pleroma.enable then "d /var/lib/pleroma 0600 pleroma pleroma - -" else "")
       "d /var/lib/restic 0600 restic - - -"
       "f /var/lib/restic/pass 0400 restic - - ${resticPass}"
+      "f /root/.config/rclone.conf 0400 root root - ${rcloneConfig}"
       (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
       "f /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
       (if cfg.nextcloud.enable then "f /var/lib/nextcloud/db-pass 0440 nextcloud nextcloud - ${nextcloudDBPass}" else "")
