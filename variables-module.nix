@@ -64,7 +64,7 @@ in
       description = ''
         SSH keys of the user that was defined at the initial setup process
       '';
-      type = types.nullOr types.str;
+      type = types.nullOr (types.listOf types.str);
       default = [ ];
     };
     ###############
