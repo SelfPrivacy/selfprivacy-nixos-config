@@ -15,10 +15,10 @@ in
         CLOUDFLARE_ZONE_API_TOKEN=${cfg.cloudflare.apiKey}
       '';
       rcloneConfig = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] ''
-      [backblaze]
-      type = b2
-      account = cfg.backblaze.accountId;
-      key = cfg.backblaze.accountKey;
+        [backblaze]
+        type = b2
+        account = ${cfg.backblaze.accountId}
+        key = ${cfg.backblaze.accountKey}
       '';
     in
     [
