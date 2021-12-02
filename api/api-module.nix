@@ -43,6 +43,12 @@ in
         B2 account key
       '';
     };
+    b2Bucket = mkOption {
+      type = types.str;
+      description = ''
+        B2 bucket
+      '';
+    };
     resticPassword = mkOption {
       type = types.str;
       description = ''
@@ -62,6 +68,7 @@ in
         ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
         B2_ACCOUNT_ID = cfg.b2AccountId;
         B2_ACCOUNT_KEY = cfg.b2AccountKey;
+        B2_BUCKET = cfg.b2Bucket;
         RESTIC_PASSWORD = cfg.resticPassword;
       } // config.networking.proxy.envVars;
       path = [ "/var/" "/var/dkim/" pkgs.coreutils pkgs.gnutar pkgs.xz.bin pkgs.gzip pkgs.gitMinimal config.nix.package.out pkgs.nixos-rebuild pkgs.restic pkgs.mkpasswd ];
