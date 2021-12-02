@@ -26,12 +26,12 @@ in
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 bitwarden_rs bitwarden_rs -" else "")
       (if cfg.pleroma.enable then "d /var/lib/pleroma 0600 pleroma pleroma - -" else "")
       "d /var/lib/restic 0600 restic - - -"
-      "f /var/lib/restic/pass 0400 restic - - ${resticPass}"
-      "f /root/.config/rclone/rclone.conf 0400 root root - ${rcloneConfig}"
-      (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
-      "f /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
-      (if cfg.nextcloud.enable then "f /var/lib/nextcloud/db-pass 0440 nextcloud nextcloud - ${nextcloudDBPass}" else "")
-      (if cfg.nextcloud.enable then "f /var/lib/nextcloud/admin-pass 0440 nextcloud nextcloud - ${nextcloudAdminPass}" else "")
-      "f /var/lib/cloudflare/Credentials.ini 0440 nginx acmerecievers - ${cloudflareCredentials}"
+      "f+ /var/lib/restic/pass 0400 restic - - ${resticPass}"
+      "f+ /root/.config/rclone/rclone.conf 0400 root root - ${rcloneConfig}"
+      (if cfg.pleroma.enable then "f+ /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
+      "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
+      (if cfg.nextcloud.enable then "f+ /var/lib/nextcloud/db-pass 0440 nextcloud nextcloud - ${nextcloudDBPass}" else "")
+      (if cfg.nextcloud.enable then "f+ /var/lib/nextcloud/admin-pass 0440 nextcloud nextcloud - ${nextcloudAdminPass}" else "")
+      "f+ /var/lib/cloudflare/Credentials.ini 0440 nginx acmerecievers - ${cloudflareCredentials}"
     ];
 }
