@@ -9,6 +9,7 @@ in
       "${cfg.username}" = {
         isNormalUser = true;
         hashedPassword = cfg.hashedMasterPassword;
+        openssh.authorizedKeys.keys = cfg.sshKeys;
       };
     } // builtins.listToAttrs (builtins.map
       (user: {
@@ -16,6 +17,7 @@ in
         value = {
           isNormalUser = true;
           hashedPassword = user.hashedPassword;
+          openssh.authorizedKeys.keys = user.sshKeys;
         };
       })
       cfg.users);

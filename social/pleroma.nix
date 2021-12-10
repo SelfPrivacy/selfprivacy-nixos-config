@@ -15,9 +15,9 @@ in
       group = "pleroma";
       configs = [
         (builtins.replaceStrings
-        [ "$DOMAIN" "$LUSER" "$DB_PASSWORD" ]
-        [ cfg.domain cfg.username cfg.databasePassword ]
-        (builtins.readFile ./config.exs))
+          [ "$DOMAIN" "$LUSER" "$DB_PASSWORD" ]
+          [ cfg.domain cfg.username cfg.databasePassword ]
+          (builtins.readFile ./config.exs))
       ];
     };
     postgresql = {

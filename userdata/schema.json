@@ -3,6 +3,17 @@
     "$id": "https://git.selfprivacy.org/inex/selfprivacy-nixos-config/raw/branch/master/userdata/schema.json",
     "type": "object",
     "properties": {
+        "autoUpgrade": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "allowReboot": {
+                    "type": "boolean"
+                }
+            }
+        },
         "hostname": {
             "type": "string"
         },
@@ -14,6 +25,12 @@
         },
         "hashedMasterPassword": {
             "type": "string"
+        },
+        "sshKeys": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
         },
         "timezone": {
             "type": "string"

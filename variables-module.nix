@@ -15,6 +15,7 @@ in
       default = true;
       type = types.nullOr types.bool;
     };
+    # General server options
     hostname = mkOption {
       description = "The hostname of the server.";
       type = types.nullOr types.str;
@@ -25,6 +26,28 @@ in
       '';
       type = types.nullOr types.str;
     };
+    timezone = mkOption {
+      description = ''
+        Timezone used by the server
+      '';
+      type = types.nullOr types.str;
+      default = "Europe/Uzhgorod";
+    };
+    autoUpgrade = {
+      enable = mkOption {
+        description = "Enable auto-upgrade of the server.";
+        default = true;
+        type = types.nullOr types.bool;
+      };
+      allowReboot = mkOption {
+        description = "Allow the server to reboot during the upgrade.";
+        default = false;
+        type = types.nullOr types.bool;
+      };
+    };
+    ########################
+    # Server admin options #
+    ########################
     username = mkOption {
       description = ''
         Username that was defined at the initial setup process
@@ -37,6 +60,16 @@ in
       '';
       type = types.nullOr types.str;
     };
+    sshKeys = mkOption {
+      description = ''
+        SSH keys of the user that was defined at the initial setup process
+      '';
+      type = types.nullOr (types.listOf types.str);
+      default = [ ];
+    };
+    ###############
+    # API options #
+    ###############
     api = {
       token = mkOption {
         description = ''
@@ -52,6 +85,9 @@ in
         type = types.bool;
       };
     };
+    #############
+    #  Secrets  #
+    #############
     backblaze = {
       bucket = mkOption {
         description = "Bucket name used for userdata backups";
@@ -72,6 +108,9 @@ in
         type = types.nullOr types.str;
       };
     };
+    ##############
+    #  Services  #
+    ##############
     databasePassword = mkOption {
       description = ''
         Password for the database
@@ -126,12 +165,18 @@ in
         type = types.nullOr types.bool;
       };
     };
+    #############
+    #  Backups  #
+    #############
     resticPassword = mkOption {
       description = ''
         Password for the restic
       '';
       type = types.nullOr types.str;
     };
+    #########
+    #  SSH  #
+    #########
     ssh = {
       enable = mkOption {
         default = true;
@@ -142,7 +187,7 @@ in
           Root SSH Keys
         '';
         type = types.nullOr (types.listOf types.str);
-        default = [""];
+        default = [ "" ];
       };
       passwordAuthentication = mkOption {
         description = ''
@@ -152,19 +197,15 @@ in
         type = types.nullOr types.bool;
       };
     };
-    timezone = mkOption {
-      description = ''
-        Timezone used by the server
-      '';
-      type = types.nullOr types.str;
-      default = "Europe/Uzhgorod";
-    };
+    ###########
+    #  Users  #
+    ###########
     users = mkOption {
       description = ''
         Users that will be created on the server
       '';
       type = types.nullOr (types.listOf (types.attrsOf types.anything));
-      default = [];
+      default = [ ];
     };
   };
 }

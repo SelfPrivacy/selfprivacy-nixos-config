@@ -59,8 +59,8 @@ in
   environment.variables = {
     DOMAIN = config.services.userdata.domain;
   };
-  system.autoUpgrade.enable = true;
-  system.autoUpgrade.allowReboot = false;
+  system.autoUpgrade.enable = config.services.userdata.autoUpgrade.enable;
+  system.autoUpgrade.allowReboot = config.services.userdata.autoUpgrade.allowReboot;
   system.autoUpgrade.channel = https://nixos.org/channels/nixos-21.05-small;
   nix = {
     optimise.automatic = true;

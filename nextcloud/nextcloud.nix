@@ -18,7 +18,7 @@ in
 
     config = {
       # Further forces Nextcloud to use HTTPS
-      overwriteProtocol = "http";
+      overwriteProtocol = "https";
 
       # Nextcloud PostegreSQL database configuration, recommended over using SQLite
       dbtype = "sqlite";
