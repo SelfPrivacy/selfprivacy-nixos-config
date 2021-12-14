@@ -3,6 +3,15 @@ let
   cfg = config.services.userdata;
 in
 {
+
+  systemd = {
+    services = {
+      "restic-scheduled-backup" = {};
+    };
+    timers = {
+      "restic-scheduled-backup-timer" = {};
+    };
+  };
   services.restic.backups = {
     options = {
       passwordFile = "/etc/restic/resticPasswd";
