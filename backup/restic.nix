@@ -6,39 +6,27 @@ in
 
   systemd = {
     services = {
-      "restic-scheduled-backup" = {};
+      "restic-scheduled-backup" = {
+        description = "Userdata restic backup trigger";
+        serviceConfig = {
+          Type = "simple";
+          User = "restic";
+          ExecStart = "${pkgs.restic}/bin/restic -r rclone:backblaze:${cfg.backblaze.bucket}:/sfbackup --verbose --json backup /var";
+        };
+      };
     };
     timers = {
-      "restic-scheduled-backup-timer" = {};
-    };
-  };
-  services.restic.backups = {
-    options = {
-      passwordFile = "/etc/restic/resticPasswd";
-      repository = "s3:s3.anazonaws.com/${cfg.backblaze.bucket}";
-      initialize = true;
-      paths = [
-        "/var/dkim"
-        "/var/vmail"
-      ];
-      timerConfig = {
-        OnCalendar = [ "daily" ];
+      "restic-scheduled-backup" = {
+        wantedBy = [ "timers.target" ];
+        partOf = [ "restic-scheduled-backup.service" ];
+        timerConfig = {
+          OnCalendar = "daily";
+        };
       };
-      user = "restic";
-      pruneOpts = [
-        "--keep-daily 5"
-      ];
     };
   };
   users.users.restic = {
     isNormalUser = false;
     isSystemUser = true;
   };
-  environment.etc."restic/resticPasswd".text = ''
-    ${cfg.resticPassword}
-  '';
-  environment.etc."restic/s3Passwd".text = ''
-    AWS_ACCESS_KEY_ID=${cfg.backblaze.accountId}
-    AWS_SECRET_ACCESS_KEY=${cfg.backblaze.accountKey}
-  '';
 }

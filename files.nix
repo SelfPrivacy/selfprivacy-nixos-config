@@ -14,6 +14,12 @@ in
         CLOUDFLARE_DNS_API_TOKEN=${cfg.cloudflare.apiKey}
         CLOUDFLARE_ZONE_API_TOKEN=${cfg.cloudflare.apiKey}
       '';
+      rcloneConfiguration = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] ''
+        [backblaze]
+        type = b2
+        account = ${cfg.backblaze.accountId}
+        key = ${cfg.backblaze.accountKey}
+      '';
     in
     [
       "d /var/restic 0660 restic - - -"
@@ -28,5 +34,6 @@ in
       "f /var/nextcloud-db-pass 0440 nextcloud nextcloud - ${nextcloudDBPass}"
       "f /var/nextcloud-admin-pass 0440 nextcloud nextcloud - ${nextcloudAdminPass}"
       "f /var/cloudflareCredentials.ini 0440 nginx acmerecievers - ${cloudflareCredentials}"
+      "f /root/.config/rclone/rclone.conf 0666 selfprivacy-api selfprivacy-api - ${rcloneConfiguration}"
     ];
 }
