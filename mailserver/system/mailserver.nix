@@ -13,11 +13,6 @@ in
     })
   ];
 
-  services.dovecot2 = {
-    enablePAM = lib.mkForce true;
-    showPAMFailure = lib.mkForce true;
-  };
-
   users.users = {
     virtualMail = {
       isNormalUser = false;
@@ -34,7 +29,6 @@ in
     loginAccounts = {
       "${cfg.username}@${cfg.domain}" = {
         hashedPassword = cfg.hashedMasterPassword;
-        catchAll = [ cfg.domain ];
         sieveScript = ''
           require ["fileinto", "mailbox"];
           if header :contains "Chat-Version" "1.0"
@@ -49,7 +43,6 @@ in
         name = "${user.username}@${cfg.domain}";
         value = {
           hashedPassword = user.hashedPassword;
-          catchAll = [ cfg.domain ];
           sieveScript = ''
             require ["fileinto", "mailbox"];
             if header :contains "Chat-Version" "1.0"

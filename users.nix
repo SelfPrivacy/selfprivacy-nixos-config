@@ -17,7 +17,7 @@ in
         value = {
           isNormalUser = true;
           hashedPassword = user.hashedPassword;
-          openssh.authorizedKeys.keys = user.sshKeys;
+          openssh.authorizedKeys.keys = (if user ? sshKeys then user.sshKeys else []);
         };
       })
       cfg.users);
