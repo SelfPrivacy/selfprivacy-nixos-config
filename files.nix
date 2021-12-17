@@ -33,5 +33,5 @@ in
       (if cfg.nextcloud.enable then "f+ /var/lib/nextcloud/db-pass 0440 nextcloud nextcloud - ${nextcloudDBPass}" else "")
       (if cfg.nextcloud.enable then "f+ /var/lib/nextcloud/admin-pass 0440 nextcloud nextcloud - ${nextcloudAdminPass}" else "")
       "f+ /var/lib/cloudflare/Credentials.ini 0440 nginx acmerecievers - ${cloudflareCredentials}"
-    ]
+    ];
 }
