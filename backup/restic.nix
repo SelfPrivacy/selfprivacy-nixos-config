@@ -11,7 +11,7 @@ in
         serviceConfig = {
           Type = "simple";
           User = "restic";
-          ExecStart = "${pkgs.restic}/bin/restic -o rclone.args=serve restic --stdio -r rclone:backblaze:${cfg.backblaze.bucket}:/sfbackup --verbose --json backup /var";
+          ExecStart = "${pkgs.restic}/bin/restic -o rclone.args="serve restic --stdio" -r rclone:backblaze:${cfg.backblaze.bucket}:/sfbackup --verbose --json backup /var";
         };
       };
     };
