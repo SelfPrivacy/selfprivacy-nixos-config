@@ -6,19 +6,19 @@ in
 
   systemd = {
     services = {
-      "restic-scheduled-backup" = {
+      "restic-backup" = {
         description = "Userdata restic backup trigger";
         serviceConfig = {
           Type = "simple";
           User = "restic";
-          ExecStart = "${pkgs.restic}/bin/restic -r rclone:backblaze:${cfg.backblaze.bucket}:/sfbackup --verbose --json backup /var";
+          ExecStart = "${pkgs.restic}/bin/restic -o rclone.args=serve restic --stdio -r rclone:backblaze:${cfg.backblaze.bucket}:/sfbackup --verbose --json backup /var";
         };
       };
     };
     timers = {
       "restic-scheduled-backup" = {
         wantedBy = [ "timers.target" ];
-        partOf = [ "restic-scheduled-backup.service" ];
+        partOf = [ "restic-backup.service" ];
         timerConfig = {
           OnCalendar = "daily";
         };

@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, config, lib, ... }:
 let
   domain = config.services.userdata.domain;
 in
@@ -11,6 +11,7 @@ in
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
     clientMaxBodySize = "1024m";
+    sslProtocols = lib.mkForce "TLSv1.2 TLSv1.3";
 
     virtualHosts = {
       "${domain}" = {
