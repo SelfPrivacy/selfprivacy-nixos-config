@@ -28,7 +28,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
@@ -46,7 +46,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
@@ -64,7 +64,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
@@ -87,7 +87,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
@@ -112,7 +112,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
@@ -156,7 +156,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
@@ -179,7 +179,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
@@ -203,7 +203,7 @@ in
           limit_conn perserver 1000;
           limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
-          add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
           add_header X-Frame-Options DENY;
           add_header X-Content-Type-Options nosniff;
