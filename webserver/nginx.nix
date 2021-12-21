@@ -24,9 +24,6 @@ in
         sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
@@ -42,9 +39,6 @@ in
         sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
@@ -60,9 +54,6 @@ in
         sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
@@ -83,9 +74,6 @@ in
         sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
@@ -108,9 +96,6 @@ in
         root = pkgs.jitsi-meet;
         extraConfig = ''
           ssi on;
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
@@ -152,9 +137,6 @@ in
         sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
@@ -175,9 +157,6 @@ in
         sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
@@ -199,9 +178,6 @@ in
         root = "/var/www/social.${domain}";
         forceSSL = true;
         extraConfig = ''
-          limit_conn perip 25;
-          limit_conn perserver 1000;
-          limit_req zone=mylimit burst=35 delay=25;
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
           add_header 'Referrer-Policy' 'origin-when-cross-origin';
