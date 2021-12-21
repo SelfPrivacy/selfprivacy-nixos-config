@@ -6,7 +6,7 @@ in
   services.restic.backups = {
     varBackup = {
       passwordFile = "/var/lib/restic/pass";
-      repository = "rclone:backblaze:${cfg.backblaze.bucket}:/sfbackup";
+      repository = "rclone:${cfg.backblaze.bucket}:/sfbackup";
       extraOptions = [ "rclone.args='serve restic --stdio'" ];
       rcloneConfig = {
         type = "b2";
