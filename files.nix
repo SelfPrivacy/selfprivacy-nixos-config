@@ -25,8 +25,9 @@ in
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 bitwarden_rs bitwarden_rs -" else "")
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 bitwarden_rs bitwarden_rs -" else "")
       (if cfg.pleroma.enable then "d /var/lib/pleroma 0700 pleroma pleroma - -" else "")
-      "d /var/lib/restic 0600 restic - - -"
+      "d /var/lib/restic 0700 restic - - -"
       "f+ /var/lib/restic/pass 0400 restic - - ${resticPass}"
+      "f+ /var/lib/restic/rclone.conf 0400 restic - - ${rcloneConfig}"
       "f+ /root/.config/rclone/rclone.conf 0400 root root - ${rcloneConfig}"
       (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
