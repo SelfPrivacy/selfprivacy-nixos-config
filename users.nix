@@ -21,5 +21,10 @@ in
         };
       })
       cfg.users);
+    groups = {
+      shared = {
+        members = [ "restic" ];
+      };
+    };  
   };
 }

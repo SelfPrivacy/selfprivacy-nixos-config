@@ -22,9 +22,10 @@ in
       '';
     in
     [
-      (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 bitwarden_rs bitwarden_rs -" else "")
-      (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 bitwarden_rs bitwarden_rs -" else "")
+      (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 vaultwarden vaultwarden -" else "")
+      (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 vaultwarden vaultwarden -" else "")
       (if cfg.pleroma.enable then "d /var/lib/pleroma 0700 pleroma pleroma - -" else "")
+      "d /var 0740 root shared - -"
       "d /var/lib/restic 0700 restic - - -"
       "f+ /var/lib/restic/pass 0400 restic - - ${resticPass}"
       "f+ /root/.config/rclone/rclone.conf 0400 root root - ${rcloneConfig}"
