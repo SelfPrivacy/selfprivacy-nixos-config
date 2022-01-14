@@ -84,6 +84,13 @@ in
         '';
         type = types.bool;
       };
+      skippedMigrations = mkOption {
+        default = [ ];
+        description = ''
+          List of migrations that should be skipped
+        '';
+        type = types.listOf types.str;
+      };
     };
     #############
     #  Secrets  #
