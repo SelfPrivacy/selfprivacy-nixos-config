@@ -43,6 +43,12 @@
                 },
                 "enableSwagger": {
                     "type": "boolean"
+                },
+                "skippedMigrations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
