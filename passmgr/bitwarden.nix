@@ -11,6 +11,7 @@ in
       domain = "https://password.${cfg.domain}/";
       signupsAllowed = true;
       rocketPort = 8222;
+      adminToken = "${cfg.databasePassword}";
     };
   };
 }
