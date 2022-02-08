@@ -35,8 +35,8 @@ in
   networking = {
     hostName = config.services.userdata.hostname;
     firewall = {
-      allowedTCPPorts = lib.mkForce [ 22 25 80 143 443 465 587 993 8443 ];
-      allowedUDPPorts = lib.mkForce [ 8443 ];
+      allowedTCPPorts = lib.mkForce [ 22 25 80 143 443 465 587 993 4443 8443 ];
+      allowedUDPPorts = lib.mkForce [ 8443 10000 ];
     };
     nameservers = [ "1.1.1.1" "1.0.0.1" ];
   };
