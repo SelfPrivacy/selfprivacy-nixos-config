@@ -6,7 +6,7 @@ in
   services.jitsi-meet = {
     enable = config.services.userdata.jitsi.enable;
     hostName = "meet.${domain}";
-    nginx.enable = false;
+    nginx.enable = true;
     interfaceConfig = {
       SHOW_JITSI_WATERMARK = false;
       SHOW_WATERMARK_FOR_GUESTS = false;
