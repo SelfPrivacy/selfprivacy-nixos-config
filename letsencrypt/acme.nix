@@ -17,12 +17,6 @@ in
         dnsProvider = "cloudflare";
         credentialsFile = "/var/lib/cloudflare/Credentials.ini";
       };
-      "meet.${cfg.domain}" = {
-        domain = "meet.${cfg.domain}";
-        group = "acmerecievers";
-        dnsProvider = "cloudflare";
-        credentialsFile = "/var/lib/cloudflare/Credentials.ini";
-      };
     };
   };
 }
