@@ -9,7 +9,7 @@ in
   security.acme = {
     acceptTerms = true;
     email = "${cfg.username}@${cfg.domain}";
-    certs = {
+    certs = lib.mkForce {
       "${cfg.domain}" = {
         domain = "*.${cfg.domain}";
         extraDomainNames = [ "${cfg.domain}" ];
