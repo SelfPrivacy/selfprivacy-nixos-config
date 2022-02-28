@@ -6,7 +6,6 @@ in
 {
   imports = [
     ./hardware-configuration.nix
-
     ./variables-module.nix
     ./variables.nix
     ./files.nix
@@ -34,9 +33,14 @@ in
   boot.cleanTmpDir = true;
   networking = {
     hostName = config.services.userdata.hostname;
+    usePredictableInterfaceNames = false;
     firewall = {
       allowedTCPPorts = lib.mkForce [ 22 25 80 143 443 465 587 993 4443 8443 ];
       allowedUDPPorts = lib.mkForce [ 8443 10000 ];
+      extraCommands = ''
+        iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE
+        iptables --append FORWARD --in-interface vpn00 -j ACCEPT
+      '';
     };
     nameservers = [ "1.1.1.1" "1.0.0.1" ];
   };
