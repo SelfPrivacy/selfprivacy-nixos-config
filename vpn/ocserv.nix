@@ -10,6 +10,7 @@ in
     isNormalUser = false;
     isSystemUser = true;
     extraGroups = [ "ocserv" "acmerecievers" ];
+    group = "ocserv";
   };
   services.ocserv = {
     enable = config.services.userdata.ocserv.enable;

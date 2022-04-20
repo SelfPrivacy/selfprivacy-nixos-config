@@ -24,6 +24,7 @@ in
   users.users.restic = {
     isNormalUser = false;
     isSystemUser = true;
+    group = "restic";
   };
   environment.etc."restic/resticPasswd".text = ''
     ${cfg.resticPassword}
