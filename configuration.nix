@@ -12,12 +12,12 @@ in
     ./users.nix
     ./mailserver/system/mailserver.nix
     ./mailserver/system/alps.nix
-    ./vpn/ocserv.nix
     ./api/api.nix
     ./api/api-module.nix
     ./social/pleroma.nix
     ./letsencrypt/acme.nix
     ./letsencrypt/resolve.nix
+    ./vpn/ocserv.nix
     ./backup/restic.nix
     ./passmgr/bitwarden.nix
     ./webserver/nginx.nix
