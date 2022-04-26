@@ -39,5 +39,6 @@ in
     extraGroups = [ "postgres" ];
     isNormalUser = false;
     isSystemUser = true;
+    group = "pleroma";
   };
 }

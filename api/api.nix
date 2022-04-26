@@ -14,6 +14,7 @@
     isNormalUser = false;
     isSystemUser = true;
     extraGroups = [ "opendkim" ];
+    group = "selfprivacy-api";
   };
   users.groups."selfprivacy-api" = {
     members = [ "selfprivacy-api" ];
