@@ -93,6 +93,7 @@ in
         User = "root";
         ExecStart = "${pkgs.nixos-rebuild}/bin/nixos-rebuild switch";
         KillMode = "none";
+        SendSIGKILL = "no";
       };
     };
     # One shot systemd service to upgrade NixOS using nixos-rebuild
@@ -107,6 +108,7 @@ in
         User = "root";
         ExecStart = "${pkgs.nixos-rebuild}/bin/nixos-rebuild switch --upgrade";
         KillMode = "none";
+        SendSIGKILL = "no";
       };
     };
     # One shot systemd service to rollback NixOS using nixos-rebuild
@@ -121,6 +123,7 @@ in
         User = "root";
         ExecStart = "${pkgs.nixos-rebuild}/bin/nixos-rebuild switch --rollback";
         KillMode = "none";
+        SendSIGKILL = "no";
       };
     };
   };
