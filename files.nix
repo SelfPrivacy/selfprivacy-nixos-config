@@ -5,16 +5,16 @@ in
 {
   systemd.tmpfiles.rules =
     let
-      nextcloudDBPass = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] cfg.nextcloud.databasePassword;
-      nextcloudAdminPass = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] cfg.nextcloud.adminPassword;
-      resticPass = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] cfg.resticPassword;
-      domain = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] cfg.domain;
-      cloudflareCredentials = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] ''
+      nextcloudDBPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.nextcloud.databasePassword;
+      nextcloudAdminPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.nextcloud.adminPassword;
+      resticPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.resticPassword;
+      domain = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.domain;
+      cloudflareCredentials = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] ''
         CF_API_KEY=${cfg.cloudflare.apiKey}
         CLOUDFLARE_DNS_API_TOKEN=${cfg.cloudflare.apiKey}
         CLOUDFLARE_ZONE_API_TOKEN=${cfg.cloudflare.apiKey}
       '';
-      rcloneConfig = builtins.replaceStrings [ "\n" "\"" "\\" ] [ "\\n" "\\\"" "\\\\" ] ''
+      rcloneConfig = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] ''
         [backblaze]
         type = b2
         account = ${cfg.backblaze.accountId}
