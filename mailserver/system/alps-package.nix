@@ -4,7 +4,7 @@ buildGoModule rec {
   version = "v1.0.0"; # latest available tag at the moment
 
   src = fetchGit {
-    url = "https://git.selfprivacy.org/ilchub/selfprivacy-alps";
+    url = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-alps";
     rev = "dc2109ca2fdabfbda5d924faa4947f5694d5d758";
   };
 
@@ -24,7 +24,7 @@ buildGoModule rec {
 
   meta = with lib; {
     description = "Webmail application for the dovecot/postfix mailserver";
-    homepage = "https://git.selfprivacy.org/ilchub/selfprivacy-alps";
+    homepage = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-alps";
     license = licenses.mit;
   };
 }
