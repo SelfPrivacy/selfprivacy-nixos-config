@@ -11,7 +11,6 @@ in
     ./files.nix
     ./users.nix
     ./mailserver/system/mailserver.nix
-    ./mailserver/system/alps.nix
     ./vpn/ocserv.nix
     ./api/api.nix
     ./api/api-module.nix
