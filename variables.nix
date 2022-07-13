@@ -25,7 +25,7 @@ in
     api = {
       token = jsonData.api.token;
       enableSwagger = (
-        if (jsonData ? "api" && jsonData.api "enableSwagger")
+        if (jsonData ? "api" && jsonData.api ? "enableSwagger")
         then jsonData.api.enableSwagger
         else false
       );
