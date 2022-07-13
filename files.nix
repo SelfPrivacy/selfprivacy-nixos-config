@@ -17,7 +17,7 @@ in
     ];
   system.activationScripts = let
     jq = "${pkgs.jq}/bin/jq";
-    sed = "${pkgs.sed}/bin/sed";
+    sed = "${pkgs.gnused}/bin/sed";
   in
   {
     nextcloudSecrets =
