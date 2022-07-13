@@ -3,11 +3,6 @@ let
   cfg = config.services.userdata;
 in
 {
-  nixpkgs.overlays = [
-    (self: super: {
-      pleroma-otp = self.callPackage ./pleroma-package.nix { };
-    })
-  ];
   services = {
     pleroma = {
       enable = cfg.pleroma.enable;
