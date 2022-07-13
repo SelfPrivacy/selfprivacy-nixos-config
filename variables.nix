@@ -29,25 +29,25 @@ in
     };
     databasePassword = (if jsonData ? "databasePassword" then jsonData.databasePassword else null);
     bitwarden = {
-      enable = (jsonData ? "bitwarden.enable" then jsonData.bitwarden.enable else false);
+      enable = (if jsonData ? "bitwarden.enable" then jsonData.bitwarden.enable else false);
     };
     gitea = {
-      enable = (jsonData ? "gitea.enable" then jsonData.gitea.enable else false);
+      enable = (if jsonData ? "gitea.enable" then jsonData.gitea.enable else false);
     };
     nextcloud = {
-      enable = (jsonData ? "nextcloud.enable" then jsonData.nextcloud.enable else false);
+      enable = (if jsonData ? "nextcloud.enable" then jsonData.nextcloud.enable else false);
       adminPassword = (jsonData ? "nextcloud.adminPassword" then jsonData.nextcloud.adminPassword else null);
     };
     pleroma = {
-      enable = (jsonData ? "pleroma.enable" then jsonData.pleroma.enable else false);
+      enable = (if jsonData ? "pleroma.enable" then jsonData.pleroma.enable else false);
     };
     jitsi = {
-      enable = (jsonData ? "jitsi.enable" then jsonData.jitsi.enable else false);
+      enable = (if jsonData ? "jitsi.enable" then jsonData.jitsi.enable else false);
     };
     ocserv = {
-      enable = (jsonData ? "ocserv.enable" then jsonData.ocserv.enable else false);
+      enable = (if jsonData ? "ocserv.enable" then jsonData.ocserv.enable else false);
     };
-    resticPassword = (jsonData ? "resticPassword" then jsonData.resticPassword else null);
+    resticPassword = (if jsonData ? "resticPassword" then jsonData.resticPassword else null);
     ssh = {
       enable = (if jsonData ? "ssh.enable" then jsonData.ssh.enable else true);
       rootKeys = (if jsonData ? "ssh.rootKeys" then jsonData.ssh.rootKeys else [ ]);
