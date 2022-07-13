@@ -5,7 +5,7 @@ in
 {
   systemd.tmpfiles.rules =
     let
-      nextcloudDBPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] (builtins.fromJSON (builtins.readFile ./userdata/userdata.json).nextcloud.databasePassword);
+      nextcloudDBPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] (builtins.fromJSON (builtins.readFile ./userdata/userdata.json)).nextcloud.databasePassword;
       nextcloudAdminPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.nextcloud.adminPassword;
       resticPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.resticPassword;
       domain = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.domain;
