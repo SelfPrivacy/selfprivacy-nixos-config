@@ -20,9 +20,9 @@ in
       skippedMigrations = (if jsonData ? "api.skippedMigrations" then jsonData.api.skippedMigrations else [ ]);
     };
     backblaze = {
-      bucket = (if jsonData ? "backblaze.bucket" then jsonData.backblaze.bucket else null);
-      accountId = (if jsonData ? "backblaze.accountId" then jsonData.backblaze.accountId else null);
-      accountKey = (if jsonData ? "backblaze.accountKey" then jsonData.backblaze.accountKey else null);
+      bucket = (if jsonData ? "backblaze.bucket" then jsonData.backblaze.bucket else "");
+      accountId = (if jsonData ? "backblaze.accountId" then jsonData.backblaze.accountId else "");
+      accountKey = (if jsonData ? "backblaze.accountKey" then jsonData.backblaze.accountKey else "");
     };
     cloudflare = {
       apiKey = (if jsonData ? "cloudflare.apiKey" then jsonData.cloudflare.apiKey else null);
