@@ -5,33 +5,54 @@ in
 {
   systemd.tmpfiles.rules =
     let
-      nextcloudDBPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] (builtins.fromJSON (builtins.readFile ./userdata/userdata.json)).nextcloud.databasePassword;
-      nextcloudAdminPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.nextcloud.adminPassword;
-      resticPass = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.resticPassword;
       domain = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] cfg.domain;
-      cloudflareCredentials = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] ''
-        CF_API_KEY=${cfg.cloudflare.apiKey}
-        CLOUDFLARE_DNS_API_TOKEN=${cfg.cloudflare.apiKey}
-        CLOUDFLARE_ZONE_API_TOKEN=${cfg.cloudflare.apiKey}
-      '';
-      rcloneConfig = builtins.replaceStrings [ "\n" "\"" "\\" "%" ] [ "\\n" "\\\"" "\\\\" "%%" ] ''
-        [backblaze]
-        type = b2
-        account = ${cfg.backblaze.accountId}
-        key = ${cfg.backblaze.accountKey}
-      '';
     in
     [
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 vaultwarden vaultwarden -" else "")
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 vaultwarden vaultwarden -" else "")
       (if cfg.pleroma.enable then "d /var/lib/pleroma 0700 pleroma pleroma - -" else "")
       "d /var/lib/restic 0600 restic - - -"
-      "f+ /var/lib/restic/pass 0400 restic - - ${resticPass}"
-      "f+ /root/.config/rclone/rclone.conf 0400 root root - ${rcloneConfig}"
       (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
-      (if cfg.nextcloud.enable then "f+ /var/lib/nextcloud/db-pass 0440 nextcloud nextcloud - ${nextcloudDBPass}" else "")
-      (if cfg.nextcloud.enable then "f+ /var/lib/nextcloud/admin-pass 0440 nextcloud nextcloud - ${nextcloudAdminPass}" else "")
-      "f+ /var/lib/cloudflare/Credentials.ini 0440 nginx acmerecievers - ${cloudflareCredentials}"
     ];
+  system.activationScripts = {
+    nextcloudSecrets =
+      if cfg.nextcloud.enable then ''
+        cat /etc/nixos/userdata/userdata.json | jq -r '.nextcloud.databasePassword' > /var/lib/nextcloud/db-pass
+        chmod 0440 /var/lib/nextcloud/db-pass
+        chown nextcloud:nextcloud /var/lib/nextcloud/db-pass
+
+        cat /etc/nixos/userdata/userdata.json | jq -r '.nextcloud.adminPassword' > /var/lib/nextcloud/admin-pass
+        chmod 0440 /var/lib/nextcloud/admin-pass
+        chown nextcloud:nextcloud /var/lib/nextcloud/admin-pass
+      ''
+      else ''
+        rm /var/lib/nextcloud/db-pass
+        rm /var/lib/nextcloud/admin-pass
+      '';
+    cloudflareCredentials = ''
+      echo 'CF_API_KEY=REPLACEME' > /var/lib/cloudflare/Credentials.ini
+      echo 'CLOUDFLARE_DNS_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
+      echo 'CLOUDFLARE_ZONE_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
+      sed -i "s/REPLACEME/$(cat /etc/nixos/userdata/userdata.json | jq -r '.cloudflare.apiKey')/g" /var/lib/cloudflare/Credentials.ini
+      chmod 0440 /var/lib/cloudflare/Credentials.ini
+      chown nginx:acmerecievers /var/lib/cloudflare/Credentials.ini
+    '';
+    resticCredentials = ''
+      echo '[backblaze]' > /root/.config/rclone/rclone.conf
+      echo 'type = b2' >> /root/.config/rclone/rclone.conf
+      echo 'account = REPLACEME1' >> /root/.config/rclone/rclone.conf
+      echo 'key = REPLACEME2' >> /root/.config/rclone/rclone.conf
+
+      sed -i "s/REPLACEME1/$(cat /etc/nixos/userdata/userdata.json | jq -r '.backblaze.accountId')/g" /root/.config/rclone/rclone.conf
+      sed -i "s/REPLACEME2/$(cat /etc/nixos/userdata/userdata.json | jq -r '.backblaze.accountKey')/g" /root/.config/rclone/rclone.conf
+
+      chmod 0400 /root/.config/rclone/rclone.conf
+      chown root:root /root/.config/rclone/rclone.conf
+
+      cat /etc/nixos/userdata/userdata.json | jq -r '.resticPassword' > /var/lib/restic/pass
+      chmod 0400 /var/lib/restic/pass
+      chown restic /var/lib/restic/pass
+    '';
+  };
 }

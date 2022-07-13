@@ -58,6 +58,7 @@ in
   };
   environment.systemPackages = with pkgs; [
     git
+    jq
   ];
   environment.variables = {
     DOMAIN = config.services.userdata.domain;
