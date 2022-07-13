@@ -141,12 +141,12 @@ in
         default = true;
         type = types.nullOr types.bool;
       };
-      databasePassword = mkOption {
-        description = ''
-          Password for the nextcloud database
-        '';
-        type = types.nullOr types.str;
-      };
+      # databasePassword = mkOption {
+      #   description = ''
+      #     Password for the nextcloud database
+      #   '';
+      #   type = types.nullOr types.str;
+      # };
       adminPassword = mkOption {
         description = ''
           Password for the nextcloud admin user
