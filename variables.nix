@@ -54,7 +54,7 @@ in
     };
     cloudflare = {
       apiKey = (
-        if (jsonData ? "cloudflare" && jsonData.cloudflare ? "apiKey"))
+        if (jsonData ? "cloudflare" && jsonData.cloudflare ? "apiKey")
         then jsonData.cloudflare.apiKey
         else null
       );
