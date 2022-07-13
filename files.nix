@@ -31,8 +31,8 @@ in
         chown nextcloud:nextcloud /var/lib/nextcloud/admin-pass
       ''
       else ''
-        rm /var/lib/nextcloud/db-pass
-        rm /var/lib/nextcloud/admin-pass
+        rm -f /var/lib/nextcloud/db-pass
+        rm -f /var/lib/nextcloud/admin-pass
       '';
     cloudflareCredentials = ''
       echo 'CF_API_KEY=REPLACEME' > /var/lib/cloudflare/Credentials.ini
