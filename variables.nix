@@ -50,7 +50,7 @@ in
     resticPassword = (if jsonData ? "resticPassword" then jsonData.resticPassword else null);
     ssh = {
       enable = (if jsonData ? "ssh.enable" then jsonData.ssh.enable else true);
-      rootKeys = (if jsonData ? "ssh.rootKeys" then jsonData.ssh.rootKeys else [ ]);
+      rootKeys = (if jsonData ? "ssh.rootKeys" then jsonData.ssh.rootKeys else [ "" ]);
       passwordAuthentication = (if jsonData ? "ssh.passwordAuthentication" then jsonData.ssh.passwordAuthentication else true);
     };
     users = (if jsonData ? "users" then jsonData.users else [ ]);
