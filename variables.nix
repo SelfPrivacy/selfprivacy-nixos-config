@@ -36,7 +36,7 @@ in
     };
     nextcloud = {
       enable = (if jsonData ? "nextcloud.enable" then jsonData.nextcloud.enable else false);
-      adminPassword = (jsonData ? "nextcloud.adminPassword" then jsonData.nextcloud.adminPassword else null);
+      adminPassword = (if jsonData ? "nextcloud.adminPassword" then jsonData.nextcloud.adminPassword else null);
     };
     pleroma = {
       enable = (if jsonData ? "pleroma.enable" then jsonData.pleroma.enable else false);
