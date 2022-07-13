@@ -11,10 +11,6 @@ let
 in
 {
   options.services.userdata = {
-    enable = mkOption {
-      default = true;
-      type = types.nullOr types.bool;
-    };
     # General server options
     hostname = mkOption {
       description = "The hostname of the server.";
