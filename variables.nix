@@ -21,8 +21,6 @@ in
     };
     backblaze = {
       bucket = lib.attrsets.attrByPath [ "backblaze" "bucket" ] "" jsonData;
-      accountId = lib.attrsets.attrByPath [ "backblaze" "accountId" ] "" jsonData;
-      accountKey = lib.attrsets.attrByPath [ "backblaze" "accountKey" ] "" jsonData;
     };
     cloudflare = {
       apiKey = lib.attrsets.attrByPath [ "cloudflare" "apiKey" ] "" jsonData;

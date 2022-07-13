@@ -31,18 +31,6 @@ in
         Enable Swagger UI
       '';
     };
-    b2AccountId = mkOption {
-      type = types.str;
-      description = ''
-        B2 account ID
-      '';
-    };
-    b2AccountKey = mkOption {
-      type = types.str;
-      description = ''
-        B2 account key
-      '';
-    };
     b2Bucket = mkOption {
       type = types.str;
       description = ''
@@ -66,8 +54,6 @@ in
         PYTHONUNBUFFERED = "1";
         AUTH_TOKEN = cfg.token;
         ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
-        B2_ACCOUNT_ID = cfg.b2AccountId;
-        B2_ACCOUNT_KEY = cfg.b2AccountKey;
         B2_BUCKET = cfg.b2Bucket;
         RESTIC_PASSWORD = cfg.resticPassword;
       } // config.networking.proxy.envVars;

@@ -26,11 +26,4 @@ in
     isSystemUser = true;
     group = "restic";
   };
-  environment.etc."restic/resticPasswd".text = ''
-    ${cfg.resticPassword}
-  '';
-  environment.etc."restic/s3Passwd".text = ''
-    AWS_ACCESS_KEY_ID=${cfg.backblaze.accountId}
-    AWS_SECRET_ACCESS_KEY=${cfg.backblaze.accountKey}
-  '';
 }

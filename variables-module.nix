@@ -96,14 +96,6 @@ in
         description = "Bucket name used for userdata backups";
         type = types.nullOr types.str;
       };
-      accountId = mkOption {
-        description = "Backblaze B2 Account ID";
-        type = types.nullOr types.str;
-      };
-      accountKey = mkOption {
-        description = "Backblaze B2 Account Key.";
-        type = types.nullOr types.str;
-      };
     };
     cloudflare = {
       apiKey = mkOption {

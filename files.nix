@@ -54,7 +54,7 @@ in
       chmod 0400 /root/.config/rclone/rclone.conf
       chown root:root /root/.config/rclone/rclone.conf
 
-      cat /etc/nixos/userdata/userdata.json | jq -r '.resticPassword' > /var/lib/restic/pass
+      cat /etc/nixos/userdata/userdata.json | ${jq} -r '.resticPassword' > /var/lib/restic/pass
       chmod 0400 /var/lib/restic/pass
       chown restic /var/lib/restic/pass
     '';
