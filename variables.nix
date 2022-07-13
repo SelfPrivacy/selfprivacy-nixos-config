@@ -4,55 +4,55 @@ let
 in
 {
   services.userdata = {
-    hostname = jsonData.hostname;
-    domain = jsonData.domain;
-    timezone = jsonData.timezone;
+    hostname = if jsonData ? "hostname" then jsonData.hostname else null;
+    domain = if jsonData ? "domain" then jsonData.domain else null;
+    timezone = if jsonData ? "timezone" then jsonData.timezone else "Europe/Uzhgorod";
     autoUpgrade = {
-      enable = jsonData.autoUpgrade.enable;
-      allowReboot = jsonData.autoUpgrade.allowReboot;
+      enable = if jsonData ? "autoUpgrade.enable" then jsonData.autoUpgrade.enable else true;
+      allowReboot = if jsonData ? "autoUpgrade.allowReboot" then jsonData.autoUpgrade.allowReboot else true;
     };
-    username = jsonData.username;
-    hashedMasterPassword = jsonData.hashedMasterPassword;
-    sshKeys = jsonData.sshKeys;
+    username = if jsonData ? "username" then jsonData.username else null;
+    hashedMasterPassword = if jsonData ? "hashedMasterPassword" then jsonData.hashedMasterPassword else null;
+    sshKeys = if jsonData ? "sshKeys" then jsonData.sshKeys else [];
     api = {
       token = jsonData.api.token;
-      enableSwagger = jsonData.api.enableSwagger;
-      skippedMigrations = jsonData.api.skippedMigrations;
+      enableSwagger = if jsonData ? "api.enableSwagger" then jsonData.api.enableSwagger else false;
+      skippedMigrations = if jsonData ? "api.skippedMigrations" then jsonData.api.skippedMigrations else [];
     };
     backblaze = {
-      bucket = jsonData.backblaze.bucket;
-      accountId = jsonData.backblaze.accountId;
-      accountKey = jsonData.backblaze.accountKey;
+      bucket = if jsonData ? "backblaze.bucket" then jsonData.backblaze.bucket else null;
+      accountId = if jsonData ? "backblaze.accountId" then jsonData.backblaze.accountId else null;
+      accountKey = if jsonData ? "backblaze.accountKey" then jsonData.backblaze.accountKey else null;
     };
     cloudflare = {
-      apiKey = jsonData.cloudflare.apiKey;
+      apiKey = if jsonData ? "cloudflare.apiKey" then jsonData.cloudflare.apiKey else null;
     };
-    databasePassword = jsonData.databasePassword;
+    databasePassword = if jsonData ? "databasePassword" then jsonData.databasePassword else null;
     bitwarden = {
-      enable = jsonData.bitwarden.enable;
+      enable = jsonData ? "bitwarden.enable" then jsonData.bitwarden.enable else false;
     };
     gitea = {
-      enable = jsonData.gitea.enable;
+      enable = jsonData ? "gitea.enable" then jsonData.gitea.enable else false;
     };
     nextcloud = {
-      enable = jsonData.nextcloud.enable;
-      adminPassword = jsonData.nextcloud.adminPassword;
+      enable = jsonData ? "nextcloud.enable" then jsonData.nextcloud.enable else false;
+      adminPassword = jsonData ? "nextcloud.adminPassword" then jsonData.nextcloud.adminPassword else null;
     };
     pleroma = {
-      enable = jsonData.pleroma.enable;
+      enable = jsonData ? "pleroma.enable" then jsonData.pleroma.enable else false;
     };
     jitsi = {
-      enable = jsonData.jitsi.enable;
+      enable = jsonData ? "jitsi.enable" then jsonData.jitsi.enable else false;
     };
     ocserv = {
-      enable = jsonData.ocserv.enable;
+      enable = jsonData ? "ocserv.enable" then jsonData.ocserv.enable else false;
     };
-    resticPassword = jsonData.resticPassword;
+    resticPassword = jsonData ? "resticPassword" then jsonData.resticPassword else null;
     ssh = {
-      enable = jsonData.ssh.enable;
+      enable = if jsonData ? "ssh.enable" then jsonData.ssh.enable else true;
       rootKeys = jsonData.ssh.rootKeys;
       passwordAuthentication = jsonData.ssh.passwordAuthentication;
     };
-    users = jsonData.users;
+    users = (if jsonData ? "users" then jsonData.users else [ ]);
   };
 }
