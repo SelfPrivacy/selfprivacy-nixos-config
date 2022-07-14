@@ -2,10 +2,8 @@
 {
   services.selfprivacy-api = {
     enable = true;
-    token = config.services.userdata.api.token;
     enableSwagger = config.services.userdata.api.enableSwagger;
     b2Bucket = config.services.userdata.backblaze.bucket;
-    resticPassword = config.services.userdata.resticPassword;
   };
 
   users.users."selfprivacy-api" = {

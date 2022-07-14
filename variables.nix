@@ -15,17 +15,12 @@ in
     hashedMasterPassword = lib.attrsets.attrByPath [ "hashedMasterPassword" ] null jsonData;
     sshKeys = lib.attrsets.attrByPath [ "sshKeys" ] [] jsonData;
     api = {
-      token = jsonData.api.token;
       enableSwagger = lib.attrsets.attrByPath [ "api" "enableSwagger" ] false jsonData;
       skippedMigrations = lib.attrsets.attrByPath [ "api" "skippedMigrations" ] [] jsonData;
     };
     backblaze = {
       bucket = lib.attrsets.attrByPath [ "backblaze" "bucket" ] "" jsonData;
     };
-    cloudflare = {
-      apiKey = lib.attrsets.attrByPath [ "cloudflare" "apiKey" ] "" jsonData;
-    };
-    databasePassword = lib.attrsets.attrByPath [ "databasePassword" ] null jsonData;
     bitwarden = {
       enable = lib.attrsets.attrByPath [ "bitwarden" "enable" ] false jsonData;
     };
@@ -34,7 +29,6 @@ in
     };
     nextcloud = {
       enable = lib.attrsets.attrByPath [ "nextcloud" "enable" ] false jsonData;
-      adminPassword = lib.attrsets.attrByPath [ "nextcloud" "adminPassword" ] "" jsonData;
     };
     pleroma = {
       enable = lib.attrsets.attrByPath [ "pleroma" "enable" ] false jsonData;
@@ -45,7 +39,6 @@ in
     ocserv = {
       enable = lib.attrsets.attrByPath [ "ocserv" "enable" ] false jsonData;
     };
-    resticPassword = lib.attrsets.attrByPath [ "resticPassword" ] null jsonData;
     ssh = {
       enable = lib.attrsets.attrByPath [ "ssh" "enable" ] true jsonData;
       rootKeys = lib.attrsets.attrByPath [ "ssh" "rootKeys" ] [ "" ] jsonData;

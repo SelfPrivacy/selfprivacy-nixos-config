@@ -10,8 +10,8 @@ in
       group = "pleroma";
       configs = [
         (builtins.replaceStrings
-          [ "$DOMAIN" "$LUSER" "$DB_PASSWORD" ]
-          [ cfg.domain cfg.username cfg.databasePassword ]
+          [ "$DOMAIN" "$LUSER" ]
+          [ cfg.domain cfg.username ]
           (builtins.readFile ./config.exs))
       ];
     };
@@ -19,11 +19,20 @@ in
       enable = true;
       package = pkgs.postgresql_12;
       initialScript = "/etc/setup.psql";
+      ensureDatabases = [
+        "pleroma"
+      ];
+      ensureUsers = [
+        {
+          name = "pleroma";
+          ensurePermissions = {
+            "DATABASE pleroma" = "ALL PRIVILEGES";
+          };
+        };
+      ];
     };
   };
   environment.etc."setup.psql".text = ''
-    CREATE USER pleroma WITH ENCRYPTED PASSWORD '${cfg.databasePassword}';
-    CREATE DATABASE pleroma OWNER pleroma;
     \c pleroma;
     --Extensions made by ecto.migrate that need superuser access
     CREATE EXTENSION IF NOT EXISTS citext;

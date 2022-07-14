@@ -22,9 +22,8 @@ config :pleroma, :media_proxy,
 config :pleroma, Pleroma.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "pleroma",
-  password: "$DB_PASSWORD",
   database: "pleroma",
-  hostname: "localhost",
+  socket_dir: "/run/postgresql",
   pool_size: 10
 
 #config :web_push_encryption, :vapid_details,
@@ -41,4 +40,4 @@ config :pleroma, :http_security,
 
 #config :joken, default_signer: ""
 
-config :pleroma, configurable_from_database: false
+config :pleroma, configurable_from_database: true
