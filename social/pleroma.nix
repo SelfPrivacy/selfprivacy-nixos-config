@@ -18,7 +18,7 @@ in
     postgresql = {
       enable = true;
       package = pkgs.postgresql_12;
-      initialScript = "/etc/setup.psql";
+      # initialScript = "/etc/setup.psql";
       ensureDatabases = [
         "pleroma"
       ];
