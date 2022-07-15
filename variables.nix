@@ -13,10 +13,10 @@ in
     };
     username = lib.attrsets.attrByPath [ "username" ] null jsonData;
     hashedMasterPassword = lib.attrsets.attrByPath [ "hashedMasterPassword" ] null jsonData;
-    sshKeys = lib.attrsets.attrByPath [ "sshKeys" ] [] jsonData;
+    sshKeys = lib.attrsets.attrByPath [ "sshKeys" ] [ ] jsonData;
     api = {
       enableSwagger = lib.attrsets.attrByPath [ "api" "enableSwagger" ] false jsonData;
-      skippedMigrations = lib.attrsets.attrByPath [ "api" "skippedMigrations" ] [] jsonData;
+      skippedMigrations = lib.attrsets.attrByPath [ "api" "skippedMigrations" ] [ ] jsonData;
     };
     backblaze = {
       bucket = lib.attrsets.attrByPath [ "backblaze" "bucket" ] "" jsonData;
@@ -44,6 +44,6 @@ in
       rootKeys = lib.attrsets.attrByPath [ "ssh" "rootKeys" ] [ "" ] jsonData;
       passwordAuthentication = lib.attrsets.attrByPath [ "ssh" "passwordAuthentication" ] true jsonData;
     };
-    users = lib.attrsets.attrByPath [ "users" ] [] jsonData;
+    users = lib.attrsets.attrByPath [ "users" ] [ ] jsonData;
   };
 }

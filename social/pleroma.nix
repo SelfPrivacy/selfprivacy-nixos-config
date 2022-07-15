@@ -28,7 +28,7 @@ in
           ensurePermissions = {
             "DATABASE pleroma" = "ALL PRIVILEGES";
           };
-        };
+        }
       ];
     };
   };
