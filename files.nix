@@ -65,7 +65,7 @@ in
         if cfg.pleroma.enable then ''
           echo 'import Config' > /var/lib/pleroma/secrets.exs
           echo 'config :pleroma, Pleroma.Repo,' >> /var/lib/pleroma/secrets.exs
-          echo '  password: "REPLACEME",' >> /var/lib/pleroma/secrets.exs
+          echo '  password: "REPLACEME"' >> /var/lib/pleroma/secrets.exs
 
           ${sed} -i "s/REPLACEME/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.databasePassword')/g" /var/lib/pleroma/secrets.exs
 
