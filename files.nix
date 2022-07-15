@@ -11,7 +11,7 @@ in
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 vaultwarden vaultwarden -" else "")
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 vaultwarden vaultwarden -" else "")
       (if cfg.pleroma.enable then "d /var/lib/pleroma 0700 pleroma pleroma - -" else "")
-      "d /val/lib/cloudflare 0440 nginx acmerecievers -"
+      "d /var/lib/cloudflare 0440 nginx acmerecievers -"
       "d /root/.config/rclone/ 0400 root root -"
       "d /var/lib/restic 0600 restic - - -"
       (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
