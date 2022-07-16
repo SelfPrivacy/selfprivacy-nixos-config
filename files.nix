@@ -11,8 +11,6 @@ in
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 vaultwarden vaultwarden -" else "")
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 vaultwarden vaultwarden -" else "")
       (if cfg.pleroma.enable then "d /var/lib/pleroma 0700 pleroma pleroma - -" else "")
-      "d /var/lib/cloudflare 0440 nginx acmerecievers -"
-      "d /root/.config/rclone/ 0400 root root -"
       "d /var/lib/restic 0600 restic - - -"
       (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
@@ -38,6 +36,9 @@ in
           rm -f /var/lib/nextcloud/admin-pass
         '';
       cloudflareCredentials = ''
+        mkdir -p /var/lib/cloudflare
+        chmod 0440 /var/lib/cloudflare
+        chown nginx:acmerecievers /var/lib/cloudflare
         echo 'CF_API_KEY=REPLACEME' > /var/lib/cloudflare/Credentials.ini
         echo 'CLOUDFLARE_DNS_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
         echo 'CLOUDFLARE_ZONE_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
