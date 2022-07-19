@@ -3,6 +3,7 @@ let
   cfg = config.services.userdata;
 in
 {
+  systemd.services.pleroma.path = [ pkgs.util-linux pkgs.exiftool ];
   services = {
     pleroma = {
       enable = cfg.pleroma.enable;
