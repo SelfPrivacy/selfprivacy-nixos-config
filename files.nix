@@ -47,6 +47,9 @@ in
         chown nginx:acmerecievers /var/lib/cloudflare/Credentials.ini
       '';
       resticCredentials = ''
+        mkdir -p /root/.config/rclone
+        chmod 0400 /root/.config/rclone
+        chown root:root /root/.config/rclone
         echo '[backblaze]' > /root/.config/rclone/rclone.conf
         echo 'type = b2' >> /root/.config/rclone/rclone.conf
         echo 'account = REPLACEME1' >> /root/.config/rclone/rclone.conf
