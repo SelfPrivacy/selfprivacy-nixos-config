@@ -11,10 +11,6 @@ let
 in
 {
   options.services.userdata = {
-    enable = mkOption {
-      default = true;
-      type = types.nullOr types.bool;
-    };
     # General server options
     hostname = mkOption {
       description = "The hostname of the server.";
@@ -71,12 +67,6 @@ in
     # API options #
     ###############
     api = {
-      token = mkOption {
-        description = ''
-          API token used to authenticate with the server
-        '';
-        type = types.nullOr types.str;
-      };
       enableSwagger = mkOption {
         default = true;
         description = ''
@@ -100,30 +90,10 @@ in
         description = "Bucket name used for userdata backups";
         type = types.nullOr types.str;
       };
-      accountId = mkOption {
-        description = "Backblaze B2 Account ID";
-        type = types.nullOr types.str;
-      };
-      accountKey = mkOption {
-        description = "Backblaze B2 Account Key.";
-        type = types.nullOr types.str;
-      };
-    };
-    cloudflare = {
-      apiKey = mkOption {
-        description = "Cloudflare API Key.";
-        type = types.nullOr types.str;
-      };
     };
     ##############
     #  Services  #
     ##############
-    databasePassword = mkOption {
-      description = ''
-        Password for the database
-      '';
-      type = types.nullOr types.str;
-    };
     bitwarden = {
       enable = mkOption {
         default = false;
@@ -140,18 +110,6 @@ in
       enable = mkOption {
         default = true;
         type = types.nullOr types.bool;
-      };
-      databasePassword = mkOption {
-        description = ''
-          Password for the nextcloud database
-        '';
-        type = types.nullOr types.str;
-      };
-      adminPassword = mkOption {
-        description = ''
-          Password for the nextcloud admin user
-        '';
-        type = types.nullOr types.str;
       };
     };
     pleroma = {
@@ -171,15 +129,6 @@ in
         default = true;
         type = types.nullOr types.bool;
       };
-    };
-    #############
-    #  Backups  #
-    #############
-    resticPassword = mkOption {
-      description = ''
-        Password for the restic
-      '';
-      type = types.nullOr types.str;
     };
     #########
     #  SSH  #

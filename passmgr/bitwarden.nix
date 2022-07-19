@@ -3,7 +3,7 @@ let
   cfg = config.services.userdata;
 in
 {
-  services.bitwarden_rs = {
+  services.vaultwarden = {
     enable = cfg.bitwarden.enable;
     dbBackend = "sqlite";
     backupDir = "/var/lib/bitwarden/backup";

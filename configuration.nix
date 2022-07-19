@@ -58,12 +58,16 @@ in
   };
   environment.systemPackages = with pkgs; [
     git
+    jq
   ];
   environment.variables = {
     DOMAIN = config.services.userdata.domain;
   };
-  system.autoUpgrade.enable = config.services.userdata.autoUpgrade.enable;
-  system.autoUpgrade.allowReboot = config.services.userdata.autoUpgrade.allowReboot;
+  system.autoUpgrade = {
+    enable = config.services.userdata.autoUpgrade.enable;
+    allowReboot = config.services.userdata.autoUpgrade.allowReboot;
+    channel = "https://channel.selfprivacy.org/nixos-selfpricacy";
+  };
   nix = {
     optimise.automatic = true;
     gc = {
