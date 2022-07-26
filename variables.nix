@@ -45,5 +45,6 @@ in
       passwordAuthentication = lib.attrsets.attrByPath [ "ssh" "passwordAuthentication" ] true jsonData;
     };
     users = lib.attrsets.attrByPath [ "users" ] [ ] jsonData;
+    volumes = lib.attrsets.attrByPath [ "volumes" ] [ ] jsonData;
   };
 }
