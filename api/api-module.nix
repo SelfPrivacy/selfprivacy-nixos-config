@@ -31,6 +31,12 @@ in
         B2 bucket
       '';
     };
+    package = mkOption {
+      type = types.package;
+      default = pkgs.selfprivacy-graphql-api;
+      defaultText = literalExpression "pkgs.selfprivacy-graphql-api";
+      description = "The SelfPrivacy package to use.";
+    };
   };
   config = lib.mkIf cfg.enable {
 
@@ -62,9 +68,13 @@ in
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
         User = "root";
-        ExecStart = "${pkgs.selfprivacy-api}/bin/app.py";
+        ExecStart = "${pkgs.python39Packages.uvicorn}/bin/uvicorn \
+          selfprivacy_api.app:app --host 0.0.0.0 --port 5050 --proxy-headers";
         Restart = "always";
         RestartSec = "5";
+        environment = {
+          PYTHONPATH = cfg.package.pythonPath + ":${cfg.package.out}/python3.9/site-packages/";
+        }
       };
     };
     # One shot systemd service to rebuild NixOS using nixos-rebuild
