@@ -43,7 +43,21 @@ in
         ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
         B2_BUCKET = cfg.b2Bucket;
       } // config.networking.proxy.envVars;
-      path = [ "/var/" "/var/dkim/" pkgs.coreutils pkgs.gnutar pkgs.xz.bin pkgs.gzip pkgs.gitMinimal config.nix.package.out pkgs.nixos-rebuild pkgs.restic pkgs.mkpasswd ];
+      path = [
+        "/var/"
+        "/var/dkim/"
+        pkgs.coreutils
+        pkgs.gnutar
+        pkgs.xz.bin
+        pkgs.gzip
+        pkgs.gitMinimal
+        config.nix.package.out
+        pkgs.nixos-rebuild
+        pkgs.restic
+        pkgs.mkpasswd
+        pkgs.util-linux
+        pkgs.e2fsprogs
+      ];
       after = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
