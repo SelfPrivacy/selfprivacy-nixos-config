@@ -9,6 +9,7 @@ in
     ./variables-module.nix
     ./variables.nix
     ./files.nix
+    ./volumes.nix
     ./users.nix
     ./mailserver/system/mailserver.nix
     ./vpn/ocserv.nix
