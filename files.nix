@@ -23,6 +23,7 @@ in
     {
       nextcloudSecrets =
         if cfg.nextcloud.enable then ''
+          mkdir -p /var/lib/nextcloud
           cat /etc/nixos/userdata/userdata.json | ${jq} -r '.nextcloud.databasePassword' > /var/lib/nextcloud/db-pass
           chmod 0440 /var/lib/nextcloud/db-pass
           chown nextcloud:nextcloud /var/lib/nextcloud/db-pass
