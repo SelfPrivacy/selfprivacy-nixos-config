@@ -78,7 +78,7 @@ in
         B2_BUCKET = cfg.b2Bucket;
         PYTHONPATH = "${pkgs.selfprivacy-graphql-api}/lib/python3.9/site-packages/";
       } // config.networking.proxy.envVars;
-      path = with self.python39Packages; [
+      path = with pkgs.python39Packages; [
         "/var/"
         "/var/dkim/"
         pkgs.coreutils
