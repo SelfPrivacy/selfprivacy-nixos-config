@@ -76,9 +76,9 @@ in
         PYTHONUNBUFFERED = "1";
         ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
         B2_BUCKET = cfg.b2Bucket;
-        PYTHONPATH = "${pkgs.selfprivacy-graphql-api}/lib/python3.9/site-packages/";
+        PYTHONPATH = pkgs.selfprivacy-graphql-api.pythonPath + ":${pkgs.selfprivacy-graphql-api}/lib/python3.9/site-packages/";
       } // config.networking.proxy.envVars;
-      path = with pkgs.python39Packages; [
+      path = [
         "/var/"
         "/var/dkim/"
         pkgs.coreutils
@@ -93,21 +93,6 @@ in
         pkgs.util-linux
         pkgs.e2fsprogs
         pkgs.iproute2
-        setuptools
-        portalocker
-        pytz
-        pytest
-        pytest-mock
-        pytest-datadir
-        huey
-        gevent
-        mnemonic
-        pydantic
-        typing-extensions
-        strawberry_graphql
-        psutil
-        fastapi
-        uvicorn
       ];
       after = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
