@@ -68,6 +68,56 @@ in
         RestartSec = "5";
       };
     };
+    systemd.services.selfprivacy-api-worker = {
+      description = "Task worker for SelfPrivacy API";
+      environment = config.nix.envVars // {
+        inherit (config.environment.sessionVariables) NIX_PATH;
+        HOME = "/root";
+        PYTHONUNBUFFERED = "1";
+        ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
+        B2_BUCKET = cfg.b2Bucket;
+        PYTHONPATH = "${pkgs.selfprivacy-graphql-api}/lib/python3.9/site-packages/";
+      } // config.networking.proxy.envVars;
+      path = with self.python39Packages; [
+        "/var/"
+        "/var/dkim/"
+        pkgs.coreutils
+        pkgs.gnutar
+        pkgs.xz.bin
+        pkgs.gzip
+        pkgs.gitMinimal
+        config.nix.package.out
+        pkgs.nixos-rebuild
+        pkgs.restic
+        pkgs.mkpasswd
+        pkgs.util-linux
+        pkgs.e2fsprogs
+        pkgs.iproute2
+        setuptools
+        portalocker
+        pytz
+        pytest
+        pytest-mock
+        pytest-datadir
+        huey
+        gevent
+        mnemonic
+        pydantic
+        typing-extensions
+        strawberry_graphql
+        psutil
+        fastapi
+        uvicorn
+      ];
+      after = [ "network-online.target" ];
+      wantedBy = [ "network-online.target" ];
+      serviceConfig = {
+        User = "root";
+        ExecStart = "${pkgs.python39Packages.huey}/bin/huey_consumer.py selfprivacy_api.utils.huey.huey";
+        Restart = "always";
+        RestartSec = "5";
+      };
+    }
     # One shot systemd service to rebuild NixOS using nixos-rebuild
     systemd.services.sp-nixos-rebuild = {
       description = "Upgrade NixOS using nixos-rebuild";
