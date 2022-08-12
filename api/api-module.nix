@@ -57,6 +57,7 @@ in
         pkgs.mkpasswd
         pkgs.util-linux
         pkgs.e2fsprogs
+        pkgs.iproute2
       ];
       after = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
