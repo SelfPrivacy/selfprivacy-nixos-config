@@ -117,7 +117,7 @@ in
         Restart = "always";
         RestartSec = "5";
       };
-    }
+    };
     # One shot systemd service to rebuild NixOS using nixos-rebuild
     systemd.services.sp-nixos-rebuild = {
       description = "Upgrade NixOS using nixos-rebuild";
