@@ -104,6 +104,12 @@ in
         type = types.nullOr types.str;
       };
     };
+    email = {
+      location = mkOption {
+        default = "sda1";
+        type = types.nullOr types.str;
+      };
+    };
     gitea = {
       enable = mkOption {
         default = false;
