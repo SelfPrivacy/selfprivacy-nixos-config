@@ -99,11 +99,19 @@ in
         default = false;
         type = types.nullOr types.bool;
       };
+      location = mkOption {
+        default = "sda1";
+        type = types.nullOr types.str;
+      };
     };
     gitea = {
       enable = mkOption {
         default = false;
         type = types.nullOr types.bool;
+      };
+      location = mkOption {
+        default = "sda1";
+        type = types.nullOr types.str;
       };
     };
     nextcloud = {
@@ -111,11 +119,19 @@ in
         default = true;
         type = types.nullOr types.bool;
       };
+      location = mkOption {
+        default = "sda1";
+        type = types.nullOr types.str;
+      };
     };
     pleroma = {
       enable = mkOption {
         default = false;
         type = types.nullOr types.bool;
+      };
+      location = mkOption {
+        default = "sda1";
+        type = types.nullOr types.str;
       };
     };
     jitsi = {
@@ -172,6 +188,10 @@ in
       '';
       type = types.nullOr (types.listOf (types.attrsOf types.anything));
       default = [ ];
+    };
+    useBinds = mkOption {
+      type = types.nullOr types.bool;
+      default = false;
     };
   };
 }
