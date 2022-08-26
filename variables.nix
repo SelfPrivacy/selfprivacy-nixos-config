@@ -23,15 +23,19 @@ in
     };
     bitwarden = {
       enable = lib.attrsets.attrByPath [ "bitwarden" "enable" ] false jsonData;
+      location = lib.attrsets.attrByPath [ "bitwarden" "location" ] "sda1" jsonData;
     };
     gitea = {
       enable = lib.attrsets.attrByPath [ "gitea" "enable" ] false jsonData;
+      location = lib.attrsets.attrByPath [ "gitea" "location" ] "sda1" jsonData;
     };
     nextcloud = {
       enable = lib.attrsets.attrByPath [ "nextcloud" "enable" ] false jsonData;
+      location = lib.attrsets.attrByPath [ "nextcloud" "location" ] "sda1" jsonData;
     };
     pleroma = {
       enable = lib.attrsets.attrByPath [ "pleroma" "enable" ] false jsonData;
+      location = lib.attrsets.attrByPath [ "pleroma" "location" ] "sda1" jsonData;
     };
     jitsi = {
       enable = lib.attrsets.attrByPath [ "jitsi" "enable" ] false jsonData;
@@ -44,6 +48,11 @@ in
       rootKeys = lib.attrsets.attrByPath [ "ssh" "rootKeys" ] [ "" ] jsonData;
       passwordAuthentication = lib.attrsets.attrByPath [ "ssh" "passwordAuthentication" ] true jsonData;
     };
+    email = {
+      location = lib.attrsets.attrByPath [ "email" "location" ] "sda1" jsonData;
+    };
     users = lib.attrsets.attrByPath [ "users" ] [ ] jsonData;
+    volumes = lib.attrsets.attrByPath [ "volumes" ] [ ] jsonData;
+    useBinds = lib.attrsets.attrByPath [ "useBinds" ] false jsonData;
   };
 }

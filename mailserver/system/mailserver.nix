@@ -13,6 +13,17 @@ in
     })
   ];
 
+  fileSystems = lib.mkIf cfg.useBinds {
+    "/var/vmail" = {
+      device = "/volumes/${cfg.email.location}/vmail";
+      options = [ "bind" ];
+    };
+    "/var/sieve" = {
+      device = "/volumes/${cfg.email.location}/sieve";
+      options = [ "bind" ];
+    };
+  };
+
   users.users = {
     virtualMail = {
       isNormalUser = false;
@@ -32,7 +43,7 @@ in
         sieveScript = ''
           require ["fileinto", "mailbox"];
           if header :contains "Chat-Version" "1.0"
-          {  
+          {
             fileinto :create "DeltaChat";
             stop;
           }
@@ -46,7 +57,7 @@ in
           sieveScript = ''
             require ["fileinto", "mailbox"];
             if header :contains "Chat-Version" "1.0"
-            {  
+            {
               fileinto :create "DeltaChat";
               stop;
             }

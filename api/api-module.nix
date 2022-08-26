@@ -57,12 +57,48 @@ in
         pkgs.mkpasswd
         pkgs.util-linux
         pkgs.e2fsprogs
+        pkgs.iproute2
       ];
       after = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
         User = "root";
-        ExecStart = "${pkgs.selfprivacy-api}/bin/app.py";
+        ExecStart = "${pkgs.selfprivacy-graphql-api}/bin/app.py";
+        Restart = "always";
+        RestartSec = "5";
+      };
+    };
+    systemd.services.selfprivacy-api-worker = {
+      description = "Task worker for SelfPrivacy API";
+      environment = config.nix.envVars // {
+        inherit (config.environment.sessionVariables) NIX_PATH;
+        HOME = "/root";
+        PYTHONUNBUFFERED = "1";
+        ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
+        B2_BUCKET = cfg.b2Bucket;
+        PYTHONPATH = pkgs.selfprivacy-graphql-api.pythonPath + ":${pkgs.selfprivacy-graphql-api}/lib/python3.9/site-packages/";
+      } // config.networking.proxy.envVars;
+      path = [
+        "/var/"
+        "/var/dkim/"
+        pkgs.coreutils
+        pkgs.gnutar
+        pkgs.xz.bin
+        pkgs.gzip
+        pkgs.gitMinimal
+        config.nix.package.out
+        pkgs.nixos-rebuild
+        pkgs.restic
+        pkgs.mkpasswd
+        pkgs.util-linux
+        pkgs.e2fsprogs
+        pkgs.iproute2
+      ];
+      after = [ "network-online.target" ];
+      wantedBy = [ "network-online.target" ];
+      serviceConfig = {
+        User = "root";
+        ExecStart = "${pkgs.python39Packages.huey}/bin/huey_consumer.py selfprivacy_api.task_registry.huey";
         Restart = "always";
         RestartSec = "5";
       };

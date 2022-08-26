@@ -1,8 +1,14 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.services.userdata;
 in
 {
+  fileSystems = lib.mkIf cfg.useBinds {
+    "/var/lib/gitea" = {
+      device = "/volumes/${cfg.gitea.location}/gitea";
+      options = [ "bind" ];
+    };
+  };
   services = {
     gitea = {
       enable = cfg.gitea.enable;

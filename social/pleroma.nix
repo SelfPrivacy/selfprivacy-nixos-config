@@ -1,8 +1,18 @@
-{ pkgs, config, ... }:
+{ pkgs, lib, config, ... }:
 let
   cfg = config.services.userdata;
 in
 {
+  fileSystems = lib.mkIf cfg.useBinds {
+    "/var/lib/pleroma" = {
+      device = "/volumes/${cfg.pleroma.location}/pleroma";
+      options = [ "bind" ];
+    };
+    "/var/lib/postgresql" = {
+      device = "/volumes/${cfg.pleroma.location}/postgresql";
+      options = [ "bind" ];
+    };
+  };
   services = {
     pleroma = {
       enable = cfg.pleroma.enable;

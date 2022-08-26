@@ -9,6 +9,7 @@ in
     ./variables-module.nix
     ./variables.nix
     ./files.nix
+    ./volumes.nix
     ./users.nix
     ./mailserver/system/mailserver.nix
     ./vpn/ocserv.nix
@@ -75,6 +76,7 @@ in
       options = "--delete-older-than 7d";
     };
   };
+  services.journald.extraConfig = "SystemMaxUse=500M";
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
   };

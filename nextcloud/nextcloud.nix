@@ -1,11 +1,17 @@
-{ pkgs, config, ... }:
+{ pkgs, lib, config, ... }:
 let
   cfg = config.services.userdata;
 in
 {
+  fileSystems = lib.mkIf cfg.useBinds {
+    "/var/lib/nextcloud" = {
+      device = "/volumes/${cfg.nextcloud.location}/nextcloud";
+      options = [ "bind" ];
+    };
+  };
   services.nextcloud = {
     enable = cfg.nextcloud.enable;
-    package = pkgs.nextcloud22;
+    package = pkgs.nextcloud23;
     hostName = "cloud.${cfg.domain}";
 
     # Use HTTPS for links
