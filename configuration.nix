@@ -30,6 +30,25 @@ in
 
   nixpkgs.overlays = [ (nix-overlay) ];
 
+  services.redis.servers.sp-api = {
+    enable = true;
+    save = [
+      [
+        30
+        1
+      ]
+      [
+        10
+        10
+      ]
+    ];
+    port = 0;
+    settings = {
+      notify-keyspace-events = "KEA";
+    };
+  };
+
+
   boot.cleanTmpDir = true;
   networking = {
     hostName = config.services.userdata.hostname;
