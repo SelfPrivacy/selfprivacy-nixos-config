@@ -48,6 +48,7 @@ in
     };
   };
 
+  services.do-agent.enable = if config.server.provider == "DIGITALOCEAN" then true else false;
 
   boot.cleanTmpDir = true;
   networking = {
