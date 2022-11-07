@@ -6,7 +6,7 @@ in
   services.restic.backups = {
     options = {
       passwordFile = "/etc/restic/resticPasswd";
-      repository = "s3:s3.anazonaws.com/${cfg.backblaze.bucket}";
+      repository = "s3:s3.anazonaws.com/${cfg.backup.bucket}";
       initialize = true;
       paths = [
         "/var/dkim"
