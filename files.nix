@@ -43,7 +43,7 @@ in
         echo 'CF_API_KEY=REPLACEME' > /var/lib/cloudflare/Credentials.ini
         echo 'CLOUDFLARE_DNS_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
         echo 'CLOUDFLARE_ZONE_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
-        ${sed} -i "s/REPLACEME/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.cloudflare.apiKey')/g" /var/lib/cloudflare/Credentials.ini
+        ${sed} -i "s/REPLACEME/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.dns.apiKey')/g" /var/lib/cloudflare/Credentials.ini
         chmod 0440 /var/lib/cloudflare/Credentials.ini
         chown nginx:acmerecievers /var/lib/cloudflare/Credentials.ini
       '';
@@ -56,8 +56,8 @@ in
         echo 'account = REPLACEME1' >> /root/.config/rclone/rclone.conf
         echo 'key = REPLACEME2' >> /root/.config/rclone/rclone.conf
 
-        ${sed} -i "s/REPLACEME1/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.backblaze.accountId')/g" /root/.config/rclone/rclone.conf
-        ${sed} -i "s/REPLACEME2/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.backblaze.accountKey')/g" /root/.config/rclone/rclone.conf
+        ${sed} -i "s/REPLACEME1/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.backup.accountId')/g" /root/.config/rclone/rclone.conf
+        ${sed} -i "s/REPLACEME2/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.backup.accountKey')/g" /root/.config/rclone/rclone.conf
 
         chmod 0400 /root/.config/rclone/rclone.conf
         chown root:root /root/.config/rclone/rclone.conf

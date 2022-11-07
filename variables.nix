@@ -18,8 +18,14 @@ in
       enableSwagger = lib.attrsets.attrByPath [ "api" "enableSwagger" ] false jsonData;
       skippedMigrations = lib.attrsets.attrByPath [ "api" "skippedMigrations" ] [ ] jsonData;
     };
-    backblaze = {
-      bucket = lib.attrsets.attrByPath [ "backblaze" "bucket" ] "" jsonData;
+    dns = {
+      provider = lib.attrsets.attrByPath [ "dns" "provider" ] "CLOUDFLARE" jsonData;
+    };
+    backup = {
+      bucket = lib.attrsets.attrByPath [ "backup" "bucket" ] (lib.attrsets.attrByPath [ "backblaze" "bucket" ] "" jsonData) jsonData;
+    };
+    server = {
+      provider = lib.attrsets.attrByPath [ "server" "provider" ] "HETZNER" jsonData;
     };
     bitwarden = {
       enable = lib.attrsets.attrByPath [ "bitwarden" "enable" ] false jsonData;
