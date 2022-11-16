@@ -90,6 +90,10 @@ in
         description = "DNS provider that was defined at the initial setup process. Default is ClOUDFLARE";
         type = types.nullOr types.str;
       };
+      useStagingACME = mkOption {
+        description = "Use staging ACME server. Default is false";
+        type = types.nullOr types.bool;
+      };
     };
     backup = {
       bucket = mkOption {

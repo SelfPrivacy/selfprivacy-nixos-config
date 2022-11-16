@@ -20,6 +20,7 @@ in
     };
     dns = {
       provider = lib.attrsets.attrByPath [ "dns" "provider" ] "CLOUDFLARE" jsonData;
+      useStagingACME = lib.attrsets.attrByPath [ "dns" "useStagingACME" ] false jsonData;
     };
     backup = {
       bucket = lib.attrsets.attrByPath [ "backup" "bucket" ] (lib.attrsets.attrByPath [ "backblaze" "bucket" ] "" jsonData) jsonData;
