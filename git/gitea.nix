@@ -47,6 +47,7 @@ in
         };
         ui = {
           DEFAULT_THEME = "arc-green";
+          SHOW_USER_EMAIL = false;
         };
         picture = {
           DISABLE_GRAVATAR = true;
