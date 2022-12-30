@@ -85,9 +85,25 @@ in
     #############
     #  Secrets  #
     #############
-    backblaze = {
+    dns = {
+      provider = mkOption {
+        description = "DNS provider that was defined at the initial setup process. Default is ClOUDFLARE";
+        type = types.nullOr types.str;
+      };
+      useStagingACME = mkOption {
+        description = "Use staging ACME server. Default is false";
+        type = types.nullOr types.bool;
+      };
+    };
+    backup = {
       bucket = mkOption {
         description = "Bucket name used for userdata backups";
+        type = types.nullOr types.str;
+      };
+    };
+    server = {
+      provider = mkOption {
+        description = "Server provider that was defined at the initial setup process. Default is HETZNER";
         type = types.nullOr types.str;
       };
     };

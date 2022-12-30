@@ -26,10 +26,10 @@ in
         path = "/var/lib/gitea/data/gitea.db";
         createDatabase = true;
       };
-      ssh = {
-        enable = true;
-        clonePort = 22;
-      };
+      # ssh = {
+      #   enable = true;
+      #   clonePort = 22;
+      # };
       lfs = {
         enable = true;
         contentDir = "/var/lib/gitea/lfs";

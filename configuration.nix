@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 let
-  url-overlay = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo/archive/master.tar.gz";
+  url-overlay = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo/archive/redis.tar.gz";
   nix-overlay = (import (builtins.fetchTarball url-overlay));
 in
 {
@@ -29,6 +29,26 @@ in
   ];
 
   nixpkgs.overlays = [ (nix-overlay) ];
+
+  services.redis.servers.sp-api = {
+    enable = true;
+    save = [
+      [
+        30
+        1
+      ]
+      [
+        10
+        10
+      ]
+    ];
+    port = 0;
+    settings = {
+      notify-keyspace-events = "KEA";
+    };
+  };
+
+  services.do-agent.enable = if config.services.userdata.server.provider == "DIGITALOCEAN" then true else false;
 
   boot.cleanTmpDir = true;
   networking = {
