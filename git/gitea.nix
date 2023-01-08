@@ -37,7 +37,7 @@ in
       appName = "SelfPrivacy git Service";
       repositoryRoot = "/var/lib/gitea/repositories";
       domain = "git.${cfg.domain}";
-      rootUrl = "https://${cfg.domain}/";
+      rootUrl = "https://git.${cfg.domain}/";
       httpAddress = "0.0.0.0";
       httpPort = 3000;
       cookieSecure = true;
