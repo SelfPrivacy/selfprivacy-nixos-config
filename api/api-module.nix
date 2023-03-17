@@ -98,7 +98,7 @@ in
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
         User = "root";
-        ExecStart = "${pkgs.python39Packages.huey}/bin/huey_consumer.py selfprivacy_api.task_registry.huey";
+        ExecStart = "${pkgs.python310Packages.huey}/bin/huey_consumer.py selfprivacy_api.task_registry.huey";
         Restart = "always";
         RestartSec = "5";
       };
