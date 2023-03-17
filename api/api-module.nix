@@ -76,7 +76,7 @@ in
         PYTHONUNBUFFERED = "1";
         ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
         B2_BUCKET = cfg.b2Bucket;
-        PYTHONPATH = pkgs.selfprivacy-graphql-api.pythonPath + ":${pkgs.selfprivacy-graphql-api}/lib/python3.9/site-packages/";
+        PYTHONPATH = pkgs.selfprivacy-graphql-api.pythonPath + ":${pkgs.selfprivacy-graphql-api}/lib/python3.10/site-packages/";
       } // config.networking.proxy.envVars;
       path = [
         "/var/"
