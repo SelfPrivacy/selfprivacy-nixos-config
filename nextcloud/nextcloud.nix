@@ -11,7 +11,7 @@ in
   };
   services.nextcloud = {
     enable = cfg.nextcloud.enable;
-    package = pkgs.nextcloud24;
+    package = pkgs.nextcloud25;
     hostName = "cloud.${cfg.domain}";
 
     # Use HTTPS for links
