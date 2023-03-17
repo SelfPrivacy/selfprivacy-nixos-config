@@ -89,6 +89,7 @@ in
     allowReboot = config.services.userdata.autoUpgrade.allowReboot;
     channel = "https://channel.selfprivacy.org/nixos-selfpricacy";
   };
+  system.stateVersion = config.services.userdata.stateVersion;
   nix = {
     optimise.automatic = true;
     gc = {
