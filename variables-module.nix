@@ -45,7 +45,7 @@ in
       description = ''
         State version of the server
       '';
-      type = types.string;
+      type = types.str;
       default = "22.11";
     };
     ########################
