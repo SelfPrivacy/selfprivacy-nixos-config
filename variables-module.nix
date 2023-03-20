@@ -41,6 +41,13 @@ in
         type = types.nullOr types.bool;
       };
     };
+    stateVersion = mkOption {
+      description = ''
+        State version of the server
+      '';
+      type = types.str;
+      default = "22.11";
+    };
     ########################
     # Server admin options #
     ########################

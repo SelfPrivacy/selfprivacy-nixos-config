@@ -6,10 +6,10 @@ in
   imports = [
     (builtins.fetchTarball {
       # Pick a commit from the branch you are interested in
-      url = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/f535d812/nixos-mailserver-f535d812.tar.gz";
+      url = "https://gitlab.com/simple-nixos-mailserver/nixos-mailserver/-/archive/6d0d9fb9/nixos-mailserver-6d0d9fb9.tar.gz";
 
       # And set its hash
-      sha256 = "sha256:0csx2i8p7gbis0n5aqpm57z5f9cd8n9yabq04bg1h4mkfcf7mpl6";
+      sha256 = "sha256:0h35al73p15z9v8zb6hi5nq987sfl5wp4rm5c8947nlzlnsjl61x";
     })
   ];
 
