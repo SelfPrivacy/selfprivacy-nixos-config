@@ -13,6 +13,10 @@ in
     gitea = {
       enable = cfg.gitea.enable;
       stateDir = "/var/lib/gitea";
+      log = {
+        rootPath = "/var/lib/gitea/log";
+        level = "Warn";
+      };
       user = "gitea";
       database = {
         type = "sqlite3";
@@ -36,6 +40,7 @@ in
       rootUrl = "https://git.${cfg.domain}/";
       httpAddress = "0.0.0.0";
       httpPort = 3000;
+      cookieSecure = true;
       settings = {
         mailer = {
           ENABLED = false;
@@ -53,13 +58,13 @@ in
         repository = {
           FORCE_PRIVATE = false;
         };
-        session = {
-          COOKIE_SECURE = true;
-        };
-        log = {
-          ROOT_PATH = "/var/lib/gitea/log";
+#        session = {
+#          COOKIE_SECURE = true;
+#        };
+#        log = {
+#          ROOT_PATH = "/var/lib/gitea/log";
 #          LEVEL = "Warn";
-        };
+#        };
       };
     };
   };
