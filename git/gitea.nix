@@ -58,7 +58,7 @@ in
         };
         log = {
           ROOT_PATH = "/var/lib/gitea/log";
-          LEVEL = "Warn";
+#          LEVEL = "Warn";
         };
       };
     };
