@@ -175,6 +175,16 @@ in
         type = types.nullOr types.bool;
       };
     };
+    mastodon = {
+      enable = mkOption {
+        default = false;
+        type = types.nullOr types.bool;
+      };
+      location = mkOption {
+        default = "sda1";
+        type = types.nullOr types.str;
+      };
+    };
     #########
     #  SSH  #
     #########

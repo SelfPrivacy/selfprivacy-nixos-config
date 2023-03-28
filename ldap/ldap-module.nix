@@ -100,6 +100,7 @@ in
                 "gitea"
                 "nextcloud"
                 "pleroma"
+                "mastodon"
               ]);
               example = [ "gitea" ];
               default = [ ];
@@ -174,10 +175,21 @@ in
 
             ${mkUsersNamespace "users" cfg.users}
 
+            # Make a root user for some services to bind
+            dn: uid=root,ou=users,${domain}
+            objectClass: inetOrgPerson
+            cn: root
+            sn: root
+            mail: root@${domain}
+            # Password is "root"
+            userPassword: {crypt}$6$teiD8ySLE58taSvY$veZS9QRSmfBcox2JfgYH/AWv24cpHD4P7IUzFv8WgxUaio.j7Y4aqMcC4a17v3PvOdCu8vgkKAtu/jhhKjVQm0
+
+
             ${mkGroupsNamespace "users" cfg.users "groups" [
               "admin"
               "gitea"
               "nextcloud"
+              "mastodon"
             ]}
 
             # pleroma has no support for ldap filters
@@ -250,7 +262,6 @@ in
 
           # https://docs.gitea.io/en-us/command-line/#admin
           ${config.services.gitea.package}/bin/gitea admin auth $auth_command \
-            --id $ldap_id \
             --name nixos-ldap \
             --security-protocol unencrypted \
             --host 127.0.0.1 \
@@ -319,6 +330,19 @@ in
             fi
           ''}
         '';
+    })
+    (lib.mkIf (config.services.mastodon.enable && cfg.enable) {
+      services.mastodon.extraConfig = {
+        LDAP_ENABLED = true;
+        LDAP_HOST = "127.0.0.1";
+        LDAP_PORT = 389;
+        LDAP_BASE = "ou=users,${domain}";
+        LDAP_BIND_DN = "uid=root,ou=users,${domain}";
+        LDAP_BIND_PASSWORD = "root";
+        LDAP_UID = "uid";
+        LDAP_MAIL = "mail";
+        LDAP_SEARCH_FILTER = "(&(objectClass=shadowAccount)(memberOf=cn=mastodon,ou=groups,${domain})(uid=%{username}))";
+      };
     })
     (lib.mkIf (config.services.pleroma.enable && cfg.enable) {
       services.pleroma.configs = [

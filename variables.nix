@@ -51,6 +51,10 @@ in
     ocserv = {
       enable = lib.attrsets.attrByPath [ "ocserv" "enable" ] false jsonData;
     };
+    mastodon = {
+      enable = lib.attrsets.attrByPath [ "mastodon" "enable" ] false jsonData;
+      location = lib.attrsets.attrByPath [ "mastodon" "location" ] "sda1" jsonData;
+    };
     ssh = {
       enable = lib.attrsets.attrByPath [ "ssh" "enable" ] true jsonData;
       rootKeys = lib.attrsets.attrByPath [ "ssh" "rootKeys" ] [ "" ] jsonData;
