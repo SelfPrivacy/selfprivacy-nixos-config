@@ -22,4 +22,20 @@ in
       })
       cfg.users);
   };
+  selfprivacy.ldap = {
+    enable = true;
+    domain = "${cfg.domain}";
+    rootUser = "${cfg.username}";
+    rootHashedPassword = cfg.hashedMasterPassword;
+    users = [
+      (builtins.map
+        (user: {
+          username = "${user.username}";
+          email = "${user.username}@${cfg.domain}";
+          hashedPassword = user.hashedPassword;
+          groups = [ "gitea" "nextcloud" "pleroma" ];
+        })
+        cfg.users)
+    ];
+  };
 }

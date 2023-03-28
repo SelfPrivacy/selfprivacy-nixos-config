@@ -10,6 +10,7 @@ in
     ./variables.nix
     ./files.nix
     ./volumes.nix
+    ./ldap/ldap-module.nix
     ./users.nix
     ./mailserver/system/mailserver.nix
     ./vpn/ocserv.nix
