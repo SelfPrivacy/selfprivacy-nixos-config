@@ -130,6 +130,10 @@ in
           };
         };
       };
+      "mastodon.${domain}" = {
+        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+      };
       "social.${domain}" = {
         sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
         sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
