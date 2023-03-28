@@ -27,7 +27,7 @@ in
     domain = "${cfg.domain}";
     rootUser = "${cfg.username}";
     rootHashedPassword = cfg.hashedMasterPassword;
-    users = [
+    users =
       (builtins.map
         (user: {
           username = "${user.username}";
@@ -35,7 +35,6 @@ in
           hashedPassword = user.hashedPassword;
           groups = [ "gitea" "nextcloud" "pleroma" ];
         })
-        cfg.users)
-    ];
+        cfg.users);
   };
 }
