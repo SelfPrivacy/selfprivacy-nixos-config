@@ -17,6 +17,7 @@ in
     ./api/api.nix
     ./api/api-module.nix
     ./social/pleroma.nix
+    ./social/mastodon.nix
     ./letsencrypt/acme.nix
     ./letsencrypt/resolve.nix
     ./backup/restic.nix

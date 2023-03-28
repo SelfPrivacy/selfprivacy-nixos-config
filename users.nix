@@ -33,7 +33,7 @@ in
           username = "${user.username}";
           email = "${user.username}@${cfg.domain}";
           hashedPassword = user.hashedPassword;
-          groups = [ "gitea" "nextcloud" "pleroma" ];
+          groups = [ "gitea" "nextcloud" "pleroma" "mastodon" ];
         })
         cfg.users);
   };
