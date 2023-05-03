@@ -14,6 +14,7 @@ in
       "d /var/lib/restic 0600 restic - - -"
       (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
+      (if cfg.bitwarden.enable then "f /var/lib/bitwarden/.env 0640 vaultwarden vaultwarden - -" else "")
     ];
   system.activationScripts =
     let
@@ -78,6 +79,21 @@ in
           chown pleroma:pleroma /var/lib/pleroma/secrets.exs
         '' else ''
           rm -f /var/lib/pleroma/secrets.exs
+        '';
+      bitwardenCredentials =
+        if cfg.bitwarden.enable then ''
+          mkdir -p /var/lib/bitwarden
+          token=$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.bitwarden.adminToken')
+          if [ "$token" == "null" ]; then
+            # If it's null, delete the contents of the file
+            > /var/lib/bitwarden/.env
+          else
+            echo "ADMIN_TOKEN=$token" > /var/lib/bitwarden/.env
+          fi
+          chmod 0640 /var/lib/bitwarden/.env
+          chown vaultwarden:vaultwarden /var/lib/bitwarden/.env
+        '' else ''
+          rm -f /var/lib/bitwarden/.env
         '';
     };
 }
