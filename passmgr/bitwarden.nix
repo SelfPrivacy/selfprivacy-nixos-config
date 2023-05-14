@@ -17,6 +17,7 @@ in
     enable = cfg.bitwarden.enable;
     dbBackend = "sqlite";
     backupDir = "/var/lib/bitwarden/backup";
+    environmentFile = "/var/lib/bitwarden/.env";
     config = {
       domain = "https://password.${cfg.domain}/";
       signupsAllowed = true;
