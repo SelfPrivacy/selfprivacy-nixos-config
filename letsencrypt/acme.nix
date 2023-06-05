@@ -17,13 +17,13 @@ in
         domain = "*.${cfg.domain}";
         extraDomainNames = [ "${cfg.domain}" ];
         group = "acmerecievers";
-        dnsProvider = "cloudflare";
+        dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = "/var/lib/cloudflare/Credentials.ini";
       };
       "meet.${cfg.domain}" = {
         domain = "meet.${cfg.domain}";
         group = "acmerecievers";
-        dnsProvider = "cloudflare";
+        dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = "/var/lib/cloudflare/Credentials.ini";
       };
     };

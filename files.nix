@@ -1,6 +1,16 @@
 { config, pkgs, ... }:
 let
   cfg = config.services.userdata;
+  dnsCredentialsTemplates = {
+    DIGITALOCEAN = "DO_AUTH_TOKEN=REPLACEME";
+    CLOUDFLARE = ''
+      CF_API_KEY=REPLACEME
+      CLOUDFLARE_DNS_API_TOKEN=REPLACEME
+      CLOUDFLARE_ZONE_API_TOKEN=REPLACEME
+    '';
+    DESEC = "DESEC_TOKEN=REPLACEME";
+  };
+  dnsCredentialsTemplate = dnsCredentialsTemplates.${cfg.dns.provider};
 in
 {
   systemd.tmpfiles.rules =
@@ -41,9 +51,7 @@ in
         mkdir -p /var/lib/cloudflare
         chmod 0440 /var/lib/cloudflare
         chown nginx:acmerecievers /var/lib/cloudflare
-        echo 'CF_API_KEY=REPLACEME' > /var/lib/cloudflare/Credentials.ini
-        echo 'CLOUDFLARE_DNS_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
-        echo 'CLOUDFLARE_ZONE_API_TOKEN=REPLACEME' >> /var/lib/cloudflare/Credentials.ini
+        echo '${dnsCredentialsTemplate}' > /var/lib/cloudflare/Credentials.ini
         ${sed} -i "s/REPLACEME/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.dns.apiKey')/g" /var/lib/cloudflare/Credentials.ini
         chmod 0440 /var/lib/cloudflare/Credentials.ini
         chown nginx:acmerecievers /var/lib/cloudflare/Credentials.ini
