@@ -11,17 +11,12 @@ in
     defaults = {
       email = "${cfg.username}@${cfg.domain}";
       server = if cfg.dns.useStagingACME then "https://acme-staging-v02.api.letsencrypt.org/directory" else "https://acme-v02.api.letsencrypt.org/directory";
+      dnsPropagationCheck = false;
     };
     certs = lib.mkForce {
       "${cfg.domain}" = {
         domain = "*.${cfg.domain}";
         extraDomainNames = [ "${cfg.domain}" ];
-        group = "acmerecievers";
-        dnsProvider = lib.strings.toLower cfg.dns.provider;
-        credentialsFile = "/var/lib/cloudflare/Credentials.ini";
-      };
-      "meet.${cfg.domain}" = {
-        domain = "meet.${cfg.domain}";
         group = "acmerecievers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = "/var/lib/cloudflare/Credentials.ini";
