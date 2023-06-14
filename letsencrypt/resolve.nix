@@ -12,11 +12,6 @@ in
           Restart = "on-failure";
         };
       };
-      "nginx-config-reload" = {
-        serviceConfig = {
-          After = [ "acme-${domain}.service" ];
-        };
-      };
     };
   };
 }
