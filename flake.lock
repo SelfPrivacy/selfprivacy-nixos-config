@@ -1,0 +1,43 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1688392541,
+        "narHash": "sha256-lHrKvEkCPTUO+7tPfjIcb7Trk6k31rz18vkyqmkeJfY=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "ea4c80b39be4c09702b0cb3b42eab59e2ba4f24b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-22.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "selfprivacy-overlay": "selfprivacy-overlay"
+      }
+    },
+    "selfprivacy-overlay": {
+      "locked": {
+        "lastModified": 1689468120,
+        "narHash": "sha256-bgQQbUkU0Q4hTwj2RYrGAwwHZ5hmR6cEv87kYn7JjrU=",
+        "ref": "refs/heads/flakes",
+        "rev": "636a941969553db2d704734ccaf8684b69271d0f",
+        "revCount": 31,
+        "type": "git",
+        "url": "file:///data/selfprivacy/selfprivacy-nix-repo"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///data/selfprivacy/selfprivacy-nix-repo"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

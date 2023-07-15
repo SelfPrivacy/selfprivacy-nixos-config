@@ -1,8 +1,4 @@
-{ config, pkgs, lib, ... }:
-let
-  url-overlay = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo/archive/22-11.tar.gz";
-  nix-overlay = (import (builtins.fetchTarball url-overlay));
-in
+{ selfprivacy-overlay, config, pkgs, lib, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -28,7 +24,9 @@ in
     ./git/gitea.nix
   ];
 
-  nixpkgs.overlays = [ (nix-overlay) ];
+  nixpkgs.overlays = [ (import selfprivacy-overlay) ];
+  # this should be specified in hardware-configuration.nix?
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   services.redis.servers.sp-api = {
     enable = true;
