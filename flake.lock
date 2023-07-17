@@ -2,16 +2,15 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1688392541,
-        "narHash": "sha256-lHrKvEkCPTUO+7tPfjIcb7Trk6k31rz18vkyqmkeJfY=",
+        "lastModified": 1686476475,
+        "narHash": "sha256-W9yUePvCSDghn+YUXewuodyPxt+kJl/a7zdY4Q6r4MU=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "ea4c80b39be4c09702b0cb3b42eab59e2ba4f24b",
+        "rev": "eef86b8a942913a828b9ef13722835f359deef29",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-22.11",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -24,17 +23,17 @@
     },
     "selfprivacy-overlay": {
       "locked": {
-        "lastModified": 1689468120,
-        "narHash": "sha256-bgQQbUkU0Q4hTwj2RYrGAwwHZ5hmR6cEv87kYn7JjrU=",
-        "ref": "refs/heads/flakes",
-        "rev": "636a941969553db2d704734ccaf8684b69271d0f",
+        "lastModified": 1689554432,
+        "narHash": "sha256-hegMIgxBHUuRFbCecQpbjFfTHpduV3VZWr8OINtQO6k=",
+        "ref": "flakes",
+        "rev": "53ed9b3f5f70a7f2843ecbef7775307e23a2c1f4",
         "revCount": 31,
         "type": "git",
-        "url": "file:///data/selfprivacy/selfprivacy-nix-repo"
+        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git"
       },
       "original": {
         "type": "git",
-        "url": "file:///data/selfprivacy/selfprivacy-nix-repo"
+        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git"
       }
     }
   },
