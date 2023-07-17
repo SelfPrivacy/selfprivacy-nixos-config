@@ -1,4 +1,4 @@
-{ selfprivacy-overlay, config, pkgs, lib, ... }:
+{ userdata, selfprivacy-overlay, config, pkgs, lib, ... }:
 {
   imports = [
     ./hardware-configuration.nix

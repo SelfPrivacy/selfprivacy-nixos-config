@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ lib, userdata, ... }:
 let
-  jsonData = builtins.fromJSON (builtins.readFile ./userdata/userdata.json);
+  jsonData = userdata;
 in
 {
   services.userdata = {

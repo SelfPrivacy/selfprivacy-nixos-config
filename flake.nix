@@ -12,12 +12,9 @@
   outputs = { self, nixpkgs, selfprivacy-overlay }:
     let
       system = "x86_64-linux";
-
-      # pkgs = import nixpkgs { inherit system; };
-      userdata = builtins.fromJSON (builtins.readFile ./userdata/userdata.json);
     in
     {
-      nixosConfigurations = {
+      nixosConfigurations-fun = userdata: {
         just-nixos = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system selfprivacy-overlay userdata; };
 
