@@ -6,18 +6,20 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
     # selfprivacy-overlay.url = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo/archive/22-11.tar.gz";
     selfprivacy-overlay.url = "git+file:///data/selfprivacy/selfprivacy-nix-repo";
+    # userdata-json.url = ./userdata/userdata.json;
   };
 
   outputs = { self, nixpkgs, selfprivacy-overlay }:
     let
       system = "x86_64-linux";
 
-      pkgs = import nixpkgs { inherit system; };
+      # pkgs = import nixpkgs { inherit system; };
+      userdata = builtins.fromJSON (builtins.readFile ./userdata/userdata.json);
     in
     {
       nixosConfigurations = {
         just-nixos = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit system; };
+          specialArgs = { inherit system selfprivacy-overlay userdata; };
 
           modules = [ ./configuration.nix ];
         };
