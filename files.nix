@@ -56,25 +56,6 @@ in
         chmod 0440 /var/lib/cloudflare/Credentials.ini
         chown nginx:acmerecievers /var/lib/cloudflare/Credentials.ini
       '';
-      resticCredentials = ''
-        mkdir -p /root/.config/rclone
-        chmod 0400 /root/.config/rclone
-        chown root:root /root/.config/rclone
-        echo '[backblaze]' > /root/.config/rclone/rclone.conf
-        echo 'type = b2' >> /root/.config/rclone/rclone.conf
-        echo 'account = REPLACEME1' >> /root/.config/rclone/rclone.conf
-        echo 'key = REPLACEME2' >> /root/.config/rclone/rclone.conf
-
-        ${sed} -i "s/REPLACEME1/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.backup.accountId')/g" /root/.config/rclone/rclone.conf
-        ${sed} -i "s/REPLACEME2/$(cat /etc/nixos/userdata/userdata.json | ${jq} -r '.backup.accountKey')/g" /root/.config/rclone/rclone.conf
-
-        chmod 0400 /root/.config/rclone/rclone.conf
-        chown root:root /root/.config/rclone/rclone.conf
-
-        cat /etc/nixos/userdata/userdata.json | ${jq} -r '.resticPassword' > /var/lib/restic/pass
-        chmod 0400 /var/lib/restic/pass
-        chown restic /var/lib/restic/pass
-      '';
       pleromaCredentials =
         if cfg.pleroma.enable then ''
           echo 'import Config' > /var/lib/pleroma/secrets.exs
