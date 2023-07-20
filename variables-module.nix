@@ -74,13 +74,6 @@ in
     # API options #
     ###############
     api = {
-      enableSwagger = mkOption {
-        default = true;
-        description = ''
-          Enable Swagger UI
-        '';
-        type = types.bool;
-      };
       skippedMigrations = mkOption {
         default = [ ];
         description = ''

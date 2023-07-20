@@ -18,19 +18,6 @@ in
         Enable SelfPrivacy API service
       '';
     };
-    enableSwagger = mkOption {
-      default = false;
-      type = types.bool;
-      description = ''
-        Enable Swagger UI
-      '';
-    };
-    b2Bucket = mkOption {
-      type = types.str;
-      description = ''
-        B2 bucket
-      '';
-    };
   };
   config = lib.mkIf cfg.enable {
 
@@ -40,8 +27,6 @@ in
         inherit (config.environment.sessionVariables) NIX_PATH;
         HOME = "/root";
         PYTHONUNBUFFERED = "1";
-        ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
-        B2_BUCKET = cfg.b2Bucket;
       } // config.networking.proxy.envVars;
       path = [
         "/var/"
@@ -53,11 +38,14 @@ in
         pkgs.gitMinimal
         config.nix.package.out
         pkgs.nixos-rebuild
+        pkgs.rclone
         pkgs.restic
         pkgs.mkpasswd
         pkgs.util-linux
         pkgs.e2fsprogs
         pkgs.iproute2
+        pkgs.fuse-overlayfs
+        pkgs.fuse
       ];
       after = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];
@@ -74,8 +62,6 @@ in
         inherit (config.environment.sessionVariables) NIX_PATH;
         HOME = "/root";
         PYTHONUNBUFFERED = "1";
-        ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
-        B2_BUCKET = cfg.b2Bucket;
         PYTHONPATH = pkgs.selfprivacy-graphql-api.pythonPath + ":${pkgs.selfprivacy-graphql-api}/lib/python3.10/site-packages/";
       } // config.networking.proxy.envVars;
       path = [
@@ -88,11 +74,14 @@ in
         pkgs.gitMinimal
         config.nix.package.out
         pkgs.nixos-rebuild
+        pkgs.rclone
         pkgs.restic
         pkgs.mkpasswd
         pkgs.util-linux
         pkgs.e2fsprogs
         pkgs.iproute2
+        pkgs.fuse-overlayfs
+        pkgs.fuse
       ];
       after = [ "network-online.target" ];
       wantedBy = [ "network-online.target" ];

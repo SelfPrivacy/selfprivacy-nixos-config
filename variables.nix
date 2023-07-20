@@ -16,7 +16,6 @@ in
     hashedMasterPassword = lib.attrsets.attrByPath [ "hashedMasterPassword" ] null jsonData;
     sshKeys = lib.attrsets.attrByPath [ "sshKeys" ] [ ] jsonData;
     api = {
-      enableSwagger = lib.attrsets.attrByPath [ "api" "enableSwagger" ] false jsonData;
       skippedMigrations = lib.attrsets.attrByPath [ "api" "skippedMigrations" ] [ ] jsonData;
     };
     dns = {
