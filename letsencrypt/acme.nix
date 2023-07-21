@@ -11,7 +11,7 @@ in
     defaults = {
       email = "${cfg.username}@${cfg.domain}";
       server = if cfg.dns.useStagingACME then "https://acme-staging-v02.api.letsencrypt.org/directory" else "https://acme-v02.api.letsencrypt.org/directory";
-      dnsPropagationCheck = false;
+      dnsPropagationCheck = true;
       reloadServices = [ "nginx" ];
     };
     certs = lib.mkForce {
