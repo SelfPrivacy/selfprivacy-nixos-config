@@ -15,7 +15,7 @@ in
       reloadServices = [ "nginx" ];
     };
     certs = lib.mkForce {
-      "${cfg.domain}" = {
+      "wildcard-${cfg.domain}" = {
         domain = "*.${cfg.domain}";
         group = "acmerecievers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
