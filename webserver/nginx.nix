@@ -20,8 +20,7 @@ in
 
     virtualHosts = {
       "${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        enableACME = true;
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;

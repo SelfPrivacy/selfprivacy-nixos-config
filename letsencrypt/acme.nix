@@ -17,7 +17,6 @@ in
     certs = lib.mkForce {
       "${cfg.domain}" = {
         domain = "*.${cfg.domain}";
-        extraDomainNames = [ "${cfg.domain}" ];
         group = "acmerecievers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = "/var/lib/cloudflare/Credentials.ini";
