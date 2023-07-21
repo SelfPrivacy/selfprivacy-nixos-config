@@ -34,8 +34,8 @@ in
         '';
       };
       "vpn.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
@@ -49,8 +49,8 @@ in
         '';
       };
       "git.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
@@ -69,8 +69,8 @@ in
         };
       };
       "cloud.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
@@ -89,8 +89,8 @@ in
         };
       };
       "password.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
@@ -109,8 +109,8 @@ in
         };
       };
       "api.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
@@ -130,8 +130,8 @@ in
         };
       };
       "social.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
         root = "/var/www/social.${domain}";
         forceSSL = true;
         extraConfig = ''
@@ -151,10 +151,10 @@ in
         };
       };
       "meet.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+        sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
         forceSSL = true;
-        useACMEHost = domain;
+        useACMEHost = "wildcard-${domain}";
         enableACME = false;
       };
     };

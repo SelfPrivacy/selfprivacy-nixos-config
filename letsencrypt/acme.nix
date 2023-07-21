@@ -15,11 +15,16 @@ in
       reloadServices = [ "nginx" ];
     };
     certs = lib.mkForce {
-      "${cfg.domain}" = {
+      "wildcard-${cfg.domain}" = {
         domain = "*.${cfg.domain}";
         group = "acmerecievers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = "/var/lib/cloudflare/Credentials.ini";
+      };
+      "${cfg.domain}" = {
+        domain = cfg.domain;
+        group = "acmerecievers";
+        webroot = "/var/lib/acme/acme-challenge";
       };
     };
   };
