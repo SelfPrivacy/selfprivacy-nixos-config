@@ -24,6 +24,7 @@ in
       (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
       (if cfg.bitwarden.enable then "f /var/lib/bitwarden/.env 0640 vaultwarden vaultwarden - -" else "")
+      "d /var/sieve 0770 virtualMail virtualMail - -"
     ];
   system.activationScripts =
     let
