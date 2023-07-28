@@ -13,6 +13,7 @@ let
   dnsCredentialsTemplate = dnsCredentialsTemplates.${cfg.dns.provider};
   acme-env-filepath = "/var/lib/selfprivacy/acme-env";
   secrets-filepath = "/etc/selfprivacy/secrets.json";
+  dnsPropagationCheckExceptions = [ "DIGITALOCEAN" ];
 in
 {
   users.groups.acmereceivers.members = [ "nginx" ];
@@ -21,7 +22,8 @@ in
     defaults = {
       email = "${cfg.username}@${cfg.domain}";
       server = if cfg.dns.useStagingACME then "https://acme-staging-v02.api.letsencrypt.org/directory" else "https://acme-v02.api.letsencrypt.org/directory";
-      dnsPropagationCheck = false;
+      dnsPropagationCheck =
+        ! (lib.elem cfg.dns.provider dnsPropagationCheckExceptions);
       reloadServices = [ "nginx" ];
     };
     certs = lib.mkForce {
