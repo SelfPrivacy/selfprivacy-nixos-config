@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 let
   cfg = config.services.userdata;
+  dnsPropagationCheckExceptions = [ "DIGITALOCEAN" ];
 in
 {
   users.groups.acmerecievers = {
@@ -11,7 +12,7 @@ in
     defaults = {
       email = "${cfg.username}@${cfg.domain}";
       server = if cfg.dns.useStagingACME then "https://acme-staging-v02.api.letsencrypt.org/directory" else "https://acme-v02.api.letsencrypt.org/directory";
-      dnsPropagationCheck = true;
+      dnsPropagationCheck = if lib.elem cfg.dns.provider dnsPropagationCheckExceptions then false else true;
       reloadServices = [ "nginx" ];
     };
     certs = lib.mkForce {
