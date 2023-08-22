@@ -6,14 +6,17 @@
     nixpkgs.url = "github:nixos/nixpkgs";
     selfprivacy-overlay.url =
       "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git";
+    userdata-json.url = "path:./userdata.json";
+    userdata-json.flake = false;
   };
 
-  outputs = { self, nixpkgs, selfprivacy-overlay }:
+  outputs = { self, nixpkgs, selfprivacy-overlay, userdata-json }:
     let
       system = "x86_64-linux";
+      userdata = builtins.fromJSON (builtins.readFile userdata-json);
     in
     {
-      nixosConfigurations-fun = userdata: {
+      nixosConfigurations = {
         just-nixos = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system selfprivacy-overlay userdata; };
 
