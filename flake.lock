@@ -1,5 +1,18 @@
 {
   "nodes": {
+    "hardware-configuration-nix": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1692731346,
+        "narHash": "sha256-rQIpYKwowqbbVVurEl5qNpuPfoRyEUMefoZXrUoO6p8=",
+        "path": "hardware-configuration.nix",
+        "type": "path"
+      },
+      "original": {
+        "id": "hardware-configuration-nix",
+        "type": "indirect"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1686476475,
@@ -17,11 +30,13 @@
     },
     "root": {
       "inputs": {
+        "hardware-configuration-nix": "hardware-configuration-nix",
         "nixpkgs": "nixpkgs",
-        "selfprivacy-overlay": "selfprivacy-overlay"
+        "selfprivacy-overlay-path": "selfprivacy-overlay-path",
+        "userdata-json": "userdata-json"
       }
     },
-    "selfprivacy-overlay": {
+    "selfprivacy-overlay-path": {
       "locked": {
         "lastModified": 1689554432,
         "narHash": "sha256-hegMIgxBHUuRFbCecQpbjFfTHpduV3VZWr8OINtQO6k=",
@@ -34,6 +49,19 @@
       "original": {
         "type": "git",
         "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git"
+      }
+    },
+    "userdata-json": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1689259484,
+        "narHash": "sha256-Co3QGsxCjDspP5Nzzu1zICkee5CEq+ORlxSF3bFqbCY=",
+        "path": "userdata/userdata.json",
+        "type": "path"
+      },
+      "original": {
+        "id": "userdata-json",
+        "type": "indirect"
       }
     }
   },
