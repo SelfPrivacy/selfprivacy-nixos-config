@@ -65,3 +65,11 @@ Example JSON config:
     ]
 }
 ```
+
+# flakes edition
+
+Build with:
+```console
+$ nixos-rebuild build --flake .#just-nixos
+```
+
