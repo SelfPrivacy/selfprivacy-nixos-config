@@ -32,11 +32,11 @@
       "inputs": {
         "hardware-configuration-nix": "hardware-configuration-nix",
         "nixpkgs": "nixpkgs",
-        "selfprivacy-overlay-path": "selfprivacy-overlay-path",
+        "selfprivacy-overlay": "selfprivacy-overlay",
         "userdata-json": "userdata-json"
       }
     },
-    "selfprivacy-overlay-path": {
+    "selfprivacy-overlay": {
       "locked": {
         "lastModified": 1689554432,
         "narHash": "sha256-hegMIgxBHUuRFbCecQpbjFfTHpduV3VZWr8OINtQO6k=",

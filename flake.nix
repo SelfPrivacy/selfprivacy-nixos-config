@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
 
-    selfprivacy-overlay-path.url =
+    selfprivacy-overlay.url =
       "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git";
 
     # these inputs are expected to be set by the caller
@@ -16,13 +16,12 @@
   outputs =
     { self
     , nixpkgs
-    , selfprivacy-overlay-path
+    , selfprivacy-overlay
     , userdata-json
     , hardware-configuration-nix
     }:
     let
       system = "x86_64-linux";
-      selfprivacy-overlay = import selfprivacy-overlay-path;
       userdata = builtins.fromJSON (builtins.readFile userdata-json);
       hardware-configuration = import hardware-configuration-nix;
     in
@@ -31,7 +30,7 @@
         just-nixos = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system userdata; };
           modules = [
-            { nixpkgs.overlays = [ selfprivacy-overlay ]; }
+            { nixpkgs.overlays = [ selfprivacy-overlay.overlay ]; }
             hardware-configuration
             ./configuration.nix
           ];
