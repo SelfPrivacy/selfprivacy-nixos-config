@@ -22,6 +22,10 @@
     }:
     let
       system = "x86_64-linux";
+      cfgShortRev =
+        if self ? rev then builtins.substring 0 7 self.rev else "dirty";
+      nixosLabel = config:
+        "${cfgShortRev}.${config.system.nixos.release}.${nixpkgs.shortRev}";
       userdata = builtins.fromJSON (builtins.readFile userdata-json);
       hardware-configuration = import hardware-configuration-nix;
     in
@@ -30,9 +34,14 @@
         just-nixos = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system userdata; };
           modules = [
+            # SelfPrivacy overlay
             { nixpkgs.overlays = [ selfprivacy-overlay.overlay ]; }
+            # machine specifics
             hardware-configuration
+            # main configuration part
             ./configuration.nix
+            # we need to embed NixOS repository git commit sha1
+            ({ config, ... }: { system.nixos.label = nixosLabel config; })
           ];
         };
       };
