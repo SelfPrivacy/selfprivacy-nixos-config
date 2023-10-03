@@ -69,7 +69,7 @@
     openFirewall = false;
   };
   programs.ssh = {
-    pubkeyAcceptedKeyTypes = [ "ssh-ed25519" "ssh-rsa" ];
+    pubkeyAcceptedKeyTypes = [ "ssh-ed25519" "ssh-rsa" "ecdsa-sha2-nistp256" ];
     hostKeyAlgorithms = [ "ssh-ed25519" "ssh-rsa" ];
   };
   environment.systemPackages = with pkgs; [
