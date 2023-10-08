@@ -22,8 +22,7 @@
     }:
     let
       system = "x86_64-linux";
-      # (only "dirty", because userdata.json and others are overriden)
-      cfgShortRev = builtins.substring 0 7 self.dirtyRev;
+      cfgShortRev = builtins.substring 0 7 self.rev;
       nixosLabel = config:
         "${config.system.nixos.release}.${cfgShortRev}.${nixpkgs.shortRev}";
       userdata = builtins.fromJSON (builtins.readFile userdata-json);
@@ -44,7 +43,7 @@
             ({ config, ... }: {
               system.nixos.label = nixosLabel config;
               system.nixos.version = nixosLabel config;
-              system.configurationRevision = self.dirtyRev;
+              system.configurationRevision = self.rev;
             })
           ];
         };
