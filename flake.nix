@@ -22,9 +22,6 @@
     }:
     let
       system = "x86_64-linux";
-      cfgShortRev = builtins.substring 0 7 self.rev;
-      nixosLabel = config:
-        "${config.system.nixos.release}.${cfgShortRev}.${nixpkgs.shortRev}";
       userdata = builtins.fromJSON (builtins.readFile userdata-json);
       hardware-configuration = import hardware-configuration-nix;
     in
@@ -39,12 +36,6 @@
             hardware-configuration
             # main configuration part
             ./configuration.nix
-            # we need NixOS repository git commit sha1 embedded
-            ({ config, ... }: {
-              system.nixos.label = nixosLabel config;
-              system.nixos.version = nixosLabel config;
-              system.configurationRevision = self.rev;
-            })
           ];
         };
       };
