@@ -32,6 +32,11 @@ in
           proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
           expires 10m;
         '';
+        locations = {
+          "/" = {
+            root = "/var/www/root";
+          };
+        };
       };
       "vpn.${domain}" = {
         sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";

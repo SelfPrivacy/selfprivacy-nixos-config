@@ -25,6 +25,7 @@ in
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
       (if cfg.bitwarden.enable then "f /var/lib/bitwarden/.env 0640 vaultwarden vaultwarden - -" else "")
       "d /var/sieve 0770 virtualMail virtualMail - -"
+      "d /var/www/root 0750 nginx nginx - -"
     ];
   system.activationScripts =
     let
