@@ -187,7 +187,7 @@ in
         description = ''
           Password authentication for SSH
         '';
-        default = true;
+        default = false;
         type = types.nullOr types.bool;
       };
     };
