@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, selfprivacy-graphql-api, ... }:
 
 with lib;
 
@@ -63,7 +63,7 @@ in
       wantedBy = [ "network-online.target" ];
       serviceConfig = {
         User = "root";
-        ExecStart = "${pkgs.selfprivacy-graphql-api}/bin/app.py";
+        ExecStart = "${selfprivacy-graphql-api}/bin/app.py";
         Restart = "always";
         RestartSec = "5";
       };
@@ -76,7 +76,7 @@ in
         PYTHONUNBUFFERED = "1";
         ENABLE_SWAGGER = (if cfg.enableSwagger then "1" else "0");
         B2_BUCKET = cfg.b2Bucket;
-        PYTHONPATH = pkgs.selfprivacy-graphql-api.pythonPath + ":${pkgs.selfprivacy-graphql-api}/lib/python3.10/site-packages/";
+        PYTHONPATH = selfprivacy-graphql-api.pythonPath + ":${selfprivacy-graphql-api}/lib/python3.10/site-packages/";
       } // config.networking.proxy.envVars;
       path = [
         "/var/"

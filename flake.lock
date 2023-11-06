@@ -18,22 +18,27 @@
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "selfprivacy-overlay": "selfprivacy-overlay"
+        "selfprivacy-graphql-api": "selfprivacy-graphql-api"
       }
     },
-    "selfprivacy-overlay": {
+    "selfprivacy-graphql-api": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1689554432,
-        "narHash": "sha256-hegMIgxBHUuRFbCecQpbjFfTHpduV3VZWr8OINtQO6k=",
-        "ref": "flakes",
-        "rev": "53ed9b3f5f70a7f2843ecbef7775307e23a2c1f4",
-        "revCount": 31,
+        "lastModified": 1699259966,
+        "narHash": "sha256-NMZ1NZ/3I4d9AvegG95sSaV2Hv4A6WEfJ5UCpsFr+Zk=",
+        "ref": "flake",
+        "rev": "b6e84f2596b78da497f63179d72c903bb9b92d4e",
+        "revCount": 942,
         "type": "git",
-        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git"
+        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
       },
       "original": {
         "type": "git",
-        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git"
+        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
       }
     }
   },

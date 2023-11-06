@@ -1,4 +1,4 @@
-{ userdata, selfprivacy-overlay, config, pkgs, lib, ... }:
+{ userdata, config, pkgs, lib, ... }:
 {
   imports = [
     ./variables-module.nix
@@ -22,10 +22,6 @@
     ./videomeet/jitsi.nix
     ./git/gitea.nix
   ];
-
-  nixpkgs.overlays = [ (import selfprivacy-overlay) ];
-  # this should be specified in hardware-configuration.nix?
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   services.redis.servers.sp-api = {
     enable = true;
