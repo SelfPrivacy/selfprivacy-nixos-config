@@ -1,7 +1,6 @@
 { userdata, selfprivacy-overlay, config, pkgs, lib, ... }:
 {
   imports = [
-    ./hardware-configuration.nix
     ./variables-module.nix
     ./variables.nix
     ./files.nix
