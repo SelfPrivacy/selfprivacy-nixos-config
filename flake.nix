@@ -29,7 +29,11 @@
           specialArgs = { inherit system userdata; };
           modules = [
             # SelfPrivacy overlay
-            { nixpkgs.overlays = [ selfprivacy-overlay.overlay ]; }
+            {
+              nixpkgs.overlays = [ selfprivacy-overlay.overlay ];
+              environment.etc.selfprivacy-nixos-config-source.source =
+                etc-nixos.outPath;
+            }
             # machine specifics
             "${etc-nixos}/hardware-configuration.nix"
             # main configuration part
