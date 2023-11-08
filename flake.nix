@@ -17,29 +17,29 @@
     , etc-nixos
     , nixpkgs
     , selfprivacy-overlay
-    }:
+    } @ inputs:
     let
       system = "x86_64-linux";
       userdata =
         builtins.fromJSON (builtins.readFile "${etc-nixos}/userdata.json");
+      lib = nixpkgs.legacyPackages.${system}.lib;
     in
     {
-      nixosConfigurations = {
-        just-nixos = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit system userdata; };
-          modules = [
-            # SelfPrivacy overlay
-            {
-              nixpkgs.overlays = [ selfprivacy-overlay.overlay ];
-              environment.etc.selfprivacy-nixos-config-source.source =
-                etc-nixos.outPath;
-            }
-            # machine specifics
-            "${etc-nixos}/hardware-configuration.nix"
-            # main configuration part
-            ./configuration.nix
-          ];
-        };
+      nixosConfigurations.just-nixos = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit system userdata; };
+        modules = [
+          # SelfPrivacy overlay
+          {
+            nixpkgs.overlays = [ selfprivacy-overlay.overlay ];
+            environment.etc.selfprivacy-nixos-config-source.source =
+              etc-nixos.outPath;
+            nix.registry = lib.mapAttrs (_n: flake: { inherit flake; }) inputs;
+          }
+          # machine specifics
+          "${etc-nixos}/hardware-configuration.nix"
+          # main configuration part
+          ./configuration.nix
+        ];
       };
     };
 }
