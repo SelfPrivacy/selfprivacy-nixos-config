@@ -10,6 +10,8 @@
     # the /etc/nixos folder input is expected to be set by the caller
     # for example, upon nix build using --override-input
     etc-nixos.flake = false;
+
+    sp-extensions-json.flake = false;
   };
 
   outputs =
@@ -17,11 +19,14 @@
     , etc-nixos
     , nixpkgs
     , selfprivacy-overlay
+    , sp-extensions-json
     } @ inputs:
     let
       system = "x86_64-linux";
       userdata =
         builtins.fromJSON (builtins.readFile "${etc-nixos}/userdata.json");
+      sp-extensions =
+        builtins.fromJSON (builtins.readFile sp-extensions-json);
       lib = nixpkgs.legacyPackages.${system}.lib;
     in
     {
@@ -30,7 +35,7 @@
         modules = [
           # SelfPrivacy overlay
           {
-            nixpkgs.overlays = [ selfprivacy-overlay.overlay ];
+            nixpkgs.overlays = builtins.trace (sp-extensions.mailserver) [ selfprivacy-overlay.overlay ];
             environment.etc.selfprivacy-nixos-config-source.source =
               etc-nixos.outPath;
             nix.registry = lib.mapAttrs (_n: flake: { inherit flake; }) inputs;
