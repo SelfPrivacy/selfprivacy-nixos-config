@@ -7,23 +7,21 @@
     selfprivacy-overlay.url =
       "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo.git";
 
-    # these inputs are expected to be set by the caller
+    # the /etc/nixos folder input is expected to be set by the caller
     # for example, upon nix build using --override-input
-    userdata-json.flake = false; # userdata.json
-    hardware-configuration-nix.flake = false; # hardware-configuration.nix
+    etc-nixos.flake = false;
   };
 
   outputs =
     { self
+    , etc-nixos
     , nixpkgs
     , selfprivacy-overlay
-    , userdata-json
-    , hardware-configuration-nix
     }:
     let
       system = "x86_64-linux";
-      userdata = builtins.fromJSON (builtins.readFile userdata-json);
-      hardware-configuration = import hardware-configuration-nix;
+      userdata =
+        builtins.fromJSON (builtins.readFile "${etc-nixos}/userdata.json");
     in
     {
       nixosConfigurations = {
@@ -33,7 +31,7 @@
             # SelfPrivacy overlay
             { nixpkgs.overlays = [ selfprivacy-overlay.overlay ]; }
             # machine specifics
-            hardware-configuration
+            "${etc-nixos}/hardware-configuration.nix"
             # main configuration part
             ./configuration.nix
           ];
