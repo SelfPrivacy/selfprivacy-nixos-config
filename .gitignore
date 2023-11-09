@@ -2,3 +2,4 @@ userdata/userdata.json
 userdata/tokens.json
 hardware-configuration.nix
 networking.nix
+/result

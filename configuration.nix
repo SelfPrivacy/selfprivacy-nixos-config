@@ -95,6 +95,9 @@ in
       automatic = true;
       options = "--delete-older-than 7d";
     };
+    extraOptions = ''
+      experimental-features = nix-command flakes repl-flake
+    '';
   };
   services.journald.extraConfig = "SystemMaxUse=500M";
   boot.kernel.sysctl = {
