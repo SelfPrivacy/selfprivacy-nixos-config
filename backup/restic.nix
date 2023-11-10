@@ -1,6 +1,6 @@
-{ config, pkgs, ... }:
+{ config, ... }:
 let
-  cfg = config.services.userdata;
+  cfg = config.selfprivacy.userdata;
 in
 {
   services.restic.backups = {

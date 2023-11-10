@@ -1,9 +1,9 @@
-{ pkgs, config, ... }:
+{ config, ... }:
 let
-  cfg = config.services.userdata;
+  cfg = config.selfprivacy.userdata;
 in
 {
-  fileSystems = { } // builtins.listToAttrs (builtins.map
+  fileSystems = builtins.listToAttrs (builtins.map
     (volume: {
       name = "${volume.mountPoint}";
       value = {

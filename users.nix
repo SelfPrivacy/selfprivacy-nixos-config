@@ -1,6 +1,6 @@
 { pkgs, config, ... }:
 let
-  cfg = config.services.userdata;
+  cfg = config.selfprivacy.userdata;
 in
 {
   users.mutableUsers = false;

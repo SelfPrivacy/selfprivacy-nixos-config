@@ -1,4 +1,4 @@
-{ config, lib, pkgs, selfprivacy-graphql-api, ... }:
+selfprivacy-graphql-api: { config, lib, pkgs, ... }:
 
 with lib;
 

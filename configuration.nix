@@ -1,15 +1,12 @@
-{ userdata, config, pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 {
   imports = [
     ./variables-module.nix
-    ./variables.nix
     ./files.nix
     ./volumes.nix
     ./users.nix
-    ./mailserver/system/mailserver.nix
     ./vpn/ocserv.nix
     ./api/api.nix
-    ./api/api-module.nix
     ./social/pleroma.nix
     ./letsencrypt/acme.nix
     ./letsencrypt/resolve.nix
@@ -41,11 +38,11 @@
     };
   };
 
-  services.do-agent.enable = if config.services.userdata.server.provider == "DIGITALOCEAN" then true else false;
+  services.do-agent.enable = if config.selfprivacy.userdata.server.provider == "DIGITALOCEAN" then true else false;
 
   boot.cleanTmpDir = true;
   networking = {
-    hostName = config.services.userdata.hostname;
+    hostName = config.selfprivacy.userdata.hostname;
     usePredictableInterfaceNames = false;
     firewall = {
       allowedTCPPorts = lib.mkForce [ 22 25 80 143 443 465 587 993 4443 8443 ];
@@ -57,12 +54,12 @@
     };
     nameservers = [ "1.1.1.1" "1.0.0.1" ];
   };
-  time.timeZone = config.services.userdata.timezone;
+  time.timeZone = config.selfprivacy.userdata.timezone;
   i18n.defaultLocale = "en_GB.UTF-8";
-  users.users.root.openssh.authorizedKeys.keys = config.services.userdata.ssh.rootKeys;
+  users.users.root.openssh.authorizedKeys.keys = config.selfprivacy.userdata.ssh.rootKeys;
   services.openssh = {
-    enable = config.services.userdata.ssh.enable;
-    passwordAuthentication = config.services.userdata.ssh.passwordAuthentication;
+    enable = config.selfprivacy.userdata.ssh.enable;
+    passwordAuthentication = config.selfprivacy.userdata.ssh.passwordAuthentication;
     permitRootLogin = "yes";
     openFirewall = false;
   };
@@ -75,14 +72,14 @@
     jq
   ];
   environment.variables = {
-    DOMAIN = config.services.userdata.domain;
+    DOMAIN = config.selfprivacy.userdata.domain;
   };
   system.autoUpgrade = {
-    enable = config.services.userdata.autoUpgrade.enable;
-    allowReboot = config.services.userdata.autoUpgrade.allowReboot;
+    enable = config.selfprivacy.userdata.autoUpgrade.enable;
+    allowReboot = config.selfprivacy.userdata.autoUpgrade.allowReboot;
     channel = "https://channel.selfprivacy.org/nixos-selfpricacy";
   };
-  system.stateVersion = config.services.userdata.stateVersion;
+  system.stateVersion = config.selfprivacy.userdata.stateVersion;
   nix = {
     optimise.automatic = true;
     gc = {

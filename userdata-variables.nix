@@ -1,9 +1,6 @@
-{ lib, userdata, ... }:
-let
-  jsonData = userdata;
-in
+jsonData: { lib, ... }:
 {
-  services.userdata = {
+  selfprivacy.userdata = jsonData // {
     hostname = lib.attrsets.attrByPath [ "hostname" ] null jsonData;
     domain = lib.attrsets.attrByPath [ "domain" ] null jsonData;
     timezone = lib.attrsets.attrByPath [ "timezone" ] "Europe/Uzhgorod" jsonData;
@@ -61,6 +58,5 @@ in
     };
     users = lib.attrsets.attrByPath [ "users" ] [ ] jsonData;
     volumes = lib.attrsets.attrByPath [ "volumes" ] [ ] jsonData;
-    useBinds = lib.attrsets.attrByPath [ "useBinds" ] false jsonData;
   };
 }

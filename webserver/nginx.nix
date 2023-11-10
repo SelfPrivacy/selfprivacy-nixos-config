@@ -1,6 +1,6 @@
-{ pkgs, config, lib, ... }:
+{ config, lib, ... }:
 let
-  domain = config.services.userdata.domain;
+  domain = config.selfprivacy.userdata.domain;
 in
 {
   services.nginx = {

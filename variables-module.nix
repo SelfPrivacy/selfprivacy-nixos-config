@@ -1,16 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ lib, ... }:
 
 with lib;
-
-let
-  cfg = config.services.userdata;
-  directionArg =
-    if cfg.direction == ""
-    then ""
-    else "--direction=${cfg.direction}";
-in
 {
-  options.services.userdata = {
+  options.selfprivacy.userdata = {
     # General server options
     hostname = mkOption {
       description = "The hostname of the server.";
@@ -221,6 +213,7 @@ in
     useBinds = mkOption {
       type = types.nullOr types.bool;
       default = false;
+      description = "Whether to bind-mount vmail and sieve folders";
     };
   };
 }

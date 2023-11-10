@@ -1,11 +1,8 @@
-{ pkgs, config, ... }:
-let
-  domain = config.services.userdata.domain;
-in
+{ config, ... }:
 {
   services.jitsi-meet = {
-    enable = config.services.userdata.jitsi.enable;
-    hostName = "meet.${domain}";
+    enable = config.selfprivacy.userdata.jitsi.enable;
+    hostName = "meet.${config.selfprivacy.userdata.domain}";
     nginx.enable = true;
     interfaceConfig = {
       SHOW_JITSI_WATERMARK = false;

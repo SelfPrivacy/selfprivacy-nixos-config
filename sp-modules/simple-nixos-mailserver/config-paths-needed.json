@@ -1,0 +1,24 @@
+[
+  [
+    "services",
+    "redis"
+  ],
+  [
+    "mailserver"
+  ],
+  [
+    "selfprivacy",
+    "userdata",
+    "email"
+  ],
+  [
+    "selfprivacy",
+    "userdata",
+    "domain"
+  ],
+  [
+    "selfprivacy",
+    "userdata",
+    "username"
+  ]
+]

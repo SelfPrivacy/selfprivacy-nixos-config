@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 let
-  cfg = config.services.userdata;
+  cfg = config.selfprivacy.userdata;
 in
 {
   users.groups.acmerecievers = {

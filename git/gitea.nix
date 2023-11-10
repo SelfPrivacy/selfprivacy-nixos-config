@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... }:
 let
-  cfg = config.services.userdata;
+  cfg = config.selfprivacy.userdata;
 in
 {
   fileSystems = lib.mkIf cfg.useBinds {

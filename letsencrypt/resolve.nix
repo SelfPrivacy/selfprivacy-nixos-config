@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  domain = config.services.userdata.domain;
+  domain = config.selfprivacy.userdata.domain;
 in
 {
   systemd = {

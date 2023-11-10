@@ -2,8 +2,8 @@
 {
   services.selfprivacy-api = {
     enable = true;
-    enableSwagger = config.services.userdata.api.enableSwagger;
-    b2Bucket = config.services.userdata.backup.bucket;
+    enableSwagger = config.selfprivacy.userdata.api.enableSwagger;
+    b2Bucket = config.selfprivacy.userdata.backup.bucket;
   };
 
   users.users."selfprivacy-api" = {
