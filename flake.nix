@@ -32,9 +32,12 @@
               hardware-configuration
               ./configuration.nix
               {
+                # embed top-level flake source folder into the build
+                environment.etc."selfprivacy-config-source" =
+                  top-level-flake.outPath;
                 # for running "nix search nixpkgs", etc
                 nix.registry.nixpkgs.flake = nixpkgs;
-                # dirty builds are forbidden
+                # embed commit sha1; dirty builds are intentionally forbidden
                 system.configurationRevision = top-level-flake.rev; # FIXME
                 # system.configurationRevision = self.rev;
               }
