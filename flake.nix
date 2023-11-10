@@ -38,8 +38,7 @@
                 # for running "nix search nixpkgs", etc
                 nix.registry.nixpkgs.flake = nixpkgs;
                 # embed commit sha1; dirty builds are intentionally forbidden
-                system.configurationRevision = top-level-flake.rev; # FIXME
-                # system.configurationRevision = self.rev;
+                system.configurationRevision = self.rev;
               }
             ];
             inherit system;
