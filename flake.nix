@@ -6,6 +6,7 @@
 
     selfprivacy-graphql-api.url =
       "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git";
+    # make selfprivacy-graphql-api use the same shared nixpkgs
     selfprivacy-graphql-api.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -21,7 +22,7 @@
         lib = nixpkgs.legacyPackages.${system}.lib;
       in
       {
-        just-nixos = nixpkgs.lib.nixosSystem {
+        sp-nixos = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system; };
           modules = [
             hardware-configuration
@@ -31,7 +32,7 @@
               selfprivacy-graphql-api.packages.${system}.default)
             {
               # embed top-level flake source folder into the build
-              environment.etc."selfprivacy-config-source".source =
+              environment.etc."selfprivacy/current-config-source".source =
                 top-level-flake.outPath;
               # for running "nix search nixpkgs", etc
               nix.registry.nixpkgs.flake = nixpkgs;
@@ -53,9 +54,9 @@
                       sp-module.configPathsNeeded));
               }))
             )
-            # (sp-module: sp-module.nixosModules.default)
             (lib.attrsets.attrValues sp-modules);
         };
       };
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
   };
 }
