@@ -21,7 +21,6 @@
         lib = nixpkgs.legacyPackages.${system}.lib;
       in
       {
-        inherit system;
         just-nixos = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system; };
           modules = [
