@@ -36,8 +36,10 @@
                 top-level-flake.outPath;
               # for running "nix search nixpkgs", etc
               nix.registry.nixpkgs.flake = nixpkgs;
-              # embed commit sha1; FIXME dirty builds must be intentionally forbidden
-              system.configurationRevision = self.rev or ("#" + self.lastModifiedDate + "-" + toString self.lastModified);
+              # embed commit sha1 for `nixos-version --configuration-revision`
+              system.configurationRevision = self.rev
+                or "@${self.lastModifiedDate}"; # for development
+              # TODO assertion to forbid dirty builds caused by top-level-flake
             }
           ]
           ++
