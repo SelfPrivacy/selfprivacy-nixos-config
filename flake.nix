@@ -57,6 +57,8 @@
                 };
                 constrainImportsArgsRecursive = lib.attrsets.mapAttrsRecursive
                   (p: v:
+                    # TODO traverse only imports and imports of imports, etc
+                    # without traversing all attributes
                     if lib.lists.last p == "imports"
                     then
                       map
