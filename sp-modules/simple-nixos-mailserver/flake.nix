@@ -6,17 +6,14 @@
 
   outputs = { self, mailserver }: {
     # tricks to rename (alias) the original module
-    nixosModules.default = args@{ pkgs, ... }:
+    nixosModules.default = args@{ pkgs, config, ... }:
       let
         module = mailserver.nixosModules.default args;
       in
       module // {
         imports = module.imports ++ [
           ./config.nix
-          ({ config, ... }: {
-            mailserver =
-              config.selfprivacy.userdata.simple-nixos-mailserver;
-          })
+          { mailserver = config.selfprivacy.userdata.simple-nixos-mailserver; }
         ];
         options = module.options // {
           selfprivacy.userdata.simple-nixos-mailserver =

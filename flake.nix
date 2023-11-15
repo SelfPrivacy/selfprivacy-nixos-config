@@ -18,9 +18,6 @@
       , top-level-flake
       , sp-modules
       }:
-      let
-        lib = nixpkgs.legacyPackages.${system}.lib;
-      in
       {
         sp-nixos = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system; };
@@ -43,20 +40,42 @@
             }
           ]
           ++
-          # add SP modules, but filter available config attributes for each
+          # add SP modules, but contrain available config attributes for each
+          # (TODO revise evaluation performance of the code below)
           map
-            (sp-module: args@{ pkgs, ... }: (sp-module.nixosModules.default
-              (args // {
-                config =
-                  # TODO use lib.attrsets.mergeAttrsList from nixpkgs 23.05
-                  (builtins.foldl' lib.trivial.mergeAttrs { }
-                    (map
-                      (p: lib.attrsets.setAttrByPath p
-                        (lib.attrsets.getAttrFromPath p args.config))
-                      sp-module.configPathsNeeded));
-              }))
+            (sp-module: args@{ config, pkgs, ... }:
+              let
+                lib = nixpkgs.lib;
+                constrainConfigArgs = args'@{ pkgs, ... }: args' // {
+                  config =
+                    # TODO use lib.attrsets.mergeAttrsList from nixpkgs 23.05
+                    (builtins.foldl' lib.attrsets.recursiveUpdate { }
+                      (map
+                        (p: lib.attrsets.setAttrByPath p
+                          (lib.attrsets.getAttrFromPath p config))
+                        sp-module.configPathsNeeded));
+                };
+                constrainImportsArgsRecursive = lib.attrsets.mapAttrsRecursive
+                  (p: v:
+                    if lib.lists.last p == "imports"
+                    then
+                      map
+                        (m:
+                          (args'@{ pkgs, ... }: constrainImportsArgsRecursive
+                            (if builtins.isPath m
+                            then import m (constrainConfigArgs args')
+                            else
+                              if builtins.isFunction m
+                              then constrainConfigArgs args'
+                              else m))
+                        )
+                        v
+                    else v);
+              in
+              constrainImportsArgsRecursive
+                (sp-module.nixosModules.default (constrainConfigArgs args))
             )
-            (lib.attrsets.attrValues sp-modules);
+            (nixpkgs.lib.attrsets.attrValues sp-modules);
         };
       };
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;

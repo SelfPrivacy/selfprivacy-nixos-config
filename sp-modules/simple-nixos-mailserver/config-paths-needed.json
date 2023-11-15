@@ -1,24 +1,16 @@
 [
-  [
-    "services",
-    "redis"
-  ],
-  [
-    "mailserver"
-  ],
-  [
-    "selfprivacy",
-    "userdata",
-    "email"
-  ],
-  [
-    "selfprivacy",
-    "userdata",
-    "domain"
-  ],
-  [
-    "selfprivacy",
-    "userdata",
-    "username"
-  ]
+  [ "mailserver" ],
+  [ "selfprivacy", "userdata", "domain" ],
+  [ "selfprivacy", "userdata", "email" ],
+  [ "selfprivacy", "userdata", "hashedMasterPassword" ],
+  [ "selfprivacy", "userdata", "simple-nixos-mailserver" ],
+  [ "selfprivacy", "userdata", "useBinds" ],
+  [ "selfprivacy", "userdata", "username" ],
+  [ "selfprivacy", "userdata", "users" ],
+  [ "services", "dovecot2" ],
+  [ "services", "opendkim" ],
+  [ "services", "postfix", "group" ],
+  [ "services", "postfix", "user" ],
+  [ "services", "redis" ],
+  [ "services", "rspamd" ]
 ]
