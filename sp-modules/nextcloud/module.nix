@@ -17,6 +17,7 @@
       secrets-filepath = "/etc/nixos/userdata/userdata.json";
       db-pass-filepath = "/var/lib/nextcloud/db-pass";
       admin-pass-filepath = "/var/lib/nextcloud/admin-pass";
+      hostName = "cloud.${cfg.domain}";
     in
     lib.mkIf cfg.nextcloud.enable
       {
@@ -39,7 +40,7 @@
         services.nextcloud = {
           enable = true;
           package = pkgs.nextcloud25;
-          hostName = "cloud.${cfg.domain}";
+          inherit hostName;
 
           # Use HTTPS for links
           https = false;
@@ -60,6 +61,26 @@
             dbpassFile = db-pass-filepath;
             adminpassFile = admin-pass-filepath;
             adminuser = "admin";
+          };
+        };
+        services.nginx.virtualHosts.${hostName} = {
+          sslCertificate = "/var/lib/acme/${cfg.domain}/fullchain.pem";
+          sslCertificateKey = "/var/lib/acme/${cfg.domain}/key.pem";
+          forceSSL = true;
+          extraConfig = ''
+            add_header Strict-Transport-Security $hsts_header;
+            #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+            add_header 'Referrer-Policy' 'origin-when-cross-origin';
+            add_header X-Frame-Options DENY;
+            add_header X-Content-Type-Options nosniff;
+            add_header X-XSS-Protection "1; mode=block";
+            proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
+            expires 10m;
+          '';
+          locations = {
+            "/" = {
+              proxyPass = "http://127.0.0.1:80/";
+            };
           };
         };
       }
