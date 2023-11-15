@@ -14,7 +14,6 @@
     ./passmgr/bitwarden.nix
     ./webserver/nginx.nix
     ./webserver/memcached.nix
-    ./nextcloud/nextcloud.nix
     ./resources/limits.nix
     ./videomeet/jitsi.nix
     ./git/gitea.nix

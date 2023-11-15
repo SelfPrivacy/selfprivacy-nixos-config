@@ -135,16 +135,6 @@ with lib;
         type = types.nullOr types.str;
       };
     };
-    nextcloud = {
-      enable = mkOption {
-        default = true;
-        type = types.nullOr types.bool;
-      };
-      location = mkOption {
-        default = "sda1";
-        type = types.nullOr types.str;
-      };
-    };
     pleroma = {
       enable = mkOption {
         default = false;

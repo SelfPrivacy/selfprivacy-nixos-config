@@ -32,21 +32,6 @@ in
       sed = "${pkgs.gnused}/bin/sed";
     in
     {
-      nextcloudSecrets =
-        if cfg.nextcloud.enable then ''
-          mkdir -p /var/lib/nextcloud
-          cat /etc/nixos/userdata/userdata.json | ${jq} -r '.nextcloud.databasePassword' > /var/lib/nextcloud/db-pass
-          chmod 0440 /var/lib/nextcloud/db-pass
-          chown nextcloud:nextcloud /var/lib/nextcloud/db-pass
-
-          cat /etc/nixos/userdata/userdata.json | ${jq} -r '.nextcloud.adminPassword' > /var/lib/nextcloud/admin-pass
-          chmod 0440 /var/lib/nextcloud/admin-pass
-          chown nextcloud:nextcloud /var/lib/nextcloud/admin-pass
-        ''
-        else ''
-          rm -f /var/lib/nextcloud/db-pass
-          rm -f /var/lib/nextcloud/admin-pass
-        '';
       cloudflareCredentials = ''
         mkdir -p /var/lib/cloudflare
         chmod 0440 /var/lib/cloudflare
