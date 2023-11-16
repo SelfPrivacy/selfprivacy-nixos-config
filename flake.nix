@@ -4,13 +4,13 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
 
-    selfprivacy-graphql-api.url =
+    selfprivacy-api.url =
       "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git";
-    # make selfprivacy-graphql-api use the same shared nixpkgs
-    selfprivacy-graphql-api.inputs.nixpkgs.follows = "nixpkgs";
+    # make selfprivacy-api use the same shared nixpkgs
+    selfprivacy-api.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, selfprivacy-graphql-api }: {
+  outputs = { self, nixpkgs, selfprivacy-api }: {
     nixosConfigurations-fun =
       { system
       , hardware-configuration
@@ -25,8 +25,7 @@
             hardware-configuration
             ./configuration.nix
             (import ./userdata-variables.nix userdata)
-            (import ./api/api-module.nix
-              selfprivacy-graphql-api.packages.${system}.default)
+            selfprivacy-api.nixosModules.default
             {
               # embed top-level flake source folder into the build
               environment.etc."selfprivacy/current-config-source".source =

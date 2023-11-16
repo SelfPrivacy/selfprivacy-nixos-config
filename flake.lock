@@ -18,21 +18,21 @@
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "selfprivacy-graphql-api": "selfprivacy-graphql-api"
+        "selfprivacy-api": "selfprivacy-api"
       }
     },
-    "selfprivacy-graphql-api": {
+    "selfprivacy-api": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1699259966,
-        "narHash": "sha256-NMZ1NZ/3I4d9AvegG95sSaV2Hv4A6WEfJ5UCpsFr+Zk=",
-        "ref": "flake",
-        "rev": "b6e84f2596b78da497f63179d72c903bb9b92d4e",
-        "revCount": 942,
+        "lastModified": 1700101644,
+        "narHash": "sha256-RtzREz64LQt0xO6mMW3CGtu6NOdKSStHqHM8Jlcnano=",
+        "ref": "nixos-module",
+        "rev": "e6e9d0677e51e5b1f2f5ee60809d190ab18a9f3e",
+        "revCount": 1028,
         "type": "git",
         "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
       },
