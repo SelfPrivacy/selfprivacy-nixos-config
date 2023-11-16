@@ -5,20 +5,22 @@
     gitlab:simple-nixos-mailserver/nixos-mailserver;
 
   outputs = { self, mailserver }: {
-    # tricks to rename (alias) the original module
-    nixosModules.default = args@{ pkgs, config, ... }:
+    nixosModules.default = args@{ config, ... }:
+      # tricks to rename (alias) the original module
       let
         module = mailserver.nixosModules.default args;
       in
-      module // {
-        imports = module.imports ++ [
+      {
+        imports = [
+          module
+          {
+            config.mailserver =
+              config.selfprivacy.modules.simple-nixos-mailserver;
+            options.selfprivacy.modules.simple-nixos-mailserver =
+              module.options.mailserver;
+          }
           ./config.nix
-          { mailserver = config.selfprivacy.modules.simple-nixos-mailserver; }
         ];
-        options = module.options // {
-          selfprivacy.modules.simple-nixos-mailserver =
-            module.options.mailserver;
-        };
       };
     configPathsNeeded =
       builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
