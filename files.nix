@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  cfg = config.selfprivacy.userdata;
+  cfg = config.selfprivacy;
   dnsCredentialsTemplates = {
     DIGITALOCEAN = "DO_AUTH_TOKEN=REPLACEME";
     CLOUDFLARE = ''

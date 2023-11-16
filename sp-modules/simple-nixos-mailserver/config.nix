@@ -1,37 +1,37 @@
 { config, lib, ... }:
 let
-  cfg = config.selfprivacy.userdata;
+  sp = config.selfprivacy;
 in
 {
-  fileSystems = lib.mkIf
-    (cfg.simple-nixos-mailserver.enable && cfg.useBinds)
-    {
-      "/var/vmail" = {
-        device = "/volumes/${cfg.email.location}/vmail";
-        options = [ "bind" ];
+  fileSystems =
+    lib.mkIf (sp.modules.simple-nixos-mailserver.enable && sp.useBinds)
+      {
+        "/var/vmail" = {
+          device = "/volumes/${sp.email.location}/vmail";
+          options = [ "bind" ];
+        };
+        "/var/sieve" = {
+          device = "/volumes/${sp.email.location}/sieve";
+          options = [ "bind" ];
+        };
       };
-      "/var/sieve" = {
-        device = "/volumes/${cfg.email.location}/sieve";
-        options = [ "bind" ];
-      };
-    };
 
-  users.users = lib.mkIf cfg.simple-nixos-mailserver.enable {
+  users.users = lib.mkIf sp.modules.simple-nixos-mailserver.enable {
     virtualMail = {
       isNormalUser = false;
     };
   };
 
-  selfprivacy.userdata.simple-nixos-mailserver =
-    lib.mkIf cfg.simple-nixos-mailserver.enable {
-      fqdn = cfg.domain;
-      domains = [ cfg.domain ];
+  selfprivacy.modules.simple-nixos-mailserver =
+    lib.mkIf sp.modules.simple-nixos-mailserver.enable {
+      fqdn = sp.domain;
+      domains = [ sp.domain ];
 
       # A list of all login accounts. To create the password hashes, use
       # mkpasswd -m sha-512 "super secret password"
       loginAccounts = {
-        "${cfg.username}@${cfg.domain}" = {
-          hashedPassword = cfg.hashedMasterPassword;
+        "${sp.username}@${sp.domain}" = {
+          hashedPassword = sp.hashedMasterPassword;
           sieveScript = ''
             require ["fileinto", "mailbox"];
             if header :contains "Chat-Version" "1.0"
@@ -43,7 +43,7 @@ in
         };
       } // builtins.listToAttrs (builtins.map
         (user: {
-          name = "${user.username}@${cfg.domain}";
+          name = "${user.username}@${sp.domain}";
           value = {
             hashedPassword = user.hashedPassword;
             sieveScript = ''
@@ -56,15 +56,15 @@ in
             '';
           };
         })
-        cfg.users);
+        sp.users);
 
       extraVirtualAliases = {
-        "admin@${cfg.domain}" = "${cfg.username}@${cfg.domain}";
+        "admin@${sp.domain}" = "${sp.username}@${sp.domain}";
       };
 
       certificateScheme = "manual";
-      certificateFile = "/var/lib/acme/${cfg.domain}/fullchain.pem";
-      keyFile = "/var/lib/acme/${cfg.domain}/key.pem";
+      certificateFile = "/var/lib/acme/${sp.domain}/fullchain.pem";
+      keyFile = "/var/lib/acme/${sp.domain}/key.pem";
 
       # Enable IMAP and POP3
       enableImap = true;

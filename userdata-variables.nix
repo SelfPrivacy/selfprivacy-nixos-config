@@ -1,6 +1,6 @@
 jsonData: { lib, ... }:
 {
-  selfprivacy.userdata = jsonData // {
+  selfprivacy = jsonData // {
     hostname = lib.attrsets.attrByPath [ "hostname" ] null jsonData;
     domain = lib.attrsets.attrByPath [ "domain" ] null jsonData;
     timezone = lib.attrsets.attrByPath [ "timezone" ] "Europe/Uzhgorod" jsonData;
@@ -12,10 +12,6 @@ jsonData: { lib, ... }:
     username = lib.attrsets.attrByPath [ "username" ] null jsonData;
     hashedMasterPassword = lib.attrsets.attrByPath [ "hashedMasterPassword" ] null jsonData;
     sshKeys = lib.attrsets.attrByPath [ "sshKeys" ] [ ] jsonData;
-    api = {
-      enableSwagger = lib.attrsets.attrByPath [ "api" "enableSwagger" ] false jsonData;
-      skippedMigrations = lib.attrsets.attrByPath [ "api" "skippedMigrations" ] [ ] jsonData;
-    };
     dns = {
       provider = lib.attrsets.attrByPath [ "dns" "provider" ] "CLOUDFLARE" jsonData;
       useStagingACME = lib.attrsets.attrByPath [ "dns" "useStagingACME" ] false jsonData;

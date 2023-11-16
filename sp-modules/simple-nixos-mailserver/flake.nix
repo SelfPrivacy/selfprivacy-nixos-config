@@ -13,10 +13,10 @@
       module // {
         imports = module.imports ++ [
           ./config.nix
-          { mailserver = config.selfprivacy.userdata.simple-nixos-mailserver; }
+          { mailserver = config.selfprivacy.modules.simple-nixos-mailserver; }
         ];
         options = module.options // {
-          selfprivacy.userdata.simple-nixos-mailserver =
+          selfprivacy.modules.simple-nixos-mailserver =
             module.options.mailserver;
         };
       };

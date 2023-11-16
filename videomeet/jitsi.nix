@@ -1,8 +1,8 @@
 { config, ... }:
 {
   services.jitsi-meet = {
-    enable = config.selfprivacy.userdata.jitsi.enable;
-    hostName = "meet.${config.selfprivacy.userdata.domain}";
+    enable = config.selfprivacy.jitsi.enable;
+    hostName = "meet.${config.selfprivacy.domain}";
     nginx.enable = true;
     interfaceConfig = {
       SHOW_JITSI_WATERMARK = false;

@@ -1,6 +1,6 @@
 { config, lib, ... }:
 let
-  domain = config.selfprivacy.userdata.domain;
+  domain = config.selfprivacy.domain;
 in
 {
   services.nginx = {

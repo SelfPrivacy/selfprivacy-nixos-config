@@ -2,7 +2,7 @@
 
 with lib;
 {
-  options.selfprivacy.userdata = {
+  options.selfprivacy = {
     # General server options
     hostname = mkOption {
       description = "The hostname of the server.";
@@ -205,5 +205,9 @@ with lib;
       default = false;
       description = "Whether to bind-mount vmail and sieve folders";
     };
+    ##############
+    #   Modules  #
+    ##############
+    # modules =
   };
 }

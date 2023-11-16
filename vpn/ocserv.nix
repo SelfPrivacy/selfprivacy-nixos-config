@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  domain = config.selfprivacy.userdata.domain;
+  domain = config.selfprivacy.domain;
 in
 {
   users.groups.ocserv = {
@@ -13,7 +13,7 @@ in
     group = "ocserv";
   };
   services.ocserv = {
-    enable = config.selfprivacy.userdata.ocserv.enable;
+    enable = config.selfprivacy.ocserv.enable;
     config = ''
       socket-file = /var/run/ocserv-socket
 

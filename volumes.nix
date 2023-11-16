@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  cfg = config.selfprivacy.userdata;
+  cfg = config.selfprivacy;
 in
 {
   fileSystems = builtins.listToAttrs (builtins.map

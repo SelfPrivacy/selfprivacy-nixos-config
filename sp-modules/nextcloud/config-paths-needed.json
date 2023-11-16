@@ -1,5 +1,5 @@
 [
-  [ "selfprivacy", "userdata", "domain" ],
-  [ "selfprivacy", "userdata", "nextcloud" ],
-  [ "selfprivacy", "userdata", "useBinds" ]
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "useBinds" ],
+  [ "selfprivacy", "modules", "nextcloud" ]
 ]

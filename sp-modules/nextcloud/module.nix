@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... }:
 {
-  options.selfprivacy.userdata.nextcloud = with lib; {
+  options.selfprivacy.modules.nextcloud = with lib; {
     enable = mkOption {
       type = types.nullOr types.bool;
       default = false;
@@ -13,13 +13,13 @@
 
   config =
     let
-      cfg = config.selfprivacy.userdata;
-      secrets-filepath = "/etc/nixos/userdata/userdata.json";
+      sp = config.selfprivacy;
+      secrets-filepath = "/etc/selfprivacy/secrets.json";
       db-pass-filepath = "/var/lib/nextcloud/db-pass";
       admin-pass-filepath = "/var/lib/nextcloud/admin-pass";
-      hostName = "cloud.${cfg.domain}";
+      hostName = "cloud.${sp.domain}";
     in
-    lib.mkIf cfg.nextcloud.enable
+    lib.mkIf sp.modules.nextcloud.enable
       {
         system.activationScripts.nextcloudSecrets = ''
           mkdir -p /var/lib/nextcloud
@@ -31,9 +31,9 @@
           chmod 0440 ${admin-pass-filepath}
           chown nextcloud:nextcloud ${admin-pass-filepath}
         '';
-        fileSystems = lib.mkIf cfg.useBinds {
+        fileSystems = lib.mkIf sp.useBinds {
           "/var/lib/nextcloud" = {
-            device = "/volumes/${cfg.nextcloud.location}/nextcloud";
+            device = "/volumes/${sp.modules.nextcloud.location}/nextcloud";
             options = [ "bind" ];
           };
         };
@@ -64,8 +64,8 @@
           };
         };
         services.nginx.virtualHosts.${hostName} = {
-          sslCertificate = "/var/lib/acme/${cfg.domain}/fullchain.pem";
-          sslCertificateKey = "/var/lib/acme/${cfg.domain}/key.pem";
+          sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
+          sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
           forceSSL = true;
           extraConfig = ''
             add_header Strict-Transport-Security $hsts_header;
@@ -86,7 +86,7 @@
       }
     # FIXME do we really want to delete passwords on module deactivation!?
     //
-    lib.mkIf (!cfg.nextcloud.enable) {
+    lib.mkIf (!sp.modules.nextcloud.enable) {
       system.activationScripts.nextcloudSecrets =
         lib.trivial.warn
           (
