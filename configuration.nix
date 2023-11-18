@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, system, ... }:
 {
   imports = [
     ./variables-module.nix
@@ -108,6 +108,7 @@
     if lib.versionAtLeast pkgs.nix.version "2.15.2"
     then pkgs.nix.out
     else pkgs.nixUnstable.out;
+  nixpkgs.hostPlatform = system;
   services.journald.extraConfig = "SystemMaxUse=500M";
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1; # TODO why is it here by default?
