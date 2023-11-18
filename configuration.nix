@@ -69,6 +69,7 @@
     git
     jq
   ];
+  # consider environment.defaultPackages = lib.mkForce [];
   environment.variables = {
     DOMAIN = config.selfprivacy.domain;
   };
@@ -79,15 +80,37 @@
   };
   system.stateVersion = config.selfprivacy.stateVersion;
   nix = {
-    optimise.automatic = true;
+    # TODO uncomment when NixOS version is at least 23.05
+    # nix.channel.enable = false;
+
+    # daemonCPUSchedPolicy = "idle";
+    # daemonIOSchedClass = "idle";
+    # daemonIOSchedPriority = 7;
+    # this is superseded by nix.settings.auto-optimise-store.
+    # optimise.automatic = true;
+
     gc = {
       automatic = true;
       options = "--delete-older-than 7d";
     };
   };
+  nix.settings = {
+    sandbox = true;
+    experimental-features = [ "nix-command" "flakes" "repl-flake" ];
+    # auto-optimise-store = true;
+
+    # evaluation restrictions:
+    # restrict-eval = true;
+    # allowed-uris = [];
+    allow-dirty = false;
+  };
+  nix.package =
+    if lib.versionAtLeast pkgs.nix.version "2.15.2"
+    then pkgs.nix.out
+    else pkgs.nixUnstable.out;
   services.journald.extraConfig = "SystemMaxUse=500M";
   boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
+    "net.ipv4.ip_forward" = 1; # TODO why is it here by default?
   };
   swapDevices = [
     {
