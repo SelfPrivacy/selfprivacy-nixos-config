@@ -37,7 +37,7 @@ in
         chmod 0440 /var/lib/cloudflare
         chown nginx:acmerecievers /var/lib/cloudflare
         echo '${dnsCredentialsTemplate}' > /var/lib/cloudflare/Credentials.ini
-        ${sed} -i "s/REPLACEME/$(cat /etc/nixos/userdata.json | ${jq} -r '.dns.apiKey')/g" /var/lib/cloudflare/Credentials.ini
+        ${sed} -i "s/REPLACEME/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.dns.apiKey')/g" /var/lib/cloudflare/Credentials.ini
         chmod 0440 /var/lib/cloudflare/Credentials.ini
         chown nginx:acmerecievers /var/lib/cloudflare/Credentials.ini
       '';
@@ -50,13 +50,13 @@ in
         echo 'account = REPLACEME1' >> /root/.config/rclone/rclone.conf
         echo 'key = REPLACEME2' >> /root/.config/rclone/rclone.conf
 
-        ${sed} -i "s/REPLACEME1/$(cat /etc/nixos/userdata.json | ${jq} -r '.backup.accountId')/g" /root/.config/rclone/rclone.conf
-        ${sed} -i "s/REPLACEME2/$(cat /etc/nixos/userdata.json | ${jq} -r '.backup.accountKey')/g" /root/.config/rclone/rclone.conf
+        ${sed} -i "s/REPLACEME1/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.backup.accountId')/g" /root/.config/rclone/rclone.conf
+        ${sed} -i "s/REPLACEME2/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.backup.accountKey')/g" /root/.config/rclone/rclone.conf
 
         chmod 0400 /root/.config/rclone/rclone.conf
         chown root:root /root/.config/rclone/rclone.conf
 
-        cat /etc/nixos/userdata.json | ${jq} -r '.resticPassword' > /var/lib/restic/pass
+        cat /etc/selfprivacy/secrets.json | ${jq} -r '.resticPassword' > /var/lib/restic/pass
         chmod 0400 /var/lib/restic/pass
         chown restic /var/lib/restic/pass
       '';
@@ -66,7 +66,7 @@ in
           echo 'config :pleroma, Pleroma.Repo,' >> /var/lib/pleroma/secrets.exs
           echo '  password: "REPLACEME"' >> /var/lib/pleroma/secrets.exs
 
-          ${sed} -i "s/REPLACEME/$(cat /etc/nixos/userdata.json | ${jq} -r '.databasePassword')/g" /var/lib/pleroma/secrets.exs
+          ${sed} -i "s/REPLACEME/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.databasePassword')/g" /var/lib/pleroma/secrets.exs
 
           chmod 0750 /var/lib/pleroma/secrets.exs
           chown pleroma:pleroma /var/lib/pleroma/secrets.exs
@@ -76,7 +76,7 @@ in
       bitwardenCredentials =
         if cfg.bitwarden.enable then ''
           mkdir -p /var/lib/bitwarden
-          token=$(cat /etc/nixos/userdata.json | ${jq} -r '.bitwarden.adminToken')
+          token=$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.bitwarden.adminToken')
           if [ "$token" == "null" ]; then
             # If it's null, delete the contents of the file
             > /var/lib/bitwarden/.env
