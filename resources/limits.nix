@@ -1,47 +1,46 @@
-{ pkgs, ... }:
 {
   systemd.services = {
     dovecot2 = {
       serviceConfig = {
-        cpuAccounting = true;
-        cpuQuota = "20%";
-        memoryAccounting = true;
-        memoryMax = "256M";
-        startLimitIntervalSec = 500;
-        startLimitBurst = 5;
-        blockIOWeigth = 25;
+        CpuAccounting = true;
+        CpuQuota = "20%";
+        MemoryAccounting = true;
+        MemoryMax = "256M";
+        StartLimitIntervalSec = 500;
+        StartLimitBurst = 5;
+        BlockIOWeight = 25;
       };
     };
     postfix = {
       serviceConfig = {
-        cpuAccounting = true;
-        cpuQuota = "20%";
-        memoryAccounting = true;
-        memoryMax = "256M";
-        startLimitIntervalSec = 500;
-        startLimitBurst = 5;
-        blockIOWeigth = 25;
+        CpuAccounting = true;
+        CpuQuota = "20%";
+        MemoryAccounting = true;
+        MemoryMax = "256M";
+        StartLimitIntervalSec = 500;
+        StartLimitBurst = 5;
+        BlockIOWeight = 25;
       };
     };
     ocserv = {
       serviceConfig = {
-        cpuAccounting = true;
-        cpuQuota = "70%";
-        memoryAccounting = true;
-        memoryMax = "512M";
-        startLimitIntervalSec = 500;
-        startLimitBurst = 5;
+        CpuAccounting = true;
+        CpuQuota = "70%";
+        MemoryAccounting = true;
+        MemoryMax = "512M";
+        StartLimitIntervalSec = 500;
+        StartLimitBurst = 5;
       };
     };
     nginx = {
       serviceConfig = {
-        cpuAccounting = true;
-        cpuQuota = "70%";
-        memoryAccounting = true;
-        memoryMax = "768M";
-        startLimitIntervalSec = 500;
-        startLimitBurst = 5;
-        blockIOWeigth = 10;
+        CpuAccounting = true;
+        CpuQuota = "70%";
+        MemoryAccounting = true;
+        MemoryMax = "768M";
+        StartLimitIntervalSec = 500;
+        StartLimitBurst = 5;
+        BlockIOWeight = 10;
       };
     };
   };

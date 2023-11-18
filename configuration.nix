@@ -13,7 +13,7 @@
     ./passmgr/bitwarden.nix
     ./webserver/nginx.nix
     ./webserver/memcached.nix
-    ./resources/limits.nix
+    # ./resources/limits.nix
     ./videomeet/jitsi.nix
     ./git/gitea.nix
   ];
