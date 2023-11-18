@@ -24,7 +24,7 @@ with lib;
     autoUpgrade = {
       enable = mkOption {
         description = "Enable auto-upgrade of the server.";
-        default = true;
+        default = false;
         type = types.nullOr types.bool;
       };
       allowReboot = mkOption {
