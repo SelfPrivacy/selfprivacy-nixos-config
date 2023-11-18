@@ -73,6 +73,7 @@
   environment.variables = {
     DOMAIN = config.selfprivacy.domain;
   };
+  documentation.dev.enable = false; # no {man,info}-pages & docs to save space
   system.autoUpgrade = {
     enable = config.selfprivacy.autoUpgrade.enable;
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
