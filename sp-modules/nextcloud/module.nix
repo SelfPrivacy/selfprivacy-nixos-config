@@ -23,11 +23,11 @@
       {
         system.activationScripts.nextcloudSecrets = ''
           mkdir -p /var/lib/nextcloud
-          ${pkgs.jq}/bin/jq < ${secrets-filepath} -r '.nextcloud.databasePassword' > ${db-pass-filepath}
+          ${pkgs.jq}/bin/jq < ${secrets-filepath} -r '.modules.nextcloud.databasePassword' > ${db-pass-filepath}
           chmod 0440 ${db-pass-filepath}
           chown nextcloud:nextcloud ${db-pass-filepath}
 
-          ${pkgs.jq}/bin/jq < ${secrets-filepath} -r '.nextcloud.adminPassword' > ${admin-pass-filepath}
+          ${pkgs.jq}/bin/jq < ${secrets-filepath} -r '.modules.nextcloud.adminPassword' > ${admin-pass-filepath}
           chmod 0440 ${admin-pass-filepath}
           chown nextcloud:nextcloud ${admin-pass-filepath}
         '';
