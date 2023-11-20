@@ -18,6 +18,8 @@
     ./git/gitea.nix
   ];
 
+  fileSystems."/".options = [ "noatime" ];
+
   services.redis.servers.sp-api = {
     enable = true;
     save = [
