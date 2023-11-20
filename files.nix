@@ -32,6 +32,9 @@ in
       sed = "${pkgs.gnused}/bin/sed";
     in
     {
+      nixos-lustrate = ''
+        rm -rf /old-root
+      '';
       cloudflareCredentials = ''
         mkdir -p /var/lib/cloudflare
         chmod 0440 /var/lib/cloudflare
