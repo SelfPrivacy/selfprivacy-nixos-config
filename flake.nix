@@ -2,10 +2,10 @@
   description = "SelfPrivacy NixOS configuration flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = github:nixos/nixpkgs;
 
     selfprivacy-api.url =
-      "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git";
+      git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git;
     # make selfprivacy-api use the same shared nixpkgs
     selfprivacy-api.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -28,7 +28,7 @@
             selfprivacy-api.nixosModules.default
             {
               # embed top-level flake source folder into the build
-              environment.etc."selfprivacy/current-config-source".source =
+              environment.etc."selfprivacy/nixos-config-source".source =
                 top-level-flake.outPath;
               # for running "nix search nixpkgs", etc
               nix.registry.nixpkgs.flake = nixpkgs;
