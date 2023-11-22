@@ -5,10 +5,6 @@ jsonData: { lib, ... }:
     domain = lib.attrsets.attrByPath [ "domain" ] null jsonData;
     timezone = lib.attrsets.attrByPath [ "timezone" ] "Europe/Uzhgorod" jsonData;
     stateVersion = lib.attrsets.attrByPath [ "stateVersion" ] "22.05" jsonData;
-    autoUpgrade = {
-      enable = lib.attrsets.attrByPath [ "autoUpgrade" "enable" ] true jsonData;
-      allowReboot = lib.attrsets.attrByPath [ "autoUpgrade" "allowReboot" ] true jsonData;
-    };
     username = lib.attrsets.attrByPath [ "username" ] null jsonData;
     hashedMasterPassword = lib.attrsets.attrByPath [ "hashedMasterPassword" ] null jsonData;
     sshKeys = lib.attrsets.attrByPath [ "sshKeys" ] [ ] jsonData;
