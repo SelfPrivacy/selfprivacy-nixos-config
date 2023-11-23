@@ -128,4 +128,6 @@
       enable = true;
     };
   };
+  systemd.enableEmergencyMode = false;
+  systemd.coredump.enable = false;
 }
