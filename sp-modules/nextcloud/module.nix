@@ -13,11 +13,8 @@
 
   config =
     let
-      sp = config.selfprivacy;
-      secrets-filepath = "/etc/selfprivacy/secrets.json";
-      db-pass-filepath = "/var/lib/nextcloud/db-pass";
-      admin-pass-filepath = "/var/lib/nextcloud/admin-pass";
-      hostName = "cloud.${sp.domain}";
+      inherit (import ./common.nix config)
+        sp secrets-filepath db-pass-filepath admin-pass-filepath hostName;
     in
     lib.mkIf sp.modules.nextcloud.enable
       {
@@ -83,19 +80,5 @@
             };
           };
         };
-      }
-    # FIXME do we really want to delete passwords on module deactivation!?
-    //
-    lib.mkIf (!sp.modules.nextcloud.enable) {
-      system.activationScripts.nextcloudSecrets =
-        lib.trivial.warn
-          (
-            "nextcloud service is disabled, " +
-            "${db-pass-filepath} and ${admin-pass-filepath} will be removed!"
-          )
-          ''
-            rm -f ${db-pass-filepath}
-            rm -f ${admin-pass-filepath}
-          '';
-    };
+      };
 }
