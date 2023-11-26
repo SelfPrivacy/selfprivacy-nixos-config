@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+mailserverDate: { config, lib, ... }:
 let
   sp = config.selfprivacy;
 in
@@ -62,7 +62,11 @@ in
         "admin@${sp.domain}" = "${sp.username}@${sp.domain}";
       };
 
-      certificateScheme = "manual";
+      certificateScheme =
+        if builtins.compareVersions mailserverDate "20230525011002"
+          >= 0
+        then "manual"
+        else 1;
       certificateFile = "/var/lib/acme/${sp.domain}/fullchain.pem";
       keyFile = "/var/lib/acme/${sp.domain}/key.pem";
 

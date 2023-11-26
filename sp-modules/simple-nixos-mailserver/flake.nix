@@ -6,7 +6,6 @@
 
   outputs = { self, mailserver }: {
     nixosModules.default = args@{ config, ... }:
-      # tricks to rename (alias) the original module
       let
         module = mailserver.nixosModules.default args;
       in
@@ -14,12 +13,13 @@
         imports = [
           module
           {
+            # tricks to rename (alias) the original module
             config.mailserver =
               config.selfprivacy.modules.simple-nixos-mailserver;
             options.selfprivacy.modules.simple-nixos-mailserver =
               module.options.mailserver;
           }
-          ./config.nix
+          (import ./config.nix mailserver.lastModifiedDate)
         ];
       };
     configPathsNeeded =
