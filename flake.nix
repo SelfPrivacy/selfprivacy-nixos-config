@@ -67,7 +67,7 @@
                             then import m (constrainConfigArgs args')
                             else
                               if builtins.isFunction m
-                              then constrainConfigArgs args'
+                              then m (constrainConfigArgs args')
                               else m))
                         )
                         v
