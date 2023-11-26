@@ -19,14 +19,15 @@
     lib.mkIf sp.modules.nextcloud.enable
       {
         system.activationScripts.nextcloudSecrets = ''
-          mkdir -p /var/lib/nextcloud
-          ${pkgs.jq}/bin/jq < ${secrets-filepath} -r '.modules.nextcloud.databasePassword' > ${db-pass-filepath}
-          chmod 0440 ${db-pass-filepath}
-          chown nextcloud:nextcloud ${db-pass-filepath}
+          install -m 0440 -o nextcloud -g nextcloud -DT \
+          <(${pkgs.jq}/bin/jq < \
+            ${secrets-filepath} -r '.modules.nextcloud.databasePassword') \
+          ${db-pass-filepath}
 
-          ${pkgs.jq}/bin/jq < ${secrets-filepath} -r '.modules.nextcloud.adminPassword' > ${admin-pass-filepath}
-          chmod 0440 ${admin-pass-filepath}
-          chown nextcloud:nextcloud ${admin-pass-filepath}
+          install -m 0440 -o nextcloud -g nextcloud -DT \
+          <(${pkgs.jq}/bin/jq < \
+            ${secrets-filepath} -r '.modules.nextcloud.adminPassword') \
+          ${admin-pass-filepath}
         '';
         fileSystems = lib.mkIf sp.useBinds {
           "/var/lib/nextcloud" = {
