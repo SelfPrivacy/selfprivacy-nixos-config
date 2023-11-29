@@ -38,11 +38,11 @@ in
       cloudflareCredentials = ''
         mkdir -p /var/lib/cloudflare
         chmod 0440 /var/lib/cloudflare
-        chown nginx:acmerecievers /var/lib/cloudflare
+        chown nginx:acmereceivers /var/lib/cloudflare
         echo '${dnsCredentialsTemplate}' > /var/lib/cloudflare/Credentials.ini
         ${sed} -i "s/REPLACEME/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.dns.apiKey')/g" /var/lib/cloudflare/Credentials.ini
         chmod 0440 /var/lib/cloudflare/Credentials.ini
-        chown nginx:acmerecievers /var/lib/cloudflare/Credentials.ini
+        chown nginx:acmereceivers /var/lib/cloudflare/Credentials.ini
       '';
       resticCredentials = ''
         mkdir -p /root/.config/rclone

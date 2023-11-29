@@ -9,7 +9,7 @@ in
   users.users.ocserv = {
     isNormalUser = false;
     isSystemUser = true;
-    extraGroups = [ "ocserv" "acmerecievers" ];
+    extraGroups = [ "ocserv" "acmereceivers" ];
     group = "ocserv";
   };
   services.ocserv = {

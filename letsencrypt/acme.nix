@@ -3,7 +3,7 @@ let
   cfg = config.selfprivacy;
 in
 {
-  users.groups.acmerecievers = {
+  users.groups.acmereceivers = {
     members = [ "nginx" "dovecot2" "postfix" "virtualMail" "ocserv" ];
   };
   security.acme = {
@@ -18,7 +18,7 @@ in
       "${cfg.domain}" = {
         domain = "*.${cfg.domain}";
         extraDomainNames = [ "${cfg.domain}" ];
-        group = "acmerecievers";
+        group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = "/var/lib/cloudflare/Credentials.ini";
       };
