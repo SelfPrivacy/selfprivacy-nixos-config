@@ -12,8 +12,8 @@ in
           "${db-pass-filepath} and ${admin-pass-filepath} will be removed!"
         )
         ''
-          rm -f ${db-pass-filepath}
-          rm -f ${admin-pass-filepath}
+          rm -f -v ${db-pass-filepath}
+          rm -f -v ${admin-pass-filepath}
         '';
   };
 }
