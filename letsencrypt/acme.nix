@@ -3,9 +3,7 @@ let
   cfg = config.selfprivacy;
 in
 {
-  users.groups.acmereceivers = {
-    members = [ "nginx" "dovecot2" "postfix" "virtualMail" "ocserv" ];
-  };
+  users.groups.acmereceivers.members = [ "nginx" "ocserv" ];
   security.acme = {
     acceptTerms = true;
     defaults = {

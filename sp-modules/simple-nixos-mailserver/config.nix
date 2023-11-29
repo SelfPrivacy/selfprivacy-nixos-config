@@ -22,6 +22,8 @@ in
     };
   };
 
+  users.groups.acmereceivers.members = [ "dovecot2" "postfix" "virtualMail" ];
+
   selfprivacy.modules.simple-nixos-mailserver =
     lib.mkIf sp.modules.simple-nixos-mailserver.enable {
       fqdn = sp.domain;
