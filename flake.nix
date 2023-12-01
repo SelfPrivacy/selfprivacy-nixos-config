@@ -41,10 +41,12 @@
           ++
           # add SP modules, but contrain available config attributes for each
           # (TODO revise evaluation performance of the code below)
-          map
-            (sp-module: args@{ config, pkgs, ... }:
+          nixpkgs.lib.attrsets.mapAttrsToList
+            (name: sp-module: args@{ config, pkgs, ... }:
               let
                 lib = nixpkgs.lib;
+                configPathsNeeded = sp-module.configPathsNeeded or
+                  (abort "allowed config paths not set for module \"${name}\"");
                 constrainConfigArgs = args'@{ pkgs, ... }: args' // {
                   config =
                     # TODO use lib.attrsets.mergeAttrsList from nixpkgs 23.05
@@ -52,7 +54,9 @@
                       (map
                         (p: lib.attrsets.setAttrByPath p
                           (lib.attrsets.getAttrFromPath p config))
-                        sp-module.configPathsNeeded));
+                        configPathsNeeded
+                      )
+                    );
                 };
                 constrainImportsArgsRecursive = lib.attrsets.mapAttrsRecursive
                   (p: v:
@@ -76,7 +80,7 @@
               constrainImportsArgsRecursive
                 (sp-module.nixosModules.default (constrainConfigArgs args))
             )
-            (nixpkgs.lib.attrsets.attrValues sp-modules);
+            sp-modules;
         };
       };
     formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
