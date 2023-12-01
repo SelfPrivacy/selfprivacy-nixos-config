@@ -5,7 +5,6 @@
     ./files.nix
     ./volumes.nix
     ./users.nix
-    ./vpn/ocserv.nix
     ./social/pleroma.nix
     ./letsencrypt/acme.nix
     ./letsencrypt/resolve.nix

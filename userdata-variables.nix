@@ -33,9 +33,6 @@ jsonData: { lib, ... }:
     jitsi = {
       enable = lib.attrsets.attrByPath [ "jitsi" "enable" ] false jsonData;
     };
-    ocserv = {
-      enable = lib.attrsets.attrByPath [ "ocserv" "enable" ] false jsonData;
-    };
     ssh = {
       enable = lib.attrsets.attrByPath [ "ssh" "enable" ] true jsonData;
       rootKeys = lib.attrsets.attrByPath [ "ssh" "rootKeys" ] [ "" ] jsonData;

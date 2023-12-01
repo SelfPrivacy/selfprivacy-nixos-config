@@ -3,7 +3,7 @@ let
   cfg = config.selfprivacy;
 in
 {
-  users.groups.acmereceivers.members = [ "nginx" "ocserv" ];
+  users.groups.acmereceivers.members = [ "nginx" ];
   security.acme = {
     acceptTerms = true;
     defaults = {

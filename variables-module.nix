@@ -151,12 +151,6 @@ with lib;
         type = types.nullOr types.bool;
       };
     };
-    ocserv = {
-      enable = mkOption {
-        default = true;
-        type = types.nullOr types.bool;
-      };
-    };
     #########
     #  SSH  #
     #########
