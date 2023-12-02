@@ -20,9 +20,7 @@ in
     [
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 vaultwarden vaultwarden -" else "")
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 vaultwarden vaultwarden -" else "")
-      (if cfg.pleroma.enable then "d /var/lib/pleroma 0700 pleroma pleroma - -" else "")
       "d /var/lib/restic 0600 restic - - -"
-      (if cfg.pleroma.enable then "f /var/lib/pleroma/secrets.exs 0755 pleroma pleroma - -" else "")
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
       (if cfg.bitwarden.enable then "f /var/lib/bitwarden/.env 0640 vaultwarden vaultwarden - -" else "")
     ];
@@ -63,19 +61,6 @@ in
         chmod 0400 /var/lib/restic/pass
         chown restic /var/lib/restic/pass
       '';
-      pleromaCredentials =
-        if cfg.pleroma.enable then ''
-          echo 'import Config' > /var/lib/pleroma/secrets.exs
-          echo 'config :pleroma, Pleroma.Repo,' >> /var/lib/pleroma/secrets.exs
-          echo '  password: "REPLACEME"' >> /var/lib/pleroma/secrets.exs
-
-          ${sed} -i "s/REPLACEME/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.databasePassword')/g" /var/lib/pleroma/secrets.exs
-
-          chmod 0750 /var/lib/pleroma/secrets.exs
-          chown pleroma:pleroma /var/lib/pleroma/secrets.exs
-        '' else ''
-          rm -f /var/lib/pleroma/secrets.exs
-        '';
       bitwardenCredentials =
         if cfg.bitwarden.enable then ''
           mkdir -p /var/lib/bitwarden

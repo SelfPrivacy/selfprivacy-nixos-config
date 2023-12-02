@@ -26,10 +26,6 @@ jsonData: { lib, ... }:
       enable = lib.attrsets.attrByPath [ "gitea" "enable" ] false jsonData;
       location = lib.attrsets.attrByPath [ "gitea" "location" ] "sda1" jsonData;
     };
-    pleroma = {
-      enable = lib.attrsets.attrByPath [ "pleroma" "enable" ] false jsonData;
-      location = lib.attrsets.attrByPath [ "pleroma" "location" ] "sda1" jsonData;
-    };
     jitsi = {
       enable = lib.attrsets.attrByPath [ "jitsi" "enable" ] false jsonData;
     };

@@ -5,7 +5,6 @@
     ./files.nix
     ./volumes.nix
     ./users.nix
-    ./social/pleroma.nix
     ./letsencrypt/acme.nix
     ./letsencrypt/resolve.nix
     ./backup/restic.nix
