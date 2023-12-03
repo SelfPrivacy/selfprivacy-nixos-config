@@ -20,7 +20,6 @@ in
     [
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden 0777 vaultwarden vaultwarden -" else "")
       (if cfg.bitwarden.enable then "d /var/lib/bitwarden/backup 0777 vaultwarden vaultwarden -" else "")
-      "d /var/lib/restic 0600 restic - - -"
       "f+ /var/domain 0444 selfprivacy-api selfprivacy-api - ${domain}"
       (if cfg.bitwarden.enable then "f /var/lib/bitwarden/.env 0640 vaultwarden vaultwarden - -" else "")
     ];
@@ -41,25 +40,6 @@ in
         ${sed} -i "s/REPLACEME/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.dns.apiKey')/g" /var/lib/cloudflare/Credentials.ini
         chmod 0440 /var/lib/cloudflare/Credentials.ini
         chown nginx:acmereceivers /var/lib/cloudflare/Credentials.ini
-      '';
-      resticCredentials = ''
-        mkdir -p /root/.config/rclone
-        chmod 0400 /root/.config/rclone
-        chown root:root /root/.config/rclone
-        echo '[backblaze]' > /root/.config/rclone/rclone.conf
-        echo 'type = b2' >> /root/.config/rclone/rclone.conf
-        echo 'account = REPLACEME1' >> /root/.config/rclone/rclone.conf
-        echo 'key = REPLACEME2' >> /root/.config/rclone/rclone.conf
-
-        ${sed} -i "s/REPLACEME1/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.backup.accountId')/g" /root/.config/rclone/rclone.conf
-        ${sed} -i "s/REPLACEME2/$(cat /etc/selfprivacy/secrets.json | ${jq} -r '.backup.accountKey')/g" /root/.config/rclone/rclone.conf
-
-        chmod 0400 /root/.config/rclone/rclone.conf
-        chown root:root /root/.config/rclone/rclone.conf
-
-        cat /etc/selfprivacy/secrets.json | ${jq} -r '.resticPassword' > /var/lib/restic/pass
-        chmod 0400 /var/lib/restic/pass
-        chown restic /var/lib/restic/pass
       '';
       bitwardenCredentials =
         if cfg.bitwarden.enable then ''

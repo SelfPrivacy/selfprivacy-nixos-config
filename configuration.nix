@@ -7,7 +7,6 @@
     ./users.nix
     ./letsencrypt/acme.nix
     ./letsencrypt/resolve.nix
-    ./backup/restic.nix
     ./passmgr/bitwarden.nix
     ./webserver/nginx.nix
     ./webserver/memcached.nix
