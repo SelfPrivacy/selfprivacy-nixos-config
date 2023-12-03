@@ -30,11 +30,11 @@
         path = with pkgs; [ coreutils jq ];
         script = ''
           install -m 0440 -o nextcloud -g nextcloud -DT \
-          <(jq < ${secrets-filepath} -r '.modules.nextcloud.databasePassword') \
+          <(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath}) \
           ${db-pass-filepath}
 
           install -m 0440 -o nextcloud -g nextcloud -DT \
-          <(jq < ${secrets-filepath} -r '.modules.nextcloud.adminPassword') \
+          <(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath}) \
           ${admin-pass-filepath}
         '';
       };

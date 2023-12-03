@@ -61,7 +61,8 @@ in
       path = with pkgs; [ coreutils jq ];
       script = ''
         set -o nounset
-        password=$(jq -r '.databasePassword' ${secrets-filepath})
+
+        password="$(jq -re '.databasePassword' ${secrets-filepath})"
         filecontents=$(cat <<- EOF
         import Config
         config :pleroma, Pleroma.Repo,

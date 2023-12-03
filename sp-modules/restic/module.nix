@@ -52,8 +52,8 @@ in
       script = ''
         set -o nounset
 
-        account="$(jq -r '.modules.restic.accountId' ${secrets-filepath})"
-        key="$(jq -r '.modules.restic.accountKey' ${secrets-filepath})"
+        account="$(jq -re '.modules.restic.accountId' ${secrets-filepath})"
+        key="$(jq -re '.modules.restic.accountKey' ${secrets-filepath})"
         rclone_conf=$(cat <<- EOF
         [backblaze]
         account = $account
@@ -64,7 +64,7 @@ in
         <(printf "%s" "$rclone_conf") ${rclone-conf-filepath}
 
         install -m 0400 -o restic -g restic -DT \
-        <(jq -r '.resticPassword' ${secrets-filepath}) /var/lib/restic/pass
+        <(jq -re '.resticPassword' ${secrets-filepath}) /var/lib/restic/pass
       '';
     };
   };
