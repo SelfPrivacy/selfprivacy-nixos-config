@@ -22,9 +22,6 @@ jsonData: { lib, ... }:
       enable = lib.attrsets.attrByPath [ "gitea" "enable" ] false jsonData;
       location = lib.attrsets.attrByPath [ "gitea" "location" ] "sda1" jsonData;
     };
-    jitsi = {
-      enable = lib.attrsets.attrByPath [ "jitsi" "enable" ] false jsonData;
-    };
     ssh = {
       enable = lib.attrsets.attrByPath [ "ssh" "enable" ] true jsonData;
       rootKeys = lib.attrsets.attrByPath [ "ssh" "rootKeys" ] [ "" ] jsonData;

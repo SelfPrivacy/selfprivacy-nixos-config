@@ -125,12 +125,6 @@ with lib;
         type = types.nullOr types.str;
       };
     };
-    jitsi = {
-      enable = mkOption {
-        default = false;
-        type = types.nullOr types.bool;
-      };
-    };
     #########
     #  SSH  #
     #########
