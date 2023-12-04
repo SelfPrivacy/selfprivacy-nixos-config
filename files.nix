@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+nixos-config-source: { config, pkgs, ... }:
 let
   cfg = config.selfprivacy;
   dnsCredentialsTemplates = {
@@ -28,6 +28,10 @@ in
     {
       nixos-lustrate = ''
         rm -rf /old-root
+      '';
+      selfprivacy-nixos-configuration-source = ''
+        rm -rf /etc/nixos/{*,.[!.]*}
+        cp -r --no-preserve=all ${nixos-config-source}/ -T /etc/nixos/
       '';
       cloudflareCredentials = ''
         mkdir -p /var/lib/cloudflare

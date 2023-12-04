@@ -2,7 +2,6 @@
 {
   imports = [
     ./variables-module.nix
-    ./files.nix
     ./volumes.nix
     ./users.nix
     ./letsencrypt/acme.nix

@@ -24,6 +24,7 @@
           modules = [
             hardware-configuration
             ./configuration.nix
+            (import ./files.nix top-level-flake.outPath)
             (import ./userdata-variables.nix userdata)
             selfprivacy-api.nixosModules.default
             {
