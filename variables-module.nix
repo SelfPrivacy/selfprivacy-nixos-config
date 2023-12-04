@@ -115,16 +115,6 @@ with lib;
         type = types.nullOr types.str;
       };
     };
-    gitea = {
-      enable = mkOption {
-        default = false;
-        type = types.nullOr types.bool;
-      };
-      location = mkOption {
-        default = "sda1";
-        type = types.nullOr types.str;
-      };
-    };
     #########
     #  SSH  #
     #########

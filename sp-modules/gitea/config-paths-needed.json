@@ -1,0 +1,5 @@
+[
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "useBinds" ],
+  [ "selfprivacy", "modules", "gitea" ]
+]

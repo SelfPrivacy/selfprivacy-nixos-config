@@ -9,7 +9,6 @@
     ./webserver/nginx.nix
     ./webserver/memcached.nix
     # ./resources/limits.nix
-    ./git/gitea.nix
   ];
 
   fileSystems."/".options = [ "noatime" ];
