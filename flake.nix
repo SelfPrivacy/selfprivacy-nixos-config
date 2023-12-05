@@ -14,6 +14,7 @@
     nixosConfigurations-fun =
       { system
       , hardware-configuration
+      , deployment
       , userdata
       , top-level-flake
       , sp-modules
@@ -23,6 +24,7 @@
           specialArgs = { inherit system; };
           modules = [
             hardware-configuration
+            deployment
             ./configuration.nix
             (import ./files.nix top-level-flake.outPath)
             (import ./userdata-variables.nix userdata)

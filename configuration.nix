@@ -74,7 +74,6 @@
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
     channel = "https://channel.selfprivacy.org/nixos-selfpricacy";
   };
-  system.stateVersion = config.selfprivacy.stateVersion;
   nix = {
     # TODO uncomment when NixOS version is at least 23.05
     # nix.channel.enable = false;
@@ -86,7 +85,7 @@
     # optimise.automatic = true;
 
     gc = {
-      automatic = true;
+      automatic = true; # TODO it's debatable, because of IO&CPU load
       options = "--delete-older-than 7d";
     };
   };
@@ -107,8 +106,9 @@
   nixpkgs.hostPlatform = system;
   services.journald.extraConfig = "SystemMaxUse=500M";
   boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1; # TODO why is it here by default?
+    "net.ipv4.ip_forward" = 1; # TODO why is it here by default, for VPN only?
   };
+  # TODO must be configurable and determined at nixos-infect stage
   swapDevices = [
     {
       device = "/swapfile";
@@ -116,6 +116,7 @@
       size = 2048;
     }
   ];
+  # TODO why is sudo needed?
   security = {
     sudo = {
       enable = true;
