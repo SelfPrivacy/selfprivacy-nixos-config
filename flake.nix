@@ -12,8 +12,7 @@
 
   outputs = { self, nixpkgs, selfprivacy-api }: {
     nixosConfigurations-fun =
-      { system
-      , hardware-configuration
+      { hardware-configuration
       , deployment
       , userdata
       , top-level-flake
@@ -21,7 +20,6 @@
       }:
       {
         sp-nixos = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit system; };
           modules = [
             hardware-configuration
             deployment
