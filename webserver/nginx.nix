@@ -16,6 +16,8 @@ in
       map $scheme $hsts_header {
           https   "max-age=31536000; includeSubdomains; preload";
       }
+      proxy_headers_hash_bucket_size 128;
+      proxy_headers_hash_max_size 512;
     '';
 
     virtualHosts = {

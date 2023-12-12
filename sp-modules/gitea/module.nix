@@ -21,6 +21,10 @@ in
         options = [ "bind" ];
       };
     };
+    systemd.services.gitea.unitConfig = lib.mkIf sp.useBinds {
+      RequiresMountsFor = "/var/lib/gitea";
+      ConditionPathIsMountPoint = "/var/lib/gitea";
+    };
     services = {
       gitea = {
         enable = true;
