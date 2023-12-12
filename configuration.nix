@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 {
   imports = [
-    ./variables-module.nix
+    ./selfprivacy-module.nix
     ./volumes.nix
     ./users.nix
     ./letsencrypt/acme.nix

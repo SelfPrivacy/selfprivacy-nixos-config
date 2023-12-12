@@ -25,9 +25,10 @@
             deployment
             ./configuration.nix
             (import ./files.nix top-level-flake.outPath)
-            (import ./userdata-variables.nix userdata)
             selfprivacy-api.nixosModules.default
             {
+              # pass userdata (parsed from JSON) options to selfprivacy module
+              selfprivacy = userdata;
               # embed top-level flake source folder into the build
               environment.etc."selfprivacy/nixos-config-source".source =
                 top-level-flake.outPath;

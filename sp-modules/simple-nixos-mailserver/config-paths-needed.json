@@ -1,7 +1,6 @@
 [
   [ "mailserver" ],
   [ "selfprivacy", "domain" ],
-  [ "selfprivacy", "email" ],
   [ "selfprivacy", "hashedMasterPassword" ],
   [ "selfprivacy", "useBinds" ],
   [ "selfprivacy", "username" ],

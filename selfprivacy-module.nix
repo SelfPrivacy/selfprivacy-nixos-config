@@ -86,32 +86,25 @@ with lib;
     #############
     dns = {
       provider = mkOption {
-        description = "DNS provider that was defined at the initial setup process. Default is ClOUDFLARE";
+        description = "DNS provider that was defined at the initial setup process.";
         type = types.nullOr types.str;
       };
       useStagingACME = mkOption {
         description = "Use staging ACME server. Default is false";
         type = types.nullOr types.bool;
+        default = false;
       };
     };
     backup = {
       bucket = mkOption {
         description = "Bucket name used for userdata backups";
         type = types.nullOr types.str;
+        default = "";
       };
     };
     server = {
       provider = mkOption {
-        description = "Server provider that was defined at the initial setup process. Default is HETZNER";
-        type = types.nullOr types.str;
-      };
-    };
-    ##############
-    #  Services  #
-    ##############
-    email = {
-      location = mkOption {
-        default = "sda1";
+        description = "Server provider that was defined at the initial setup process.";
         type = types.nullOr types.str;
       };
     };
@@ -125,7 +118,7 @@ with lib;
       };
       rootKeys = mkOption {
         description = ''
-          Root SSH Keys
+          Root SSH authorized keys
         '';
         type = types.nullOr (types.listOf types.str);
         default = [ "" ];
@@ -163,9 +156,5 @@ with lib;
       default = false;
       description = "Whether to bind-mount vmail and sieve folders";
     };
-    ##############
-    #   Modules  #
-    ##############
-    # modules =
   };
 }
