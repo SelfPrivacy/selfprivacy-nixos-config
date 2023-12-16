@@ -12,7 +12,8 @@ with lib;
       description = ''
         Domain used by the server
       '';
-      type = types.nullOr types.str;
+      # see: https://regexr.com/7p7ep, https://stackoverflow.com/a/26987741
+      type = lib.types.strMatching ''^(xn--)?[a-z0-9][a-z0-9_-]{0,61}[a-z0-9]{0,1}\.(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})$'';
     };
     timezone = mkOption {
       description = ''
@@ -32,13 +33,6 @@ with lib;
         default = false;
         type = types.nullOr types.bool;
       };
-    };
-    stateVersion = mkOption {
-      description = ''
-        State version of the server
-      '';
-      type = types.str;
-      default = "22.11";
     };
     ########################
     # Server admin options #
@@ -62,27 +56,8 @@ with lib;
       type = types.nullOr (types.listOf types.str);
       default = [ ];
     };
-    ###############
-    # API options #
-    ###############
-    api = {
-      enableSwagger = mkOption {
-        default = true;
-        description = ''
-          Enable Swagger UI
-        '';
-        type = types.bool;
-      };
-      skippedMigrations = mkOption {
-        default = [ ];
-        description = ''
-          List of migrations that should be skipped
-        '';
-        type = types.listOf types.str;
-      };
-    };
     #############
-    #  Secrets  #
+    #    DNS    #
     #############
     dns = {
       provider = mkOption {
@@ -95,17 +70,10 @@ with lib;
         default = false;
       };
     };
-    backup = {
-      bucket = mkOption {
-        description = "Bucket name used for userdata backups";
-        type = types.nullOr types.str;
-        default = "";
-      };
-    };
     server = {
       provider = mkOption {
         description = "Server provider that was defined at the initial setup process.";
-        type = types.nullOr types.str;
+        type = types.str;
       };
     };
     #########

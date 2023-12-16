@@ -13,6 +13,8 @@
 
   fileSystems."/".options = [ "noatime" ];
 
+  services.selfprivacy-api.enable = true;
+
   services.redis.servers.sp-api = {
     enable = true;
     save = [
@@ -36,6 +38,7 @@
   boot.cleanTmpDir = true;
   networking = {
     hostName = config.selfprivacy.hostname;
+    domain = config.selfprivacy.domain;
     usePredictableInterfaceNames = false;
     firewall = {
       allowedTCPPorts = lib.mkForce [ 22 25 80 143 443 465 587 993 4443 8443 ];
@@ -69,6 +72,10 @@
     DOMAIN = config.selfprivacy.domain;
   };
   documentation.enable = false; # no {man,info}-pages & docs, etc to save space
+  systemd.tmpfiles.rules = [
+    "# Completely remove remnants of NIXOS_LUSTRATE."
+    "R! /old-root"
+  ];
   system.autoUpgrade = {
     enable = config.selfprivacy.autoUpgrade.enable;
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;

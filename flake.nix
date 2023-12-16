@@ -24,20 +24,28 @@
             hardware-configuration
             deployment
             ./configuration.nix
-            (import ./files.nix top-level-flake.outPath)
             selfprivacy-api.nixosModules.default
             {
               # pass userdata (parsed from JSON) options to selfprivacy module
               selfprivacy = userdata;
+
               # embed top-level flake source folder into the build
               environment.etc."selfprivacy/nixos-config-source".source =
-                top-level-flake.outPath;
+                top-level-flake;
+
               # for running "nix search nixpkgs", etc
               nix.registry.nixpkgs.flake = nixpkgs;
+
               # embed commit sha1 for `nixos-version --configuration-revision`
               system.configurationRevision = self.rev
                 or "@${self.lastModifiedDate}"; # for development
               # TODO assertion to forbid dirty builds caused by top-level-flake
+
+              # reset contents of /etc/nixos to match running NixOS generation
+              system.activationScripts.selfprivacy-nixos-config-source = ''
+                rm -rf /etc/nixos/{*,.[!.]*}
+                cp -r --no-preserve=all ${top-level-flake}/ -T /etc/nixos/
+              '';
             }
           ]
           ++
