@@ -46,12 +46,14 @@ in
         };
         appName = "SelfPrivacy git Service";
         repositoryRoot = "${stateDir}/repositories";
-        domain = "git.${sp.domain}";
-        rootUrl = "https://git.${sp.domain}/";
-        httpAddress = "0.0.0.0";
-        httpPort = 3000;
         #      cookieSecure = true;
         settings = {
+          server = {
+            DOMAIN = "git.${sp.domain}";
+            ROOT_URL = "https://git.${sp.domain}/";
+            HTTP_ADDR = "0.0.0.0";
+            HTTP_PORT = 3000;
+          };
           mailer = {
             ENABLED = false;
           };

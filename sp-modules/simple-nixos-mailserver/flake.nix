@@ -9,7 +9,7 @@
       imports = [
         mailserver.nixosModules.default
         ./options.nix
-        (import ./config.nix mailserver.lastModifiedDate)
+        ./config.nix
       ];
     };
     configPathsNeeded =

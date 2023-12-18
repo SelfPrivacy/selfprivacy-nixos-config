@@ -35,7 +35,7 @@
 
   services.do-agent.enable = if config.selfprivacy.server.provider == "digitalocean" then true else false;
 
-  boot.cleanTmpDir = true;
+  boot.tmp.cleanOnBoot = true;
   networking = {
     hostName = config.selfprivacy.hostname;
     domain = config.selfprivacy.domain;
@@ -55,8 +55,10 @@
   users.users.root.openssh.authorizedKeys.keys = config.selfprivacy.ssh.rootKeys;
   services.openssh = {
     enable = config.selfprivacy.ssh.enable;
-    passwordAuthentication = config.selfprivacy.ssh.passwordAuthentication;
-    permitRootLogin = "yes";
+    settings = {
+      PasswordAuthentication = config.selfprivacy.ssh.passwordAuthentication;
+      PermitRootLogin = "yes";
+    };
     openFirewall = false;
   };
   programs.ssh = {
