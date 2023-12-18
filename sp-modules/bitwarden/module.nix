@@ -71,7 +71,6 @@ in
         <(printf "%s" "$bitwarden_env") ${bitwarden-env}
       '';
     };
-
     services.nginx.virtualHosts."password.${sp.domain}" = {
       sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
       sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
@@ -94,5 +93,6 @@ in
     };
     # NixOS upstream bug? Otherwise, backup-vaultwarden cannot find sqlite DB.
     systemd.services.backup-vaultwarden.after = [ "vaultwarden.service" ];
+    systemd.services.backup-vaultwarden.before = lib.mkForce [ ];
   };
 }
