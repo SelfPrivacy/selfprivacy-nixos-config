@@ -18,11 +18,19 @@ in
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/pleroma" = {
         device = "/volumes/${sp.modules.pleroma.location}/pleroma";
-        options = [ "bind" ];
+        options = [
+          "bind"
+          "x-systemd.required-by=pleroma-secrets.service"
+          "x-systemd.required-by=pleroma.service"
+        ];
       };
       "/var/lib/postgresql" = {
         device = "/volumes/${sp.modules.pleroma.location}/postgresql";
-        options = [ "bind" ];
+        options = [
+          "bind"
+          "x-systemd.required-by=pleroma-secrets.service"
+          "x-systemd.required-by=pleroma.service"
+        ];
       };
     };
     services = {
@@ -70,14 +78,12 @@ in
         EOF
         )
 
-        install -m 0750 -o pleroma -g pleroma -DT \
+        install -C -m 0700 -o pleroma -g pleroma -d /var/lib/pleroma
+
+        install -C -m 0700 -o pleroma -g pleroma -DT \
         <(printf "%s" "$filecontents") ${secrets-exs}
       '';
     };
-    systemd.tmpfiles.rules = [
-      "d /var/lib/pleroma 0700 pleroma pleroma - -"
-      "f ${secrets-exs} 0755 pleroma pleroma - -"
-    ];
     environment.etc."setup.psql".text = ''
       CREATE USER pleroma;
       CREATE DATABASE pleroma OWNER pleroma;

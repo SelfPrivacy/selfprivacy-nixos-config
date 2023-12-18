@@ -1,6 +1,10 @@
 { config, lib, ... }:
 let
   sp = config.selfprivacy;
+  stateDir =
+    if sp.useBinds
+    then "/volumes/${sp.modules.gitea.location}/gitea"
+    else "/var/lib/gitea";
 in
 {
   options.selfprivacy.modules.gitea = {
@@ -15,20 +19,10 @@ in
   };
 
   config = lib.mkIf config.selfprivacy.modules.gitea.enable {
-    fileSystems = lib.mkIf sp.useBinds {
-      "/var/lib/gitea" = {
-        device = "/volumes/${sp.modules.gitea.location}/gitea";
-        options = [ "bind" ];
-      };
-    };
-    systemd.services.gitea.unitConfig = lib.mkIf sp.useBinds {
-      RequiresMountsFor = "/var/lib/gitea";
-      ConditionPathIsMountPoint = "/var/lib/gitea";
-    };
     services = {
       gitea = {
         enable = true;
-        stateDir = "/var/lib/gitea";
+        inherit stateDir;
         #      log = {
         #        rootPath = "/var/lib/gitea/log";
         #        level = "Warn";
@@ -39,7 +33,7 @@ in
           host = "127.0.0.1";
           name = "gitea";
           user = "gitea";
-          path = "/var/lib/gitea/data/gitea.db";
+          path = "${stateDir}/data/gitea.db";
           createDatabase = true;
         };
         # ssh = {
@@ -48,10 +42,10 @@ in
         # };
         lfs = {
           enable = true;
-          contentDir = "/var/lib/gitea/lfs";
+          contentDir = "${stateDir}/lfs";
         };
         appName = "SelfPrivacy git Service";
-        repositoryRoot = "/var/lib/gitea/repositories";
+        repositoryRoot = "${stateDir}/repositories";
         domain = "git.${sp.domain}";
         rootUrl = "https://git.${sp.domain}/";
         httpAddress = "0.0.0.0";
@@ -78,11 +72,13 @@ in
             COOKIE_SECURE = true;
           };
           log = {
-            ROOT_PATH = "/var/lib/gitea/log";
+            ROOT_PATH = "${stateDir}/log";
             LEVEL = "Warn";
           };
         };
       };
     };
+    systemd.services.gitea.unitConfig.RequiresMountsFor =
+      lib.mkIf sp.useBinds "/volumes/${sp.modules.gitea.location}/gitea";
   };
 }

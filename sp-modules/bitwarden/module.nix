@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   secrets-filepath = "/etc/selfprivacy/secrets.json";
+  backup-dir = "/var/lib/bitwarden/backup";
   inherit (import ./common.nix config) bitwarden-env sp;
 in
 {
@@ -19,17 +20,25 @@ in
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/bitwarden" = {
         device = "/volumes/${sp.modules.bitwarden.location}/bitwarden";
-        options = [ "bind" ];
+        options = [
+          "bind"
+          "x-systemd.required-by=bitwarden-secrets.service"
+          "x-systemd.required-by=vaultwarden.service"
+        ];
       };
       "/var/lib/bitwarden_rs" = {
         device = "/volumes/${sp.modules.bitwarden.location}/bitwarden_rs";
-        options = [ "bind" ];
+        options = [
+          "bind"
+          "x-systemd.required-by=bitwarden-secrets.service"
+          "x-systemd.required-by=vaultwarden.service"
+        ];
       };
     };
     services.vaultwarden = {
       enable = true;
       dbBackend = "sqlite";
-      backupDir = "/var/lib/bitwarden/backup";
+      backupDir = backup-dir;
       environmentFile = "${bitwarden-env}";
       config = {
         domain = "https://password.${sp.domain}/";
@@ -52,15 +61,13 @@ in
         else
             bitwarden_env="ADMIN_TOKEN=$token"
         fi
-        # TODO revise this permissions mode
-        install -m 0640 -o vaultwarden -g vaultwarden -DT \
+
+        install -C -m 0700 -o vaultwarden -g vaultwarden \
+        -d /var/lib/bitwarden
+
+        install -C -m 0600 -o vaultwarden -g vaultwarden -DT \
         <(printf "%s" "$bitwarden_env") ${bitwarden-env}
       '';
     };
-    systemd.tmpfiles.rules = [
-      "d /var/lib/bitwarden 0777 vaultwarden vaultwarden -"
-      "d /var/lib/bitwarden/backup 0777 vaultwarden vaultwarden -"
-      "f ${bitwarden-env} 0640 vaultwarden vaultwarden - -"
-    ];
   };
 }

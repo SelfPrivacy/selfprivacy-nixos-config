@@ -20,7 +20,11 @@
       fileSystems = lib.mkIf sp.useBinds {
         "/var/lib/nextcloud" = {
           device = "/volumes/${sp.modules.nextcloud.location}/nextcloud";
-          options = [ "bind" ];
+          options = [
+            "bind"
+            "x-systemd.required-by=nextcloud-setup.service"
+            "x-systemd.required-by=nextcloud-secrets.service"
+          ];
         };
       };
       systemd.services.nextcloud-secrets = {
@@ -29,11 +33,11 @@
         serviceConfig.Type = "oneshot";
         path = with pkgs; [ coreutils jq ];
         script = ''
-          install -m 0440 -o nextcloud -g nextcloud -DT \
+          install -C -m 0440 -o nextcloud -g nextcloud -DT \
           <(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath}) \
           ${db-pass-filepath}
 
-          install -m 0440 -o nextcloud -g nextcloud -DT \
+          install -C -m 0440 -o nextcloud -g nextcloud -DT \
           <(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath}) \
           ${admin-pass-filepath}
         '';
