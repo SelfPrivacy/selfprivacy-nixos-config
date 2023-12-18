@@ -99,5 +99,26 @@ in
     };
     # seems to be an upstream nixpkgs/nixos bug (missing hexdump)
     systemd.services.pleroma.path = [ pkgs.util-linux ];
+    services.nginx.virtualHosts."social.${sp.domain}" = {
+      sslCertificate = "/var/lib/acme/wildcard-${sp.domain}/fullchain.pem";
+      sslCertificateKey = "/var/lib/acme/wildcard-${sp.domain}/key.pem";
+      root = "/var/www/social.${sp.domain}";
+      forceSSL = true;
+      extraConfig = ''
+        add_header Strict-Transport-Security $hsts_header;
+        #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
+        add_header 'Referrer-Policy' 'origin-when-cross-origin';
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+        proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
+        expires 10m;
+      '';
+      locations = {
+        "/" = {
+          proxyPass = "http://127.0.0.1:4000";
+        };
+      };
+    };
   };
 }
