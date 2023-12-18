@@ -23,6 +23,7 @@ in
         options = [
           "bind"
           "x-systemd.required-by=bitwarden-secrets.service"
+          "x-systemd.required-by=backup-vaultwarden.service"
           "x-systemd.required-by=vaultwarden.service"
         ];
       };
@@ -31,6 +32,7 @@ in
         options = [
           "bind"
           "x-systemd.required-by=bitwarden-secrets.service"
+          "x-systemd.required-by=backup-vaultwarden.service"
           "x-systemd.required-by=vaultwarden.service"
         ];
       };
@@ -47,8 +49,8 @@ in
       };
     };
     systemd.services.bitwarden-secrets = {
-      before = [ "vaultwarden.service" ];
-      requiredBy = [ "vaultwarden.service" ];
+      before = [ "backup-vaultwarden.service" "vaultwarden.service" ];
+      requiredBy = [ "backup-vaultwarden.service" "vaultwarden.service" ];
       serviceConfig.Type = "oneshot";
       path = with pkgs; [ coreutils jq ];
       script = ''
