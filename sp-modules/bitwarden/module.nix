@@ -49,8 +49,8 @@ in
       };
     };
     systemd.services.bitwarden-secrets = {
-      before = [ "backup-vaultwarden.service" "vaultwarden.service" ];
-      requiredBy = [ "backup-vaultwarden.service" "vaultwarden.service" ];
+      before = [ "vaultwarden.service" ];
+      requiredBy = [ "vaultwarden.service" ];
       serviceConfig.Type = "oneshot";
       path = with pkgs; [ coreutils jq ];
       script = ''
@@ -71,6 +71,7 @@ in
         <(printf "%s" "$bitwarden_env") ${bitwarden-env}
       '';
     };
+
     services.nginx.virtualHosts."password.${sp.domain}" = {
       sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
       sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
@@ -91,5 +92,7 @@ in
         };
       };
     };
+    # NixOS upstream bug? Otherwise, backup-vaultwarden cannot find sqlite DB.
+    systemd.services.backup-vaultwarden.after = [ "vaultwarden.service" ];
   };
 }
