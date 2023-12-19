@@ -21,9 +21,8 @@ in
     '';
     virtualHosts = {
       "${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
+        enableACME = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
@@ -41,9 +40,8 @@ in
         };
       };
       "api.${domain}" = {
-        sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
         forceSSL = true;
+        enableACME = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
           #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
