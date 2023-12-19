@@ -85,8 +85,9 @@ in
       };
     };
     services.nginx.virtualHosts."git.${sp.domain}" = {
+      sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
+      sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
       forceSSL = true;
-      enableACME = true;
       extraConfig = ''
         add_header Strict-Transport-Security $hsts_header;
         #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;

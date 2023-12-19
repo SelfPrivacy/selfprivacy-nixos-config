@@ -100,9 +100,10 @@ in
     # seems to be an upstream nixpkgs/nixos bug (missing hexdump)
     systemd.services.pleroma.path = [ pkgs.util-linux ];
     services.nginx.virtualHosts."social.${sp.domain}" = {
+      sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
+      sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
       root = "/var/www/social.${sp.domain}";
       forceSSL = true;
-      enableACME = true;
       extraConfig = ''
         add_header Strict-Transport-Security $hsts_header;
         #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;

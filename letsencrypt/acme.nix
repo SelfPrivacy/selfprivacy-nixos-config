@@ -25,8 +25,15 @@ in
       dnsPropagationCheck =
         ! (lib.elem cfg.dns.provider dnsPropagationCheckExceptions);
       reloadServices = [ "nginx" ];
-      dnsProvider = lib.strings.toLower cfg.dns.provider;
-      credentialsFile = acme-env-filepath;
+    };
+    certs = lib.mkForce {
+      "${cfg.domain}" = {
+        domain = "*.${cfg.domain}";
+        extraDomainNames = [ "${cfg.domain}" ];
+        group = "acmereceivers";
+        dnsProvider = lib.strings.toLower cfg.dns.provider;
+        credentialsFile = acme-env-filepath;
+      };
     };
   };
   systemd.services.acme-secrets = {

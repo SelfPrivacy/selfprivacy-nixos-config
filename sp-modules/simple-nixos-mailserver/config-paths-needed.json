@@ -11,6 +11,5 @@
   [ "services", "postfix", "user" ],
   [ "services", "redis" ],
   [ "services", "rspamd" ],
-  [ "security", "acme", "certs" ],
   [ "selfprivacy", "modules", "simple-nixos-mailserver" ]
 ]
