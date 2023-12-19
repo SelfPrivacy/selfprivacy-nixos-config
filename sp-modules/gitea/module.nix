@@ -19,6 +19,12 @@ in
   };
 
   config = lib.mkIf config.selfprivacy.modules.gitea.enable {
+    fileSystems = lib.mkIf sp.useBinds {
+      "/var/lib/gitea" = {
+        device = "/volumes/${sp.modules.gitea.location}/gitea";
+        options = [ "bind" ];
+      };
+    };
     services.gitea = {
       enable = true;
       inherit stateDir;
