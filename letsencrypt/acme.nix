@@ -27,17 +27,12 @@ in
       reloadServices = [ "nginx" ];
     };
     certs = lib.mkForce {
-      "wildcard-${cfg.domain}" = {
+      "${cfg.domain}" = {
         domain = "*.${cfg.domain}";
         extraDomainNames = [ "${cfg.domain}" ];
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = acme-env-filepath;
-      };
-      "${cfg.domain}" = {
-        domain = cfg.domain;
-        group = "acmereceivers";
-        webroot = "/var/lib/acme/acme-challenge";
       };
     };
   };

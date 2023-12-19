@@ -28,8 +28,8 @@ in
         tcp-port = 8443
         udp-port = 8443
 
-        server-cert = /var/lib/acme/wildcard-${domain}/fullchain.pem
-        server-key = /var/lib/acme/wildcard-${domain}/key.pem
+        server-cert = /var/lib/acme/${domain}/fullchain.pem
+        server-key = /var/lib/acme/${domain}/key.pem
 
         compression = true
 
@@ -56,8 +56,8 @@ in
       '';
     };
     services.nginx.virtualHosts."vpn.${domain}" = {
-      sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
-      sslCertificateKey = "/var/lib/acme/wildcard-${domain}/key.pem";
+      sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
+      sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
       forceSSL = true;
       extraConfig = ''
         add_header Strict-Transport-Security $hsts_header;
