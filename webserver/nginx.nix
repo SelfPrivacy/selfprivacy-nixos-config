@@ -19,7 +19,6 @@ in
       proxy_headers_hash_bucket_size 128;
       proxy_headers_hash_max_size 512;
     '';
-
     virtualHosts = {
       "${domain}" = {
         sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
@@ -35,6 +34,11 @@ in
           proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
           expires 10m;
         '';
+        locations = {
+          "/" = {
+            root = "/var/www/root";
+          };
+        };
       };
       "api.${domain}" = {
         sslCertificate = "/var/lib/acme/wildcard-${domain}/fullchain.pem";
@@ -59,4 +63,7 @@ in
       };
     };
   };
+  systemd.tmpfiles.rules = [
+    "d /var/www/root 0750 nginx nginx - -"
+  ];
 }
