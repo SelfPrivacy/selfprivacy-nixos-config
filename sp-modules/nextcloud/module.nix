@@ -69,8 +69,8 @@
         };
       };
       services.nginx.virtualHosts.${hostName} = {
-        sslCertificate = "/var/lib/acme/wildcard-${sp.domain}/fullchain.pem";
-        sslCertificateKey = "/var/lib/acme/wildcard-${sp.domain}/key.pem";
+        sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
+        sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
