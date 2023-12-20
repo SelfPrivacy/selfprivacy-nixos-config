@@ -26,7 +26,7 @@ in
         ! (lib.elem cfg.dns.provider dnsPropagationCheckExceptions);
       reloadServices = [ "nginx" ];
     };
-    certs = lib.mkForce {
+    certs = {
       "wildcard-${cfg.domain}" = {
         domain = "*.${cfg.domain}";
         extraDomainNames = [ "${cfg.domain}" ];
