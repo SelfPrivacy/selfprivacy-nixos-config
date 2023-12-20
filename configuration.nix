@@ -84,8 +84,7 @@
     channel = "https://channel.selfprivacy.org/nixos-selfpricacy";
   };
   nix = {
-    # TODO uncomment when NixOS version is at least 23.05
-    # nix.channel.enable = false;
+    channel.enable = false;
 
     # daemonCPUSchedPolicy = "idle";
     # daemonIOSchedClass = "idle";
