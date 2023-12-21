@@ -31,7 +31,7 @@ in
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = acme-env-filepath;
-        dnsPropagationCheck = false;
+        dnsPropagationCheck = true;
       };
     };
   };
