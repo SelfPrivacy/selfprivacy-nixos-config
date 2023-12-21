@@ -30,6 +30,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable
     enable = true;
     fqdn = sp.domain;
     domains = [ sp.domain ];
+    localDnsResolver = false;
 
     # A list of all login accounts. To create the password hashes, use
     # mkpasswd -m sha-512 "super secret password"
