@@ -22,7 +22,6 @@ in
       email = "${cfg.username}@${cfg.domain}";
       server = if cfg.dns.useStagingACME then "https://acme-staging-v02.api.letsencrypt.org/directory" else "https://acme-v02.api.letsencrypt.org/directory";
       reloadServices = [ "nginx" ];
-      dnsPropagationCheck = false;
     };
     certs = {
       "${cfg.domain}" = {
@@ -31,6 +30,7 @@ in
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = acme-env-filepath;
+        dnsPropagationCheck = false;
       };
     };
   };
