@@ -104,8 +104,7 @@ in
     # seems to be an upstream nixpkgs/nixos bug (missing hexdump)
     systemd.services.pleroma.path = [ pkgs.util-linux ];
     services.nginx.virtualHosts."social.${sp.domain}" = {
-      sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
-      sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
+      useACMEHost = config.selfprivacy.domain;
       root = "/var/www/social.${sp.domain}";
       forceSSL = true;
       extraConfig = ''

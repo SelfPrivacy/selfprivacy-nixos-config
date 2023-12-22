@@ -1,4 +1,5 @@
 [
+  [ "security", "acme", "certs" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "modules", "ocserv" ]
 ]

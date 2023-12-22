@@ -21,8 +21,6 @@ in
       };
     };
     services.nginx.virtualHosts."meet.${domain}" = {
-      sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-      sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
       forceSSL = true;
       useACMEHost = domain;
       enableACME = false;

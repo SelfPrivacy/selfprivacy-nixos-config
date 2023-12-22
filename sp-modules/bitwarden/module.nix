@@ -78,8 +78,7 @@ in
       '';
     };
     services.nginx.virtualHosts."password.${sp.domain}" = {
-      sslCertificate = "/var/lib/acme/${sp.domain}/fullchain.pem";
-      sslCertificateKey = "/var/lib/acme/${sp.domain}/key.pem";
+      useACMEHost = sp.domain;
       forceSSL = true;
       extraConfig = ''
         add_header Strict-Transport-Security $hsts_header;

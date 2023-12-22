@@ -1,6 +1,8 @@
 { config, lib, ... }:
 let
   domain = config.selfprivacy.domain;
+  cert = "${config.security.acme.certs.${domain}.directory}/fullchain.pem";
+  key = "${config.security.acme.certs.${domain}.directory}/key.pem";
 in
 {
   options.selfprivacy.modules.ocserv = {
@@ -28,8 +30,8 @@ in
         tcp-port = 8443
         udp-port = 8443
 
-        server-cert = /var/lib/acme/${domain}/fullchain.pem
-        server-key = /var/lib/acme/${domain}/key.pem
+        server-cert = ${cert}
+        server-key = ${key}
 
         compression = true
 
@@ -56,8 +58,7 @@ in
       '';
     };
     services.nginx.virtualHosts."vpn.${domain}" = {
-      sslCertificate = "/var/lib/acme/${domain}/fullchain.pem";
-      sslCertificateKey = "/var/lib/acme/${domain}/key.pem";
+      useACMEHost = domain;
       forceSSL = true;
       extraConfig = ''
         add_header Strict-Transport-Security $hsts_header;
@@ -70,5 +71,6 @@ in
         expires 10m;
       '';
     };
+    systemd.services.ocserv.unitConfig.ConditionPathExists = [ cert key ];
   };
 }

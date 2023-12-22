@@ -1,5 +1,6 @@
 [
   [ "mailserver" ],
+  [ "security", "acme", "certs" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "hashedMasterPassword" ],
   [ "selfprivacy", "useBinds" ],
