@@ -14,6 +14,7 @@ let
   dnsCredentialsTemplate = dnsCredentialsTemplates.${cfg.dns.provider};
   acme-env-filepath = "/var/lib/selfprivacy/acme-env";
   secrets-filepath = "/etc/selfprivacy/secrets.json";
+  dnsPropagationCheckExceptions = [ "DIGITALOCEAN" ];
 in
 {
   users.groups.acmereceivers.members = [ "nginx" ];
@@ -31,7 +32,8 @@ in
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = acme-env-filepath;
-        dnsPropagationCheck = true;
+        dnsPropagationCheck =
+          ! (lib.elem cfg.dns.provider dnsPropagationCheckExceptions);
       };
     };
   };
