@@ -78,6 +78,7 @@
     "# Completely remove remnants of NIXOS_LUSTRATE."
     "R! /old-root"
   ];
+  system.stateVersion = config.selfprivacy.stateVersion;
   system.autoUpgrade = {
     enable = config.selfprivacy.autoUpgrade.enable;
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
