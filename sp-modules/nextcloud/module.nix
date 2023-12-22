@@ -24,6 +24,8 @@
             "bind"
             "x-systemd.required-by=nextcloud-setup.service"
             "x-systemd.required-by=nextcloud-secrets.service"
+            "x-systemd.before=nextcloud-setup.service"
+            "x-systemd.before=nextcloud-secrets.service"
           ];
         };
       };

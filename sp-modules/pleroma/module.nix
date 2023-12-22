@@ -22,6 +22,8 @@ in
           "bind"
           "x-systemd.required-by=pleroma-secrets.service"
           "x-systemd.required-by=pleroma.service"
+          "x-systemd.before=pleroma.service"
+          "x-systemd.before=pleroma-secrets.service"
         ];
       };
       "/var/lib/postgresql" = {
@@ -30,6 +32,8 @@ in
           "bind"
           "x-systemd.required-by=pleroma-secrets.service"
           "x-systemd.required-by=pleroma.service"
+          "x-systemd.before=pleroma-secrets.service"
+          "x-systemd.before=pleroma.service"
         ];
       };
     };
@@ -78,7 +82,7 @@ in
 
         install -C -m 0700 -o pleroma -g pleroma -d /var/lib/pleroma
 
-        install -C -m 0700 -o pleroma -g pleroma -DT \
+        install -C -m 0600 -o pleroma -g pleroma -DT \
         <(printf "%s" "$filecontents") ${secrets-exs}
       '';
     };

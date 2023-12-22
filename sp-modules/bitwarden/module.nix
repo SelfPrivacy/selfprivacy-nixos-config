@@ -25,6 +25,9 @@ in
           "x-systemd.required-by=bitwarden-secrets.service"
           "x-systemd.required-by=backup-vaultwarden.service"
           "x-systemd.required-by=vaultwarden.service"
+          "x-systemd.before=bitwarden-secrets.service"
+          "x-systemd.before=backup-vaultwarden.service"
+          "x-systemd.before=vaultwarden.service"
         ];
       };
       "/var/lib/bitwarden_rs" = {
@@ -34,6 +37,9 @@ in
           "x-systemd.required-by=bitwarden-secrets.service"
           "x-systemd.required-by=backup-vaultwarden.service"
           "x-systemd.required-by=vaultwarden.service"
+          "x-systemd.before=bitwarden-secrets.service"
+          "x-systemd.before=backup-vaultwarden.service"
+          "x-systemd.before=vaultwarden.service"
         ];
       };
     };

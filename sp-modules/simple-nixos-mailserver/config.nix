@@ -9,12 +9,20 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable
       "/var/vmail" = {
         device =
           "/volumes/${sp.modules.simple-nixos-mailserver.location}/vmail";
-        options = [ "bind" ];
+        options = [
+          "bind"
+          "x-systemd.required-by=postfix.service"
+          "x-systemd.before=postfix.service"
+        ];
       };
       "/var/sieve" = {
         device =
           "/volumes/${sp.modules.simple-nixos-mailserver.location}/sieve";
-        options = [ "bind" ];
+        options = [
+          "bind"
+          "x-systemd.required-by=dovecot2.service"
+          "x-systemd.before=dovecot2.service"
+        ];
       };
     };
 
