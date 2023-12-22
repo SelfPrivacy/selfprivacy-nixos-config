@@ -36,7 +36,8 @@ with lib;
     };
     stateVersion = mkOption {
       description = "State version of the server";
-      type = types.str;
+      type = types.nullOr types.str;
+      default = null;
     };
     ########################
     # Server admin options #
