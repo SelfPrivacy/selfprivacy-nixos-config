@@ -86,7 +86,6 @@
   system.autoUpgrade = {
     enable = config.selfprivacy.autoUpgrade.enable;
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
-    channel = "https://channel.selfprivacy.org/nixos-selfpricacy";
   };
   nix = {
     channel.enable = false;
