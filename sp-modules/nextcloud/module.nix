@@ -35,12 +35,15 @@
         serviceConfig.Type = "oneshot";
         path = with pkgs; [ coreutils jq ];
         script = ''
+          databasePassword=$(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath})
+          adminPassword=$(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath})
+
           install -C -m 0440 -o nextcloud -g nextcloud -DT \
-          <(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath}) \
+          <(printf "%s\n" "$databasePassword") \
           ${db-pass-filepath}
 
           install -C -m 0440 -o nextcloud -g nextcloud -DT \
-          <(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath}) \
+          <(printf "%s\n" "$adminPassword") \
           ${admin-pass-filepath}
         '';
       };
