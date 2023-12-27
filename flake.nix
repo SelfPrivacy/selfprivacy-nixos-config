@@ -19,7 +19,7 @@
       , sp-modules
       }:
       {
-        sp-nixos = nixpkgs.lib.nixosSystem {
+        default = nixpkgs.lib.nixosSystem {
           modules = [
             hardware-configuration
             deployment
