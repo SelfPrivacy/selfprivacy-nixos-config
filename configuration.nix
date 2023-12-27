@@ -70,6 +70,7 @@
     jq
   ];
   # consider environment.defaultPackages = lib.mkForce [];
+  # TODO is it needed?
   environment.variables = {
     DOMAIN = config.selfprivacy.domain;
   };
