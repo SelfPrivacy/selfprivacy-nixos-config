@@ -30,7 +30,7 @@
       "locked": {
         "lastModified": 1703752027,
         "narHash": "sha256-oqOh+W0oF6UsH+Swpbucqz00IDbjrITQgOD5EDl/8V4=",
-        "ref": "userdata",
+        "ref": "flakes",
         "rev": "5fe4c405cea6a45326bcb8d20a95aa039ef74aeb",
         "revCount": 1058,
         "type": "git",
