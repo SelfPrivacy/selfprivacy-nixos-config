@@ -88,13 +88,27 @@
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
     # TODO get attribute name from selfprivacy options
     flake = "/etc/nixos#default";
+    flags = [ "--verbose" "--print-build-logs" ];
   };
   systemd.services.nixos-upgrade.serviceConfig.WorkingDirectory = "/etc/nixos";
   # TODO parameterize URL somehow; run nix flake update as non-root user
-  systemd.services.nixos-upgrade.serviceConfig.ExecStartPre = ''
-    ${config.nix.package.out}/bin/nix flake update \
-    --override-input selfprivacy-nixos-config git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
-  '';
+  systemd.services.nixos-upgrade.serviceConfig.ExecCondition =
+    pkgs.writeShellScript "flake-update-script" ''
+      set -o xtrace
+      if ${config.nix.package.out}/bin/nix flake update \
+      --override-input selfprivacy-nixos-config git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
+      then
+          if ${pkgs.diffutils}/bin/diff -u -r /etc/selfprivacy/nixos-config-source/ /etc/nixos/
+          then
+              set +o xtrace
+              echo "No configuration changes detected. Nothing to upgrade."
+              exit 1
+          fi
+      else
+          # ExecStart must not start after 255 exit code, service must fail.
+          exit 255
+      fi
+    '';
   nix = {
     channel.enable = false;
 
