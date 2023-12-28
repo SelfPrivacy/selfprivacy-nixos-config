@@ -10,11 +10,10 @@ in
   options.selfprivacy.modules.gitea = {
     enable = lib.mkOption {
       default = false;
-      type = with lib.types; nullOr bool;
+      type = lib.types.bool;
     };
     location = lib.mkOption {
-      default = "sda1";
-      type = with lib.types; nullOr str;
+      type = lib.types.str;
     };
   };
 

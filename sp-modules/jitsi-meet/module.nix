@@ -6,7 +6,7 @@ in
   options.selfprivacy.modules.jitsi-meet = {
     enable = lib.mkOption {
       default = false;
-      type = with lib.types; nullOr bool;
+      type = lib.types.bool;
     };
   };
 

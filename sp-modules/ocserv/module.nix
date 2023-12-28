@@ -8,7 +8,7 @@ in
   options.selfprivacy.modules.ocserv = {
     enable = lib.mkOption {
       default = false;
-      type = with lib; types.nullOr types.bool;
+      type = lib.types.bool;
     };
   };
 

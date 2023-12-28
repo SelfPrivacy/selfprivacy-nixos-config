@@ -2,12 +2,11 @@
 {
   options.selfprivacy.modules.nextcloud = with lib; {
     enable = mkOption {
-      type = types.nullOr types.bool;
+      type = types.bool;
       default = false;
     };
     location = mkOption {
-      type = types.nullOr types.str;
-      default = "sda1";
+      type = types.str;
     };
   };
 

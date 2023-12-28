@@ -7,11 +7,10 @@ in
   options.selfprivacy.modules.pleroma = {
     enable = lib.mkOption {
       default = false;
-      type = with lib; types.nullOr types.bool;
+      type = lib.types.bool;
     };
     location = lib.mkOption {
-      default = "sda1";
-      type = with lib; types.nullOr types.str;
+      type = lib.types.str;
     };
   };
   config = lib.mkIf config.selfprivacy.modules.pleroma.enable {
