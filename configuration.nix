@@ -33,7 +33,7 @@
     };
   };
 
-  services.do-agent.enable = if config.selfprivacy.server.provider == "digitalocean" then true else false;
+  services.do-agent.enable = if config.selfprivacy.server.provider == "DIGITALOCEAN" then true else false;
 
   boot.tmp.cleanOnBoot = true;
   networking = {
