@@ -88,7 +88,6 @@
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
     # TODO get attribute name from selfprivacy options
     flake = "/etc/nixos#default";
-    flags = [ "--verbose" "--print-build-logs" ];
   };
   systemd.services.nixos-upgrade.serviceConfig.WorkingDirectory = "/etc/nixos";
   # TODO parameterize URL somehow; run nix flake update as non-root user
