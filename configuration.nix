@@ -89,15 +89,12 @@
     # TODO get attribute name from selfprivacy options
     flake = "/etc/nixos#default";
   };
+  systemd.services.nixos-upgrade.serviceConfig.WorkingDirectory = "/etc/nixos";
   # TODO parameterize URL somehow; run nix flake update as non-root user
-  systemd.services.nixos-upgrade.serviceConfig.ExecStartPre =
-    lib.trivial.throwIf
-      (lib.strings.versionAtLeast config.nix.package.version "2.19")
-      "nix flake update usage is not updated to breaking 2.19"
-      ''
-        ${config.nix.package.out}/bin/nix flake update /etc/nixos \
-        --override-input selfprivacy-nixos-config git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
-      '';
+  systemd.services.nixos-upgrade.serviceConfig.ExecStartPre = ''
+    ${config.nix.package.out}/bin/nix flake update \
+    --override-input selfprivacy-nixos-config git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
+  '';
   nix = {
     channel.enable = false;
 
