@@ -53,6 +53,7 @@ in
         pkgs.gitMinimal
         config.nix.package.out
         pkgs.nixos-rebuild
+        pkgs.nix
         pkgs.restic
         pkgs.mkpasswd
         pkgs.util-linux
