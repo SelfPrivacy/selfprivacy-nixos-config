@@ -13,7 +13,8 @@
   config =
     let
       inherit (import ./common.nix config)
-        sp secrets-filepath db-pass-filepath admin-pass-filepath hostName;
+        sp secrets-filepath db-pass-filepath admin-pass-filepath;
+      hostName = "cloud.${sp.domain}";
     in
     lib.mkIf sp.modules.nextcloud.enable {
       fileSystems = lib.mkIf sp.useBinds {
@@ -52,7 +53,7 @@
         inherit hostName;
 
         # Use HTTPS for links
-        https = false;
+        https = true;
 
         # auto-update Nextcloud Apps
         autoUpdateApps.enable = true;
@@ -65,7 +66,6 @@
 
           dbtype = "sqlite";
           dbuser = "nextcloud";
-          dbhost = "/run/postgresql"; # nextcloud adds .s.PGSQL.5432 by itself
           dbname = "nextcloud";
           dbpassFile = db-pass-filepath;
           adminpassFile = admin-pass-filepath;
@@ -73,23 +73,8 @@
         };
       };
       services.nginx.virtualHosts.${hostName} = {
-      useACMEHost = config.selfprivacy.domain;
+        useACMEHost = sp.domain;
         forceSSL = true;
-        extraConfig = ''
-          add_header Strict-Transport-Security $hsts_header;
-          #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
-          add_header 'Referrer-Policy' 'origin-when-cross-origin';
-          add_header X-Frame-Options DENY;
-          add_header X-Content-Type-Options nosniff;
-          add_header X-XSS-Protection "1; mode=block";
-          proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
-          expires 10m;
-        '';
-        locations = {
-          "/" = {
-            proxyPass = "http://127.0.0.1:80/";
-          };
-        };
       };
     };
 }
