@@ -26,7 +26,7 @@ There are 2 methods:
 
 In any case a Nix flake input is specified using some special _references_ syntax, including URLs, revisions, etc, described in manual: https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html#examples. Such reference can be used inside `flake.nix` or as an argument to `nix flake` commands. When a new reference is encountered Nix downloads and extracts it to /nix/store.
 
-Before and after running `nix flake lock` (or `nix flake update`) commands you would most likely want to list current inputs using `nix flake metadata`, which are read from `flake.lock` file. Although, Nix should also print a diff between changed referrences once changed.
+Before and after running `nix flake lock` (or `nix flake update`) commands you would most likely want to list current inputs using `nix flake metadata`, which are read from `flake.lock` file. Although, Nix should also print a diff between changed references once changed.
 
 `--commit-lock-file` option tells Nix commands to do `git commit flake.lock` automatically, creating a new commit for you.
 
@@ -45,7 +45,7 @@ Depending on how "precise" the URL was speficied in `flake.nix`, with _unmodifie
 
 ---
 
-Once Nix 2.19 stabilizes, a different command _must_ be used for updating a single input, like this:
+Once Nix 2.19 stabilizes, a different command _must_ be used for updating a single input (recursively), like this:
 ```console
 $ nix flake update nixpkgs
 ```
@@ -53,7 +53,7 @@ $ nix flake update nixpkgs
 
 ### method 2: override specific input
 
-Overriding is more powerful as it allows to change flake input reference to anything just in one command (not only update in the bounds of a branch or a repository).
+Overriding is more powerful (for non-nested flakes) as it allows to change a flake input reference to anything just in one command (not only update in the bounds of a branch or a repository).
 
 Example:
 ```console
@@ -61,10 +61,10 @@ $ nix flake lock --override-input nixpkgs github:nixos/nixpkgs?ref=nixos-23.11
 $ nix flake lock --override-input selfprivacy-api git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git?ref=flakes
 ```
 
-Similarly to update mechanism (described above), depending on the "precision" of an URL, its update scope varies.
+Similarly to update mechanism (described above), depending on the "precision" of an URL, its update scope varies accordingly.
 
 Note, that subsequent calls of `nix flake lock --update-input <INPUT>` or `nix flake update` (or `nix flake update INPUT` by Nix 2.19+) will update the input regardless of the prior override. The information about override is stored only in `flake.lock` (`flake.nix` is not altered by Nix).
 
 ---
 
-Note, that override does not update flake inputs recursively (say, you have a flake inside your flake input). For recursive updates only `nix flake lock --update-input` and `nix flake update` mechanisms are suitable. However, as of 2024-01-10 none of the current inputs contain other flakes, hence override mechanism is fine.
+Note, that override does not update flake inputs recursively (say, you have a flake nested inside your flake input). For recursive updates only `nix flake lock --update-input` and `nix flake update` mechanisms are suitable. However, as of 2024-01-10 none of the SP NixOS configuration inputs contain other flakes, hence override mechanism is fine (don't confuse with top-level flake which has nested inputs).
