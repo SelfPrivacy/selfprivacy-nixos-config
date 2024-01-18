@@ -70,10 +70,6 @@
     jq
   ];
   # consider environment.defaultPackages = lib.mkForce [];
-  # TODO is it needed?
-  environment.variables = {
-    DOMAIN = config.selfprivacy.domain;
-  };
   documentation.enable = false; # no {man,info}-pages & docs, etc to save space
   # (or create a systemd service with `ConditionFirstBoot=yes`?)
   systemd.tmpfiles.rules = [
