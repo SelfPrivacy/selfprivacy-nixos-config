@@ -20,7 +20,7 @@ with lib;
         Timezone used by the server
       '';
       type = types.nullOr types.str;
-      default = "Europe/Uzhgorod";
+      default = "Etc/UTC";
     };
     autoUpgrade = {
       enable = mkOption {
