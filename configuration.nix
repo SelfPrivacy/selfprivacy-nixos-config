@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 let
-  url-overlay = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo/archive/22-11-backups.tar.gz";
+  url-overlay = "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nix-repo/archive/test-migration.tar.gz";
   nix-overlay = (import (builtins.fetchTarball url-overlay));
 in
 {
