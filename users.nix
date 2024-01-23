@@ -3,8 +3,9 @@ let
   cfg = config.selfprivacy;
 in
 {
-  users.mutableUsers = false;
   users = {
+    mutableUsers = false;
+    allowNoPasswordLogin = true;
     users = {
       "${cfg.username}" = {
         isNormalUser = true;
