@@ -2,6 +2,7 @@
 let
   secrets-filepath = "/etc/selfprivacy/secrets.json";
   backup-dir = "/var/lib/bitwarden/backup";
+  cfg = sp.modules.bitwarden;
   inherit (import ./common.nix config) bitwarden-env sp;
 in
 {
@@ -13,12 +14,16 @@ in
     location = lib.mkOption {
       type = lib.types.str;
     };
+    subdomain = lib.mkOption {
+      default = "password";
+      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+    };
   };
 
   config = lib.mkIf config.selfprivacy.modules.bitwarden.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/bitwarden" = {
-        device = "/volumes/${sp.modules.bitwarden.location}/bitwarden";
+        device = "/volumes/${cfg.location}/bitwarden";
         options = [
           "bind"
           "x-systemd.required-by=bitwarden-secrets.service"
@@ -30,7 +35,7 @@ in
         ];
       };
       "/var/lib/bitwarden_rs" = {
-        device = "/volumes/${sp.modules.bitwarden.location}/bitwarden_rs";
+        device = "/volumes/${cfg.location}/bitwarden_rs";
         options = [
           "bind"
           "x-systemd.required-by=bitwarden-secrets.service"
@@ -48,7 +53,7 @@ in
       backupDir = backup-dir;
       environmentFile = "${bitwarden-env}";
       config = {
-        domain = "https://password.${sp.domain}/";
+        domain = "https://${cfg.subdomain}.${sp.domain}/";
         signupsAllowed = true;
         rocketPort = 8222;
       };
@@ -76,7 +81,7 @@ in
         <(printf "%s" "$bitwarden_env") ${bitwarden-env}
       '';
     };
-    services.nginx.virtualHosts."password.${sp.domain}" = {
+    services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
       useACMEHost = sp.domain;
       forceSSL = true;
       extraConfig = ''

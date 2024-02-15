@@ -3,8 +3,9 @@ let
   sp = config.selfprivacy;
   stateDir =
     if sp.useBinds
-    then "/volumes/${sp.modules.gitea.location}/gitea"
+    then "/volumes/${cfg.location}/gitea"
     else "/var/lib/gitea";
+  cfg = sp.modules.gitea;
 in
 {
   options.selfprivacy.modules.gitea = {
@@ -15,12 +16,16 @@ in
     location = lib.mkOption {
       type = lib.types.str;
     };
+    subdomain = lib.mkOption {
+      default = "git";
+      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+    };
   };
 
-  config = lib.mkIf config.selfprivacy.modules.gitea.enable {
+  config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/gitea" = {
-        device = "/volumes/${sp.modules.gitea.location}/gitea";
+        device = "/volumes/${cfg.location}/gitea";
         options = [ "bind" ];
       };
     };
@@ -53,8 +58,8 @@ in
       #      cookieSecure = true;
       settings = {
         server = {
-          DOMAIN = "git.${sp.domain}";
-          ROOT_URL = "https://git.${sp.domain}/";
+          DOMAIN = "${cfg.subdomain}.${sp.domain}";
+          ROOT_URL = "https://${cfg.subdomain}.${sp.domain}/";
           HTTP_ADDR = "0.0.0.0";
           HTTP_PORT = 3000;
         };
@@ -83,7 +88,7 @@ in
         };
       };
     };
-    services.nginx.virtualHosts."git.${sp.domain}" = {
+    services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
       useACMEHost = sp.domain;
       forceSSL = true;
       extraConfig = ''
@@ -103,6 +108,6 @@ in
       };
     };
     systemd.services.gitea.unitConfig.RequiresMountsFor =
-      lib.mkIf sp.useBinds "/volumes/${sp.modules.gitea.location}/gitea";
+      lib.mkIf sp.useBinds "/volumes/${cfg.location}/gitea";
   };
 }
