@@ -8,18 +8,23 @@
     location = mkOption {
       type = types.str;
     };
+    subdomain = lib.mkOption {
+      default = "cloud";
+      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+    };
   };
 
   config =
     let
       inherit (import ./common.nix config)
         sp secrets-filepath db-pass-filepath admin-pass-filepath;
-      hostName = "cloud.${sp.domain}";
+      cfg = sp.modules.nextcloud;
+      hostName = "${cfg.subdomain}.${sp.domain}";
     in
     lib.mkIf sp.modules.nextcloud.enable {
       fileSystems = lib.mkIf sp.useBinds {
         "/var/lib/nextcloud" = {
-          device = "/volumes/${sp.modules.nextcloud.location}/nextcloud";
+          device = "/volumes/${cfg.location}/nextcloud";
           options = [
             "bind"
             "x-systemd.required-by=nextcloud-setup.service"

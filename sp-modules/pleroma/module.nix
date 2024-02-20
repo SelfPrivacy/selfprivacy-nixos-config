@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   secrets-filepath = "/etc/selfprivacy/secrets.json";
+  cfg = config.selfprivacy.modules.pleroma;
   inherit (import ./common.nix config) secrets-exs sp;
 in
 {
@@ -12,11 +13,15 @@ in
     location = lib.mkOption {
       type = lib.types.str;
     };
+    subdomain = lib.mkOption {
+      default = "social";
+      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+    };
   };
-  config = lib.mkIf config.selfprivacy.modules.pleroma.enable {
+  config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/pleroma" = {
-        device = "/volumes/${sp.modules.pleroma.location}/pleroma";
+        device = "/volumes/${cfg.location}/pleroma";
         options = [
           "bind"
           "x-systemd.required-by=pleroma-secrets.service"
@@ -26,7 +31,7 @@ in
         ];
       };
       "/var/lib/postgresql" = {
-        device = "/volumes/${sp.modules.pleroma.location}/postgresql";
+        device = "/volumes/${cfg.location}/postgresql";
         options = [
           "bind"
           "x-systemd.required-by=pleroma-secrets.service"
@@ -102,9 +107,9 @@ in
     };
     # seems to be an upstream nixpkgs/nixos bug (missing hexdump)
     systemd.services.pleroma.path = [ pkgs.util-linux ];
-    services.nginx.virtualHosts."social.${sp.domain}" = {
-      useACMEHost = config.selfprivacy.domain;
-      root = "/var/www/social.${sp.domain}";
+    services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
+      useACMEHost = sp.domain;
+      root = "/var/www/${cfg.subdomain}.${sp.domain}";
       forceSSL = true;
       extraConfig = ''
         add_header Strict-Transport-Security $hsts_header;

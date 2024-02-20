@@ -3,6 +3,7 @@ let
   domain = config.selfprivacy.domain;
   cert = "${config.security.acme.certs.${domain}.directory}/fullchain.pem";
   key = "${config.security.acme.certs.${domain}.directory}/key.pem";
+  cfg = config.selfprivacy.modules.ocserv;
 in
 {
   options.selfprivacy.modules.ocserv = {
@@ -10,9 +11,13 @@ in
       default = false;
       type = lib.types.bool;
     };
+    subdomain = lib.mkOption {
+      default = "vpn";
+      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+    };
   };
 
-  config = lib.mkIf config.selfprivacy.modules.ocserv.enable {
+  config = lib.mkIf cfg.enable {
     users.groups.ocserv.members = [ "ocserv" ];
     users.users.ocserv = {
       isNormalUser = false;
@@ -43,7 +48,7 @@ in
         idle-timeout=1200
         mobile-idle-timeout=2400
 
-        default-domain = vpn.${domain}
+        default-domain = ${cfg.subdomain}.${domain}
 
         device = vpn0
 
@@ -57,7 +62,7 @@ in
         route = default
       '';
     };
-    services.nginx.virtualHosts."vpn.${domain}" = {
+    services.nginx.virtualHosts."${cfg.subdomain}.${domain}" = {
       useACMEHost = domain;
       forceSSL = true;
       extraConfig = ''

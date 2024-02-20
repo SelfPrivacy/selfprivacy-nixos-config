@@ -1,6 +1,7 @@
 { config, lib, ... }:
 let
   domain = config.selfprivacy.domain;
+  cfg = config.selfprivacy.modules.jitsi-meet;
 in
 {
   options.selfprivacy.modules.jitsi-meet = {
@@ -8,19 +9,23 @@ in
       default = false;
       type = lib.types.bool;
     };
+    subdomain = lib.mkOption {
+      default = "meet";
+      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+    };
   };
 
-  config = lib.mkIf config.selfprivacy.modules.jitsi-meet.enable {
+  config = lib.mkIf cfg.enable {
     services.jitsi-meet = {
       enable = true;
-      hostName = "meet.${domain}";
+      hostName = "${cfg.subdomain}.${domain}";
       nginx.enable = true;
       interfaceConfig = {
         SHOW_JITSI_WATERMARK = false;
         SHOW_WATERMARK_FOR_GUESTS = false;
       };
     };
-    services.nginx.virtualHosts."meet.${domain}" = {
+    services.nginx.virtualHosts."${cfg.subdomain}.${domain}" = {
       forceSSL = true;
       useACMEHost = domain;
       enableACME = false;
