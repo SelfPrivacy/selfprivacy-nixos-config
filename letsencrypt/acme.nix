@@ -9,7 +9,12 @@ let
       CLOUDFLARE_ZONE_API_TOKEN=$TOKEN
       CLOUDFLARE_POLLING_INTERVAL=30
     '';
-    DESEC = "DESEC_TOKEN=$TOKEN";
+    DESEC = ''
+      DESEC_TOKEN=$TOKEN
+      DESEC_POLLING_INTERVAL=30
+      DESEC_PROPAGATION_TIMEOUT=180
+      DESEC_TTL=3600
+    '';
   };
   dnsCredentialsTemplate = dnsCredentialsTemplates.${cfg.dns.provider};
   acme-env-filepath = "/var/lib/selfprivacy/acme-env";
