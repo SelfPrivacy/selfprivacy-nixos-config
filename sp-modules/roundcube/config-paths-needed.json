@@ -1,0 +1,15 @@
+[
+  [
+    "selfprivacy",
+    "domain"
+  ],
+  [
+    "selfprivacy",
+    "modules",
+    "roundcube"
+  ],
+  [
+    "mailserver",
+    "fqdn"
+  ]
+]
