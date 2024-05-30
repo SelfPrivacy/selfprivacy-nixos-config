@@ -1,4 +1,20 @@
 { config, pkgs, lib, ... }:
+let
+  redis-sp-api-srv-name = "sp-api";
+  sp-print-api-token = pkgs.writeShellApplication {
+    name = "sp-print-api-token";
+    runtimeInputs = with pkgs; [ redis ];
+    text = ''
+      hash_token="$(redis-cli -s /run/redis-${redis-sp-api-srv-name}/redis.sock keys "token_repo:tokens:*" | head -n 1)"
+      hash_token="''${hash_token#"token_repo:tokens:"}"
+
+      token="$(redis-cli -s /run/redis-${redis-sp-api-srv-name}/redis.sock HGETALL "token_repo:tokens:$hash_token")"
+      token="$(echo "$token" | sed -n '2p')"
+
+      echo "$token"
+    '';
+  };
+in
 {
   imports = [
     ./selfprivacy-module.nix
@@ -15,7 +31,7 @@
 
   services.selfprivacy-api.enable = true;
 
-  services.redis.servers.sp-api = {
+  services.redis.servers.${redis-sp-api-srv-name} = {
     enable = true;
     save = [
       [
@@ -68,6 +84,7 @@
   environment.systemPackages = with pkgs; [
     git
     jq
+    sp-print-api-token
   ];
   # consider environment.defaultPackages = lib.mkForce [];
   documentation.enable = false; # no {man,info}-pages & docs, etc to save space
