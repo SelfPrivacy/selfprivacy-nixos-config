@@ -17,6 +17,7 @@ in {
           enable = true;
           enabledCollectors = [ "systemd" ];
           port = 9002;
+          listenAddress = "127.0.0.1";
         };
       };
       scrapeConfigs = [
