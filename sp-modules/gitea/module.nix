@@ -52,11 +52,13 @@ in
         options = [ "bind" ];
       };
     };
-    services.gitea = {
+    services.gitea.enable = false;
+    services.forgejo = {
       enable = true;
       package = pkgs.forgejo;
       inherit stateDir;
       user = "gitea";
+      group = "gitea";
       database = {
         type = "sqlite3";
         host = "127.0.0.1";
@@ -89,7 +91,7 @@ in
           ENABLED = false;
         };
         ui = {
-          DEFAULT_THEME = "arc-green";
+          DEFAULT_THEME = "forgejo-auto";
           SHOW_USER_EMAIL = false;
         };
         picture = {
@@ -114,6 +116,13 @@ in
         };
       };
     };
+    users.users.gitea = {
+      home = "${stateDir}";
+      useDefaultShell = true;
+      group = "gitea";
+      isSystemUser = true;
+    };
+    users.groups.gitea = { };
     services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
       useACMEHost = sp.domain;
       forceSSL = true;
@@ -133,7 +142,7 @@ in
         };
       };
     };
-    systemd.services.gitea.unitConfig.RequiresMountsFor =
+    systemd.services.forgejo.unitConfig.RequiresMountsFor =
       lib.mkIf sp.useBinds "/volumes/${cfg.location}/gitea";
   };
 }
