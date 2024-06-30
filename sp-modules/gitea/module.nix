@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   sp = config.selfprivacy;
   stateDir =
@@ -20,6 +20,29 @@ in
       default = "git";
       type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
     };
+    appName = lib.mkOption {
+      default = "SelfPrivacy git Service";
+      type = lib.types.str;
+    };
+    enableLfs = lib.mkOption {
+      default = true;
+      type = lib.types.bool;
+    };
+    forcePrivate = lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Force all new repositories to be private";
+    };
+    disableRegistration = lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Disable registration of new users";
+    };
+    requireSigninView = lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Require signin to view any page";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -31,11 +54,8 @@ in
     };
     services.gitea = {
       enable = true;
+      package = pkgs.forgejo;
       inherit stateDir;
-      #      log = {
-      #        rootPath = "/var/lib/gitea/log";
-      #        level = "Warn";
-      #      };
       user = "gitea";
       database = {
         type = "sqlite3";
@@ -50,13 +70,15 @@ in
       #   clonePort = 22;
       # };
       lfs = {
-        enable = true;
+        enable = cfg.enableLfs;
         contentDir = "${stateDir}/lfs";
       };
-      appName = "SelfPrivacy git Service";
       repositoryRoot = "${stateDir}/repositories";
       #      cookieSecure = true;
       settings = {
+        DEFAULT = {
+          APP_NAME = "${cfg.appName}";
+        };
         server = {
           DOMAIN = "${cfg.subdomain}.${sp.domain}";
           ROOT_URL = "https://${cfg.subdomain}.${sp.domain}/";
@@ -77,7 +99,7 @@ in
           ENABLE_KANBAN_BOARD = true;
         };
         repository = {
-          FORCE_PRIVATE = false;
+          FORCE_PRIVATE = cfg.forcePrivate;
         };
         session = {
           COOKIE_SECURE = true;
@@ -85,6 +107,10 @@ in
         log = {
           ROOT_PATH = "${stateDir}/log";
           LEVEL = "Warn";
+        };
+        service = {
+          DISABLE_REGISTRATION = cfg.disableRegistration;
+          REQUIRE_SIGNIN_VIEW = cfg.requireSigninView;
         };
       };
     };

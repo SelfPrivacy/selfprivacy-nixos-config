@@ -18,6 +18,18 @@ in
       default = "password";
       type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
     };
+    signupsAllowed = lib.mkOption {
+      default = true;
+      type = lib.types.bool;
+    };
+    sendsAllowed = lib.mkOption {
+      default = true;
+      type = lib.types.bool;
+    };
+    emergencyAccessAllowed = lib.mkOption {
+      default = true;
+      type = lib.types.bool;
+    };
   };
 
   config = lib.mkIf config.selfprivacy.modules.bitwarden.enable {
@@ -53,9 +65,11 @@ in
       backupDir = backup-dir;
       environmentFile = "${bitwarden-env}";
       config = {
-        domain = "https://${cfg.subdomain}.${sp.domain}/";
-        signupsAllowed = true;
-        rocketPort = 8222;
+        DOMAIN = "https://${cfg.subdomain}.${sp.domain}/";
+        SIGNUPS_ALLOWED = cfg.signupsAllowed;
+        ROCKET_PORT = 8222;
+        SENDS_ALLOWED = cfg.sendsAllowed;
+        EMERGENCY_ACCESS_ALLOWED = cfg.emergencyAccessAllowed;
       };
     };
     systemd.services.bitwarden-secrets = {
