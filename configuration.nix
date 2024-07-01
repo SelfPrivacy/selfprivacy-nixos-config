@@ -74,8 +74,10 @@ in
     settings = {
       PasswordAuthentication = config.selfprivacy.ssh.passwordAuthentication;
       PermitRootLogin = "yes";
+      LoginGraceTime = 0;
     };
     openFirewall = false;
+
   };
   programs.ssh = {
     pubkeyAcceptedKeyTypes = [ "ssh-ed25519" "ssh-rsa" "ecdsa-sha2-nistp256" ];
