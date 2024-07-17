@@ -6,8 +6,21 @@ in {
       default = false;
       type = lib.types.bool;
     };
+    location = lib.mkOption {
+      type = lib.types.str;
+    };
   };
   config = lib.mkIf cfg.enable {
+    fileSystems = lib.mkIf config.selfprivacy.useBinds {
+      "/var/lib/prometheus2" = {
+        device = "/volumes/${cfg.location}/prometheus";
+        options = [
+          "bind"
+          "x-systemd.required-by=prometheus.service"
+          "x-systemd.before=prometheus.service"
+        ];
+      };
+    };
     services.prometheus = {
       enable = true;
       port = 9001;
