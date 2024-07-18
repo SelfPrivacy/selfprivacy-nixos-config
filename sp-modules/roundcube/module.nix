@@ -33,7 +33,7 @@ in
     services.nginx.virtualHosts."${cfg.subdomain}.${domain}" = {
       forceSSL = true;
       useACMEHost = domain;
+      enableACME = false;
     };
   };
 }
-
