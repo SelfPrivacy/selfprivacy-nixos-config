@@ -43,6 +43,11 @@ in
       type = lib.types.bool;
       description = "Require signin to view any page";
     };
+    defaultTheme = lib.mkOption {
+      default = "forgejo-auto";
+      type = lib.types.enum [ "forgejo-auto" "forgejo-light" "forgejo-dark" "auto" "gitea" "arc-green" ];
+      description = "The default theme for the gitea instance";
+    };
   };
 
   config = lib.mkIf cfg.enable {
