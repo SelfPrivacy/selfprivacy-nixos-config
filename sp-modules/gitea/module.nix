@@ -96,7 +96,7 @@ in
           ENABLED = false;
         };
         ui = {
-          DEFAULT_THEME = "forgejo-auto";
+          DEFAULT_THEME = cfg.defaultTheme;
           SHOW_USER_EMAIL = false;
         };
         picture = {
