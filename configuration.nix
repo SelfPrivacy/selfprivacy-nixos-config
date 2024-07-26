@@ -31,6 +31,8 @@ in
 
   services.selfprivacy-api.enable = true;
 
+  services.redis.package = pkgs.valkey;
+
   services.redis.servers.${redis-sp-api-srv-name} = {
     enable = true;
     save = [
