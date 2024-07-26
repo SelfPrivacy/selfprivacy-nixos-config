@@ -35,5 +35,13 @@ in
       useACMEHost = domain;
       enableACME = false;
     };
+    systemd = {
+      services = {
+        phpfpm-roundcube.serviceConfig.Slice = "roundcube.slice";
+      };
+      slices.roundcube = {
+        description = "Roundcube service slice";
+      };
+    };
   };
 }

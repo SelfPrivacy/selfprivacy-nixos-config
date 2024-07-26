@@ -76,5 +76,13 @@ in
       '';
     };
     systemd.services.ocserv.unitConfig.ConditionPathExists = [ cert key ];
+    systemd = {
+      services = {
+        ocserv.serviceConfig.Slice = "ocserv.slice";
+      };
+      slices.ocserv = {
+        description = "ocserv service slice";
+      };
+    };
   };
 }

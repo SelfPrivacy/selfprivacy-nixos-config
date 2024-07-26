@@ -40,5 +40,15 @@ in
       useACMEHost = domain;
       enableACME = false;
     };
+    systemd = {
+      services = {
+        jicofo.serviceConfig.Slice = "jitsi-meet.slice";
+        jitsi-videobridge2.serviceConfig.Slice = "jitsi-meet.slice";
+        prosody.serviceConfig.Slice = "jitsi-meet.slice";
+      };
+      slices.jitsi-meet = {
+        description = "Jitsi Meet service slice";
+      };
+    };
   };
 }

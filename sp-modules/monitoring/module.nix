@@ -1,6 +1,8 @@
-{config, lib, ...}: let
+{ config, lib, ... }:
+let
   cfg = config.selfprivacy.modules.monitoring;
-in {
+in
+{
   options.selfprivacy.modules.monitoring = {
     enable = lib.mkOption {
       default = false;
@@ -53,6 +55,16 @@ in {
           }];
         }
       ];
+    };
+    systemd = {
+      services = {
+        prometheus.serviceConfig.Slice = "monitoring.slice";
+        prometheus-node-exporter.serviceConfig.Slice = "monitoring.slice";
+        cadvisor.serviceConfig.Slice = "monitoring.slice";
+      };
+      slices.monitoring = {
+        description = "Monitoring service slice";
+      };
     };
   };
 }

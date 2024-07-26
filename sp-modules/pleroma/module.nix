@@ -126,5 +126,13 @@ in
         };
       };
     };
+    systemd = {
+      services = {
+        pleroma.serviceConfig.Slice = "pleroma.slice";
+      };
+      slices.pleroma = {
+        description = "Pleroma service slice";
+      };
+    };
   };
 }

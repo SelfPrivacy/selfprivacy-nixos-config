@@ -83,5 +83,13 @@
         useACMEHost = sp.domain;
         forceSSL = true;
       };
+      systemd = {
+        services = {
+          phpfpm-nextcloud.serviceConfig.Slice = "nextcloud.slice";
+        };
+        slices.nextcloud = {
+          description = "Nextcloud service slice";
+        };
+      };
     };
 }

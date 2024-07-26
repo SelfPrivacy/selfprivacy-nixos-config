@@ -116,5 +116,12 @@ in
     # NixOS upstream bug? Otherwise, backup-vaultwarden cannot find sqlite DB.
     systemd.services.backup-vaultwarden.unitConfig.ConditionPathExists =
       "/var/lib/bitwarden_rs/db.sqlite3";
+
+    systemd = {
+      services.vaultwarden.serviceConfig.Slice = "bitwarden.slice";
+      slices.bitwarden = {
+        description = "Bitwarden service slice";
+      };
+    };
   };
 }
