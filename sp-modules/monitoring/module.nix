@@ -25,6 +25,7 @@ in {
       enable = true;
       port = 9003;
       listenAddress = "127.0.0.1";
+      extraOptions = [ "--enable_metrics=cpu,memory,diskIO" ];
     };
     services.prometheus = {
       enable = true;
