@@ -32,12 +32,23 @@ in {
           port = 9002;
           listenAddress = "127.0.0.1";
         };
+        systemd = {
+          enable = true;
+          port = 9003;
+          listenAddress = "127.0.0.1";
+        };
       };
       scrapeConfigs = [
         {
           job_name = "node-exporter";
           static_configs = [{
             targets = [ "127.0.0.1:9002" ];
+          }];
+        }
+        {
+          job_name = "systemd-exporter";
+          static_configs = [{
+            targets = [ "127.0.0.1:9003" ];
           }];
         }
       ];
