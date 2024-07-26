@@ -28,7 +28,7 @@ in {
       exporters = {
         node = {
           enable = true;
-          enabledCollectors = [ "systemd" ];
+          enabledCollectors = [ "systemd" "cgroups" ];
           port = 9002;
           listenAddress = "127.0.0.1";
         };
