@@ -25,7 +25,6 @@ in {
       enable = true;
       port = 9003;
       listenAddress = "127.0.0.1";
-      extraOptions = [ "--enable_load_reader=true" ];
     };
     services.prometheus = {
       enable = true;
