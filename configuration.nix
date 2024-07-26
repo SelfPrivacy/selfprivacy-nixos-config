@@ -27,11 +27,6 @@ in
     # ./resources/limits.nix
   ];
 
-  # We have to use this version to be able to migrate from Gitea.
-  nixpkgs.config.permittedInsecurePackages = [
-    "forgejo-1.20.6-1-unstable-2024-04-18"
-  ];
-
   fileSystems."/".options = [ "noatime" ];
 
   services.selfprivacy-api.enable = true;
