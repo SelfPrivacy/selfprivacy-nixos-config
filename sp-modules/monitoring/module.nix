@@ -21,6 +21,11 @@ in {
         ];
       };
     };
+    services.cadvisor = {
+      enable = true;
+      port = 9003;
+      listenAddress = "127.0.0.1";
+    };
     services.prometheus = {
       enable = true;
       port = 9001;
@@ -28,13 +33,8 @@ in {
       exporters = {
         node = {
           enable = true;
-          enabledCollectors = [ "systemd" "cgroups" ];
+          enabledCollectors = [ "systemd" ];
           port = 9002;
-          listenAddress = "127.0.0.1";
-        };
-        systemd = {
-          enable = true;
-          port = 9003;
           listenAddress = "127.0.0.1";
         };
       };
@@ -46,7 +46,7 @@ in {
           }];
         }
         {
-          job_name = "systemd-exporter";
+          job_name = "cadvisor";
           static_configs = [{
             targets = [ "127.0.0.1:9003" ];
           }];
