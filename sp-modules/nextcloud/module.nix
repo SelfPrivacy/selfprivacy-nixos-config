@@ -34,23 +34,35 @@
           ];
         };
       };
-      systemd.services.nextcloud-secrets = {
-        before = [ "nextcloud-setup.service" ];
-        requiredBy = [ "nextcloud-setup.service" ];
-        serviceConfig.Type = "oneshot";
-        path = with pkgs; [ coreutils jq ];
-        script = ''
-          databasePassword=$(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath})
-          adminPassword=$(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath})
+      systemd = {
+        services = {
+          phpfpm-nextcloud.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-setup.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-cron.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-update-db.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-update-plugins.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-secrets = {
+            before = [ "nextcloud-setup.service" ];
+            requiredBy = [ "nextcloud-setup.service" ];
+            serviceConfig.Type = "oneshot";
+            path = with pkgs; [ coreutils jq ];
+            script = ''
+              databasePassword=$(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath})
+              adminPassword=$(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath})
 
-          install -C -m 0440 -o nextcloud -g nextcloud -DT \
-          <(printf "%s\n" "$databasePassword") \
-          ${db-pass-filepath}
+              install -C -m 0440 -o nextcloud -g nextcloud -DT \
+              <(printf "%s\n" "$databasePassword") \
+              ${db-pass-filepath}
 
-          install -C -m 0440 -o nextcloud -g nextcloud -DT \
-          <(printf "%s\n" "$adminPassword") \
-          ${admin-pass-filepath}
-        '';
+              install -C -m 0440 -o nextcloud -g nextcloud -DT \
+              <(printf "%s\n" "$adminPassword") \
+              ${admin-pass-filepath}
+            '';
+          };
+        };
+        slices.nextcloud = {
+          description = "Nextcloud service slice";
+        };
       };
       services.nextcloud = {
         enable = true;
@@ -82,14 +94,6 @@
       services.nginx.virtualHosts.${hostName} = {
         useACMEHost = sp.domain;
         forceSSL = true;
-      };
-      systemd = {
-        services = {
-          phpfpm-nextcloud.serviceConfig.Slice = "nextcloud.slice";
-        };
-        slices.nextcloud = {
-          description = "Nextcloud service slice";
-        };
       };
     };
 }

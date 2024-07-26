@@ -68,28 +68,7 @@ in
         ];
       };
     };
-    systemd.services.pleroma-secrets = {
-      before = [ "pleroma.service" ];
-      requiredBy = [ "pleroma.service" ];
-      serviceConfig.Type = "oneshot";
-      path = with pkgs; [ coreutils jq ];
-      script = ''
-        set -o nounset
 
-        password="$(jq -re '.databasePassword' ${secrets-filepath})"
-        filecontents=$(cat <<- EOF
-        import Config
-        config :pleroma, Pleroma.Repo,
-          password: "$password"
-        EOF
-        )
-
-        install -C -m 0700 -o pleroma -g pleroma -d /var/lib/pleroma
-
-        install -C -m 0600 -o pleroma -g pleroma -DT \
-        <(printf "%s" "$filecontents") ${secrets-exs}
-      '';
-    };
     environment.etc."setup.psql".text = ''
       CREATE USER pleroma;
       CREATE DATABASE pleroma OWNER pleroma;
@@ -105,8 +84,40 @@ in
       isSystemUser = true;
       group = "pleroma";
     };
-    # seems to be an upstream nixpkgs/nixos bug (missing hexdump)
-    systemd.services.pleroma.path = [ pkgs.util-linux ];
+    systemd = {
+      services = {
+        pleroma-secrets = {
+          before = [ "pleroma.service" ];
+          requiredBy = [ "pleroma.service" ];
+          serviceConfig.Type = "oneshot";
+          path = with pkgs; [ coreutils jq ];
+          script = ''
+            set -o nounset
+
+            password="$(jq -re '.databasePassword' ${secrets-filepath})"
+            filecontents=$(cat <<- EOF
+            import Config
+            config :pleroma, Pleroma.Repo,
+              password: "$password"
+            EOF
+            )
+
+            install -C -m 0700 -o pleroma -g pleroma -d /var/lib/pleroma
+
+            install -C -m 0600 -o pleroma -g pleroma -DT \
+            <(printf "%s" "$filecontents") ${secrets-exs}
+          '';
+        };
+        pleroma = {
+          # seems to be an upstream nixpkgs/nixos bug (missing hexdump)
+          path = [ pkgs.util-linux ];
+          serviceConfig.Slice = "pleroma.slice";
+        };
+      };
+      slices.pleroma = {
+        description = "Pleroma service slice";
+      };
+    };
     services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
       useACMEHost = sp.domain;
       root = "/var/www/${cfg.subdomain}.${sp.domain}";
@@ -124,14 +135,6 @@ in
         "/" = {
           proxyPass = "http://127.0.0.1:4000";
         };
-      };
-    };
-    systemd = {
-      services = {
-        pleroma.serviceConfig.Slice = "pleroma.slice";
-      };
-      slices.pleroma = {
-        description = "Pleroma service slice";
       };
     };
   };

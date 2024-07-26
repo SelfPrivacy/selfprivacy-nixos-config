@@ -75,10 +75,12 @@ in
         proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
       '';
     };
-    systemd.services.ocserv.unitConfig.ConditionPathExists = [ cert key ];
     systemd = {
       services = {
-        ocserv.serviceConfig.Slice = "ocserv.slice";
+        ocserv = {
+          unitConfig.ConditionPathExists = [ cert key ];
+          serviceConfig.Slice = "ocserv.slice";
+        };
       };
       slices.ocserv = {
         description = "ocserv service slice";
