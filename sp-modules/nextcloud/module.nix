@@ -65,10 +65,12 @@
         # set what time makes sense for you
         autoUpdateApps.startAt = "05:00:00";
 
-        config = {
+        settings = {
           # further forces Nextcloud to use HTTPS
-          overwriteProtocol = "https";
+          overwriteprotocol = "https";
+        };
 
+        config = {
           dbtype = "sqlite";
           dbuser = "nextcloud";
           dbname = "nextcloud";
