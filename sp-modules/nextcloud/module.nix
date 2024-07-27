@@ -36,7 +36,7 @@
       };
       systemd = {
         services = {
-          phpfpm-nextcloud.serviceConfig.Slice = "nextcloud.slice";
+          phpfpm-nextcloud.serviceConfig.Slice = lib.mkForce "nextcloud.slice";
           nextcloud-setup.serviceConfig.Slice = "nextcloud.slice";
           nextcloud-cron.serviceConfig.Slice = "nextcloud.slice";
           nextcloud-update-db.serviceConfig.Slice = "nextcloud.slice";

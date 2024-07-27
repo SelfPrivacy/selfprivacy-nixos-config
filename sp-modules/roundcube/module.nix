@@ -37,7 +37,7 @@ in
     };
     systemd = {
       services = {
-        phpfpm-roundcube.serviceConfig.Slice = "roundcube.slice";
+        phpfpm-roundcube.serviceConfig.Slice = lib.mkForce "roundcube.slice";
       };
       slices.roundcube = {
         description = "Roundcube service slice";
