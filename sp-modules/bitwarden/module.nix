@@ -59,6 +59,9 @@ in
         ];
       };
     };
+    systemd.tmpfiles.rules = lib.mkIf sp.useBinds [
+      "d /volumes/${cfg.location}/bitwarden/backup 0700 vaultwarden vaultwarden -"
+    ];
     services.vaultwarden = {
       enable = true;
       dbBackend = "sqlite";
