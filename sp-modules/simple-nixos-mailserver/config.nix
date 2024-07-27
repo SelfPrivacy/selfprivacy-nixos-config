@@ -92,14 +92,14 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable
 
   systemd = {
     services = {
-      dovecot2.serviceConfig.Slice = "simple-nixos-mailserver.slice";
-      postfix.serviceConfig.Slice = "simple-nixos-mailserver.slice";
-      rspamd.serviceConfig.Slice = "simple-nixos-mailserver.slice";
-      redis-rspamd.serviceConfig.Slice = "simple-nixos-mailserver.slice";
-      opendkim.serviceConfig.Slice = "simple-nixos-mailserver.slice";
+      dovecot2.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      redis-rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      opendkim.serviceConfig.Slice = "simple_nixos_mailserver.slice";
     };
-    slices."simple-nixos-mailserver" = {
-      name = "simple-nixos-mailserver.slice";
+    slices."simple_nixos_mailserver" = {
+      name = "simple_nixos_mailserver.slice";
       description = "Simple NixOS Mailserver service slice";
     };
   };

@@ -42,11 +42,11 @@ in
     };
     systemd = {
       services = {
-        jicofo.serviceConfig.Slice = "jitsi-meet.slice";
-        jitsi-videobridge2.serviceConfig.Slice = "jitsi-meet.slice";
-        prosody.serviceConfig.Slice = "jitsi-meet.slice";
+        jicofo.serviceConfig.Slice = "jitsi_meet.slice";
+        jitsi-videobridge2.serviceConfig.Slice = "jitsi_meet.slice";
+        prosody.serviceConfig.Slice = "jitsi_meet.slice";
       };
-      slices.jitsi-meet = {
+      slices.jitsi_meet = {
         description = "Jitsi Meet service slice";
       };
     };
