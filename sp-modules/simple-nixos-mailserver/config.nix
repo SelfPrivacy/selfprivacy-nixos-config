@@ -98,7 +98,8 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable
       redis-rspamd.serviceConfig.Slice = "simple-nixos-mailserver.slice";
       opendkim.serviceConfig.Slice = "simple-nixos-mailserver.slice";
     };
-    slices.simple-nixos-mailserver = {
+    slices."simple-nixos-mailserver" = {
+      name = "simple-nixos-mailserver.slice";
       description = "Simple NixOS Mailserver service slice";
     };
   };
