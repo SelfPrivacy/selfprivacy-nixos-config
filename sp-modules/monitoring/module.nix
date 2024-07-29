@@ -23,6 +23,7 @@ in
         ];
       };
     };
+    security.auditd.enable = true;
     services.cadvisor = {
       enable = true;
       port = 9003;
