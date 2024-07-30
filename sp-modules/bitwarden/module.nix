@@ -59,6 +59,9 @@ in
         ];
       };
     };
+    systemd.tmpfiles.rules = lib.mkIf sp.useBinds [
+      "d /volumes/${cfg.location}/bitwarden/backup 0700 vaultwarden vaultwarden -"
+    ];
     services.vaultwarden = {
       enable = true;
       dbBackend = "sqlite";
@@ -72,28 +75,36 @@ in
         EMERGENCY_ACCESS_ALLOWED = cfg.emergencyAccessAllowed;
       };
     };
-    systemd.services.bitwarden-secrets = {
-      before = [ "vaultwarden.service" ];
-      requiredBy = [ "vaultwarden.service" ];
-      serviceConfig.Type = "oneshot";
-      path = with pkgs; [ coreutils jq ];
-      script = ''
-        set -o nounset
+    systemd = {
+      services = {
+        vaultwarden.serviceConfig.Slice = "bitwarden.slice";
+        bitwarden-secrets = {
+          before = [ "vaultwarden.service" ];
+          requiredBy = [ "vaultwarden.service" ];
+          serviceConfig.Type = "oneshot";
+          path = with pkgs; [ coreutils jq ];
+          script = ''
+            set -o nounset
 
-        token="$(jq -r '.bitwarden.adminToken' ${secrets-filepath})"
-        if [ "$token" == "null" ]; then
-            # If it's null, empty the contents of the file
-            bitwarden_env=""
-        else
-            bitwarden_env="ADMIN_TOKEN=$token"
-        fi
+            token="$(jq -r '.bitwarden.adminToken' ${secrets-filepath})"
+            if [ "$token" == "null" ]; then
+                # If it's null, empty the contents of the file
+                bitwarden_env=""
+            else
+                bitwarden_env="ADMIN_TOKEN=$token"
+            fi
 
-        install -C -m 0700 -o vaultwarden -g vaultwarden \
-        -d /var/lib/bitwarden
+            install -C -m 0700 -o vaultwarden -g vaultwarden \
+            -d /var/lib/bitwarden
 
-        install -C -m 0600 -o vaultwarden -g vaultwarden -DT \
-        <(printf "%s" "$bitwarden_env") ${bitwarden-env}
-      '';
+            install -C -m 0600 -o vaultwarden -g vaultwarden -DT \
+            <(printf "%s" "$bitwarden_env") ${bitwarden-env}
+          '';
+        };
+      };
+      slices.bitwarden = {
+        description = "Bitwarden service slice";
+      };
     };
     services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
       useACMEHost = sp.domain;

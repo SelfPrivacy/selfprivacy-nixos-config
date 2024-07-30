@@ -34,27 +34,39 @@
           ];
         };
       };
-      systemd.services.nextcloud-secrets = {
-        before = [ "nextcloud-setup.service" ];
-        requiredBy = [ "nextcloud-setup.service" ];
-        serviceConfig.Type = "oneshot";
-        path = with pkgs; [ coreutils jq ];
-        script = ''
-          databasePassword=$(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath})
-          adminPassword=$(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath})
+      systemd = {
+        services = {
+          phpfpm-nextcloud.serviceConfig.Slice = lib.mkForce "nextcloud.slice";
+          nextcloud-setup.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-cron.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-update-db.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-update-plugins.serviceConfig.Slice = "nextcloud.slice";
+          nextcloud-secrets = {
+            before = [ "nextcloud-setup.service" ];
+            requiredBy = [ "nextcloud-setup.service" ];
+            serviceConfig.Type = "oneshot";
+            path = with pkgs; [ coreutils jq ];
+            script = ''
+              databasePassword=$(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath})
+              adminPassword=$(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath})
 
-          install -C -m 0440 -o nextcloud -g nextcloud -DT \
-          <(printf "%s\n" "$databasePassword") \
-          ${db-pass-filepath}
+              install -C -m 0440 -o nextcloud -g nextcloud -DT \
+              <(printf "%s\n" "$databasePassword") \
+              ${db-pass-filepath}
 
-          install -C -m 0440 -o nextcloud -g nextcloud -DT \
-          <(printf "%s\n" "$adminPassword") \
-          ${admin-pass-filepath}
-        '';
+              install -C -m 0440 -o nextcloud -g nextcloud -DT \
+              <(printf "%s\n" "$adminPassword") \
+              ${admin-pass-filepath}
+            '';
+          };
+        };
+        slices.nextcloud = {
+          description = "Nextcloud service slice";
+        };
       };
       services.nextcloud = {
         enable = true;
-        package = pkgs.nextcloud27;
+        package = pkgs.nextcloud28;
         inherit hostName;
 
         # Use HTTPS for links
@@ -65,10 +77,12 @@
         # set what time makes sense for you
         autoUpdateApps.startAt = "05:00:00";
 
-        config = {
+        settings = {
           # further forces Nextcloud to use HTTPS
-          overwriteProtocol = "https";
+          overwriteprotocol = "https";
+        };
 
+        config = {
           dbtype = "sqlite";
           dbuser = "nextcloud";
           dbname = "nextcloud";

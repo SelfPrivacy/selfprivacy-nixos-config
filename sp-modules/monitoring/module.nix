@@ -1,6 +1,8 @@
-{config, lib, ...}: let
+{ config, lib, ... }:
+let
   cfg = config.selfprivacy.modules.monitoring;
-in {
+in
+{
   options.selfprivacy.modules.monitoring = {
     enable = lib.mkOption {
       default = false;
@@ -21,6 +23,12 @@ in {
         ];
       };
     };
+    services.cadvisor = {
+      enable = true;
+      port = 9003;
+      listenAddress = "127.0.0.1";
+      extraOptions = [ "--enable_metrics=cpu,memory,diskIO" ];
+    };
     services.prometheus = {
       enable = true;
       port = 9001;
@@ -40,7 +48,23 @@ in {
             targets = [ "127.0.0.1:9002" ];
           }];
         }
+        {
+          job_name = "cadvisor";
+          static_configs = [{
+            targets = [ "127.0.0.1:9003" ];
+          }];
+        }
       ];
+    };
+    systemd = {
+      services = {
+        prometheus.serviceConfig.Slice = "monitoring.slice";
+        prometheus-node-exporter.serviceConfig.Slice = "monitoring.slice";
+        cadvisor.serviceConfig.Slice = "monitoring.slice";
+      };
+      slices.monitoring = {
+        description = "Monitoring service slice";
+      };
     };
   };
 }

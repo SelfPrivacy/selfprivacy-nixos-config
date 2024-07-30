@@ -146,7 +146,17 @@ in
         };
       };
     };
-    systemd.services.forgejo.unitConfig.RequiresMountsFor =
-      lib.mkIf sp.useBinds "/volumes/${cfg.location}/gitea";
+    systemd = {
+      services.forgejo = {
+        unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/gitea";
+        serviceConfig = {
+          Slice = "gitea.slice";
+        };
+      };
+      slices.gitea = {
+        description = "Forgejo service slice";
+      };
+    };
+
   };
 }

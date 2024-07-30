@@ -89,4 +89,18 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable
 
     virusScanning = false;
   };
+
+  systemd = {
+    services = {
+      dovecot2.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      redis-rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+      opendkim.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+    };
+    slices."simple_nixos_mailserver" = {
+      name = "simple_nixos_mailserver.slice";
+      description = "Simple NixOS Mailserver service slice";
+    };
+  };
 }
