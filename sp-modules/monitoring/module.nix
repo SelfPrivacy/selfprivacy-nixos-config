@@ -35,7 +35,7 @@ in
       "-a always,exit -F arch=b64 -S mknod -S mknodat -k specialfiles"
       "-a always,exit -F arch=b64 -S mount -S umount2 -F auid!=-1 -k mount"
       "-a always,exit -F arch=b64 -S swapon -S swapoff -F auid!=-1 -k swap"
-      "-a always,exit -F arch=b64 -F uid!=ntp -S adjtimex -S settimeofday -S clock_settime -k time"
+      "-a always,exit -F arch=b64 -S adjtimex -S settimeofday -S clock_settime -k time"
       "-w /etc/group -p wa -k etcgroup"
       "-w /etc/passwd -p wa -k etcpasswd"
       "-w /etc/shadow -k etcpasswd"
