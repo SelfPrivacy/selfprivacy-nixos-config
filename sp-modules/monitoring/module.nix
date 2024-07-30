@@ -24,6 +24,15 @@ in
       };
     };
     security.auditd.enable = true;
+    security.audit.enable = true;
+    security.audit.rules = [
+      "-w /root -p war -k root"
+      "-w /etc/nixos -p w -k nixos_config"
+      "-w /etc/selfprivacy.nix -p w -k selfprivacy_folder"
+      "-w /sbin/insmod -p x -k module_insertion"
+      "-w /etc/passwd -p rwxa -k passwd_changes"
+      "-a exit,always -F arch=b64 -S execve"
+    ];
     services.cadvisor = {
       enable = true;
       port = 9003;
