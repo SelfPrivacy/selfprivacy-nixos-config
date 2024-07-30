@@ -32,7 +32,6 @@ in
       "-w /etc/selfprivacy.nix -p w -k selfprivacyfolder"
       "-a always,exclude -F msgtype=CWD"
       "-a always,exclude -F msgtype=PATH"
-      "-a exit,never -F arch=b64 -F a0=systemctl -F a1=show"
       # "-a exit,always -F arch=b64 -S execve"
       "-a always,exit -F arch=b64 -S kexec_load -k KEXEC"
       "-a always,exit -F arch=b64 -S mknod -S mknodat -k specialfiles"
