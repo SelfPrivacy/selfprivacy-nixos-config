@@ -68,3 +68,25 @@ Note, that subsequent calls of `nix flake lock --update-input <INPUT>` or `nix f
 ---
 
 Note, that override does not update flake inputs recursively (say, you have a flake nested inside your flake input). For recursive updates only `nix flake lock --update-input` and `nix flake update` mechanisms are suitable. However, as of 2024-01-10 none of the SP NixOS configuration inputs contain other flakes, hence override mechanism is fine (don't confuse with top-level flake which has nested inputs).
+
+## Updating other repositories
+
+After changing the `flakes` branch here, you have to modify other repositories, so the new servers start up with the latest version of this config.
+
+### NixOS template
+
+On [selfprivacy-nixos-template](https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-template) run the following command:
+
+```bash
+./.switch-selfprivacy-nixos-config-url git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
+```
+
+And push the changes. Take note of the commit hash.
+
+### NixOS infect
+
+On [selfprivacy-nixos-infect](https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-infect) modify the commit hash on this line:
+
+```bash
+readonly CONFIG_URL="https://git.selfprivacy.org/api/v1/repos/SelfPrivacy/selfprivacy-nixos-template/archive/HASH.tar.gz"
+```
