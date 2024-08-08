@@ -35,6 +35,11 @@ in
         };
       };
     };
+    services.prosody.extraConfig = ''
+      log = {
+        info = "*syslog";
+      }
+    '';
     services.nginx.virtualHosts."${cfg.subdomain}.${domain}" = {
       forceSSL = true;
       useACMEHost = domain;
