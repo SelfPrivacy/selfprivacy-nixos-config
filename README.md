@@ -78,6 +78,7 @@ After changing the `flakes` branch here, you have to modify other repositories, 
 On [selfprivacy-nixos-template](https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-template) run the following command:
 
 ```bash
+nix flake update --override-input selfprivacy-nixos-config git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
 ./.switch-selfprivacy-nixos-config-url git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
 ```
 
