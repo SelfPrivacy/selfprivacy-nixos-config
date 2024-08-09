@@ -13,10 +13,21 @@ in
       default = false;
       type = lib.types.bool;
       description = "Enable the forgejo module";
+    } // {
+      meta = {
+        type = "sp-module-enable";
+        default = false;
+        description = "Enable the forgejo module";
+      };
     };
     location = lib.mkOption {
       type = lib.types.str;
       description = "The location to store the forgejo data";
+    } // {
+      meta = {
+        type = "sp-module-location";
+        description = "The location to store the forgejo data";
+      };
     };
     subdomain = lib.mkOption {
       default = "git";
