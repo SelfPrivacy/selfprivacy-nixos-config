@@ -12,13 +12,16 @@ in
     enable = lib.mkOption {
       default = false;
       type = lib.types.bool;
+      description = "Enable the forgejo module";
     };
     location = lib.mkOption {
       type = lib.types.str;
+      description = "The location to store the forgejo data";
     };
     subdomain = lib.mkOption {
       default = "git";
       type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+      description = "Subdomain";
     } // {
       meta = {
         widget = "subdomain";
@@ -28,10 +31,12 @@ in
     appName = lib.mkOption {
       default = "SelfPrivacy git Service";
       type = lib.types.str;
+      description = "The name displayed in the web interface";
     };
     enableLfs = lib.mkOption {
       default = true;
       type = lib.types.bool;
+      description = "Enable large file storage";
     };
     forcePrivate = lib.mkOption {
       default = false;
