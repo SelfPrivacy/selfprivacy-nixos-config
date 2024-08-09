@@ -19,7 +19,7 @@ in
     subdomain = lib.mkOption {
       default = "git";
       type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-    }; // {
+    } // {
       meta = {
         widget = "subdomain";
         description = "Subdomain";
