@@ -24,6 +24,9 @@ in
       description = "Subdomain";
     } // {
       meta = {
+        type = "string";
+        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        default = "git";
         widget = "subdomain";
         description = "Subdomain";
       };
@@ -32,31 +35,68 @@ in
       default = "SelfPrivacy git Service";
       type = lib.types.str;
       description = "The name displayed in the web interface";
+    } // {
+      meta = {
+        type = "string";
+        default = "SelfPrivacy git Service";
+        description = "The name displayed in the web interface";
+      };
     };
     enableLfs = lib.mkOption {
       default = true;
       type = lib.types.bool;
       description = "Enable large file storage";
+    } // {
+      meta = {
+        type = "bool";
+        default = true;
+        description = "Enable large file storage";
+      };
     };
     forcePrivate = lib.mkOption {
       default = false;
       type = lib.types.bool;
       description = "Force all new repositories to be private";
+    } // {
+      meta = {
+        type = "bool";
+        default = false;
+        description = "Force all new repositories to be private";
+      };
     };
     disableRegistration = lib.mkOption {
       default = false;
       type = lib.types.bool;
       description = "Disable registration of new users";
+    } // {
+      meta = {
+        type = "bool";
+        default = false;
+        description = "Disable registration of new users";
+      };
     };
     requireSigninView = lib.mkOption {
       default = false;
       type = lib.types.bool;
       description = "Require signin to view any page";
+    } // {
+      meta = {
+        type = "bool";
+        default = false;
+        description = "Require signin to view any page";
+      };
     };
     defaultTheme = lib.mkOption {
       default = "forgejo-auto";
-      type = lib.types.enum [ "forgejo-auto" "forgejo-light" "forgejo-dark" "auto" "gitea" "arc-green" ];
+      type = lib.types.enum [ "forgejo-auto" "forgejo-light" "forgejo-dark" "gitea-auto" "gitea-light" "gitea-dark" ];
       description = "The default theme for the gitea instance";
+    } // {
+      meta = {
+        type = "enum";
+        default = "forgejo-auto";
+        description = "The default theme for the gitea instance";
+        options = [ "forgejo-auto" "forgejo-light" "forgejo-dark" "gitea-auto" "gitea-light" "gitea-dark" ];
+      };
     };
   };
 
