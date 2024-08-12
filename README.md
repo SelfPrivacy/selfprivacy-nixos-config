@@ -57,7 +57,7 @@ Overriding is more powerful (for non-nested flakes) as it allows to change a fla
 
 Example:
 ```console
-$ nix flake lock --override-input nixpkgs github:nixos/nixpkgs?ref=nixos-23.11
+$ nix flake lock --override-input nixpkgs github:nixos/nixpkgs?ref=nixos-24.05
 $ nix flake lock --override-input selfprivacy-api git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git?ref=flakes
 ```
 
