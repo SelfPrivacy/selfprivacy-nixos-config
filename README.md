@@ -84,6 +84,8 @@ nix flake update --override-input selfprivacy-nixos-config git+https://git.selfp
 
 And push the changes. Take note of the commit hash.
 
+If you added a new SelfPrivacy module, you have to add it to the `sp-modules` input in `flake.nix` and update the `userdata.json` template.
+
 ### NixOS infect
 
 On [selfprivacy-nixos-infect](https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-infect) modify the commit hash on this line:
