@@ -94,6 +94,8 @@ On [selfprivacy-nixos-infect](https://git.selfprivacy.org/SelfPrivacy/selfprivac
 readonly CONFIG_URL="https://git.selfprivacy.org/api/v1/repos/SelfPrivacy/selfprivacy-nixos-template/archive/HASH.tar.gz"
 ```
 
+If you added a new SelfPrivacy module, you have to also edit a `genUserdata` function in `nixos-infect` to set up the new module.
+
 ## How to apply a change (e.g. CVE fix) to nixpkgs
 
 ### if you can determine which nixpkgs package is affected
