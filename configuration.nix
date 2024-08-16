@@ -149,6 +149,9 @@ in
     # allowed-uris = [];
     allow-dirty = false;
   };
+  nixpkgs.overlays = [
+    (import ./overlay.nix config.nixpkgs.hostPlatform.system)
+  ];
   services.journald.extraConfig = "SystemMaxUse=500M";
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1; # TODO why is it here by default, for VPN only?

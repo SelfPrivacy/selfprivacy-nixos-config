@@ -33,7 +33,7 @@
               environment.etc."selfprivacy/nixos-config-source".source =
                 top-level-flake;
 
-              # for running "nix search nixpkgs", etc
+              # for running "nix search nixpkgs", "nix shell nixpkgs#PKG... etc
               nix.registry.nixpkgs.flake = nixpkgs;
 
               # embed commit sha1 for `nixos-version --configuration-revision`
@@ -49,7 +49,7 @@
             }
           ]
           ++
-          # add SP modules, but contrain available config attributes for each
+          # add SP modules, but constrain available config attributes for each
           # (TODO revise evaluation performance of the code below)
           nixpkgs.lib.attrsets.mapAttrsToList
             (name: sp-module: args@{ config, pkgs, ... }:

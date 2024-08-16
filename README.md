@@ -93,3 +93,17 @@ On [selfprivacy-nixos-infect](https://git.selfprivacy.org/SelfPrivacy/selfprivac
 ```bash
 readonly CONFIG_URL="https://git.selfprivacy.org/api/v1/repos/SelfPrivacy/selfprivacy-nixos-template/archive/HASH.tar.gz"
 ```
+
+## How to apply a change (e.g. CVE fix) to nixpkgs
+
+### if you can determine which nixpkgs package is affected
+
+- without building from source _(after nixpkgs binary cache is ready)_ - it will use all dependencies from the nixpkgs commit, where the patch is committed:
+
+    1. Find a nixpkgs commit, which contains the patched files. It doesn't have to be (but it can be) the commit where the actual patch was introduced, it can be a more recent commit.
+    2. In [`overlay.nix`](overlay.nix) file write a line inside the existing curly brackets following the following pattern:
+        ```nix
+        PACKAGE_NAME = (builtins.getFlake "github:nixos/nixpkgs/NIXPKGS_COMMIT_SHA1").legacyPackages.${system}.PACKAGE_NAME;
+        ```
+        Substitute `PACKAGE_NAME` and `NIXPKGS_COMMIT_SHA1` with affected package name and nixpkgs commit SHA1 (found at step 1), respectively.
+    3. Commit the [`overlay.nix`](overlay.nix) changes. Configuration is ready to be built.
