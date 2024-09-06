@@ -21,7 +21,6 @@ in
     '';
     virtualHosts = {
       "${domain}" = {
-        enableACME = true;
         useACMEHost = "root-${domain}";
         forceSSL = true;
         extraConfig = ''
