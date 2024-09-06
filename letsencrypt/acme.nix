@@ -33,7 +33,6 @@ in
     certs = {
       "${cfg.domain}" = {
         domain = "*.${cfg.domain}";
-        extraDomainNames = [ "${cfg.domain}" ];
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = acme-env-filepath;
