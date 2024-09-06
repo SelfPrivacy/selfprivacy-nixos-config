@@ -33,12 +33,16 @@ in
     certs = {
       "${cfg.domain}" = {
         domain = "*.${cfg.domain}";
-        extraDomainNames = [ "${cfg.domain}" ];
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = acme-env-filepath;
         dnsPropagationCheck =
           ! (lib.elem cfg.dns.provider dnsPropagationCheckExceptions);
+      };
+      "root-${cfg.domain}" = {
+        domain = cfg.domain;
+        group = "acmereceivers";
+        webroot = "/var/lib/acme/acme-challenge";
       };
     };
   };
