@@ -22,6 +22,7 @@ in
     virtualHosts = {
       "${domain}" = {
         enableACME = true;
+        useACMEHost = "root-${domain}";
         forceSSL = true;
         extraConfig = ''
           add_header Strict-Transport-Security $hsts_header;
