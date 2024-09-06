@@ -39,6 +39,11 @@ in
         dnsPropagationCheck =
           ! (lib.elem cfg.dns.provider dnsPropagationCheckExceptions);
       };
+      "root-${cfg.domain}" = {
+        domain = cfg.domain;
+        group = "acmerecievers";
+        webroot = "/var/lib/acme/acme-challenge";
+      };
     };
   };
   systemd.services.acme-secrets = {
