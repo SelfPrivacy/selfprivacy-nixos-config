@@ -41,7 +41,7 @@ in
       };
       "root-${cfg.domain}" = {
         domain = cfg.domain;
-        group = "acmerecievers";
+        group = "acmereceivers";
         webroot = "/var/lib/acme/acme-challenge";
       };
     };
