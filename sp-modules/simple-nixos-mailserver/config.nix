@@ -76,8 +76,8 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable
     };
 
     certificateScheme = "manual";
-    certificateFile = "/var/lib/acme/root-${cfg.domain}/fullchain.pem";
-    keyFile = "/var/lib/acme/root-${cfg.domain}/key.pem";
+    certificateFile = "/var/lib/acme/root-${sp.domain}/fullchain.pem";
+    keyFile = "/var/lib/acme/root-${sp.domain}/key.pem";
 
     # Enable IMAP and POP3
     enableImap = true;
