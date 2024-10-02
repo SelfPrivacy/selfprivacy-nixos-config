@@ -20,6 +20,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    nixpkgs.config.permittedInsecurePackages = [
+      "jitsi-meet-1.0.7952"
+    ];
     services.jitsi-meet = {
       enable = true;
       hostName = "${cfg.subdomain}.${domain}";
