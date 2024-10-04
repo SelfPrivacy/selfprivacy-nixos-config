@@ -97,7 +97,7 @@ in
   systemd.tmpfiles.rules = [
     "# Completely remove remnants of NIXOS_LUSTRATE."
     "R! /old-root"
-    "d /etc/selfprivacy/dump 0755 0755 selfprivacy-api selfprivacy-api"
+    "d /etc/selfprivacy/dump 0700 0700 selfprivacy-api selfprivacy-api"
   ];
   system.stateVersion =
     lib.mkIf (config.selfprivacy.stateVersion != null)
