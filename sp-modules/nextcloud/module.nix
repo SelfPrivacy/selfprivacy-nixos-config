@@ -1,4 +1,4 @@
-{ config, lib, pkgs, nixpkgs-old, ... }:
+{ config, lib, pkgs, ... }:
 let
   oldPkgs = import nixpkgs-old {
     system = "x86_64-linux"; # Same architecture as above
