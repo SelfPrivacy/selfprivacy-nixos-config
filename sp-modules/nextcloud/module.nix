@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, nixpkgs-old, ... }:
+let
+  oldPkgs = import nixpkgs-old {
+    system = "x86_64-linux"; # Same architecture as above
+  };
+in
 {
   options.selfprivacy.modules.nextcloud = with lib; {
     enable = mkOption {
@@ -66,7 +71,7 @@
       };
       services.nextcloud = {
         enable = true;
-        package = pkgs.nextcloud29;
+        package = oldPkgs.nextcloud26;
         inherit hostName;
 
         # Use HTTPS for links

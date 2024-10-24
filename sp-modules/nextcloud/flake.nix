@@ -1,7 +1,9 @@
 {
   description = "PoC SP module for nextcloud";
 
-  outputs = { self }: {
+  inputs.nixpkgs-old.url = "nixpkgs/nixos-23.11";
+
+  outputs = { self, nixpkgs-old }: {
     nixosModules.default = _:
       { imports = [ ./module.nix ./cleanup-module.nix ]; };
     configPathsNeeded =
