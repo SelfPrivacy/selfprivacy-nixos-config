@@ -66,7 +66,7 @@
       };
       services.nextcloud = {
         enable = true;
-        #package = oldPkgs.nextcloud26;
+        package = pkgs.nextcloud27;
         inherit hostName;
 
         # Use HTTPS for links
