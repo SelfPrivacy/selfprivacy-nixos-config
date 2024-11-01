@@ -1,0 +1,7 @@
+[
+  ["mailserver", "fqdn"],
+  ["security", "acme", "certs"],
+  ["selfprivacy", "domain"],
+  ["selfprivacy", "modules"],
+  ["services"]
+]

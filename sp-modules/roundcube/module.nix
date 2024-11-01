@@ -1,7 +1,10 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.roundcube;
+  auth-module = config.selfprivacy.modules.auth;
+  auth-fqdn = auth-module.subdomain + "." + domain;
+  oauth-client-id = "roundcube";
 in
 {
   options.selfprivacy.modules.roundcube = {
@@ -16,7 +19,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-
     services.roundcube = {
       enable = true;
       # this is the url of the vhost, not necessarily the same as the fqdn of
@@ -26,8 +28,22 @@ in
         # starttls needed for authentication, so the fqdn required to match
         # the certificate
         $config['smtp_server'] = "tls://${config.mailserver.fqdn}";
-        $config['smtp_user'] = "%u";
-        $config['smtp_pass'] = "%p";
+        # $config['smtp_user'] = "%u";
+        # $config['smtp_pass'] = "%p";
+      '' + lib.strings.optionalString auth-module.enable ''
+        $config['oauth_provider'] = 'generic';
+        $config['oauth_provider_name'] = 'kanidm'; # FIXME
+        $config['oauth_client_id'] = '${oauth-client-id}';
+        $config['oauth_client_secret'] = 'VERYSTRONGSECRETFORROUNDCUBE'; # FIXME
+
+        $config['oauth_auth_uri'] = 'https://${auth-fqdn}/ui/oauth2';
+        $config['oauth_token_uri'] = 'https://${auth-fqdn}/oauth2/token';
+        $config['oauth_identity_uri'] = 'https://${auth-fqdn}/oauth2/openid/${oauth-client-id}/userinfo';
+        $config['oauth_scope'] = 'email profile openid';
+        $config['oauth_auth_parameters'] = [];
+        $config['oauth_identity_fields'] = ['email'];
+        $config['oauth_login_redirect'] = true;
+        $config['auto_create_user'] = true;
       '';
     };
     services.nginx.virtualHosts."${cfg.subdomain}.${domain}" = {
@@ -43,5 +59,38 @@ in
         description = "Roundcube service slice";
       };
     };
+    services.kanidm.serverSettings.provision.systems.oauth2.roundcube =
+      lib.mkIf auth-module.enable {
+        displayName = "Roundcube";
+        originUrl = "https://${cfg.subdomain}.${domain}/";
+        originLanding = "https://${cfg.subdomain}.${domain}/";
+        basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE"; # FIXME
+        preferShortUsername = false;
+        allowInsecureClientDisablePkce = true; # FIXME is it required?
+        scopeMaps.roundcube_users = [
+          "email"
+          "openid"
+          "profile"
+          # "dovecotprofile"
+          # "groups"
+        ];
+      };
+    services.kanidm.provision.systems.oauth2.roundcube =
+      lib.mkIf auth-module.enable {
+        displayName = "Roundcube";
+        originUrl = "https://${cfg.subdomain}.${domain}/";
+        originLanding = "https://${cfg.subdomain}.${domain}/";
+        basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE";
+        # when true, name is passed to a service instead of name@domain
+        preferShortUsername = false;
+        allowInsecureClientDisablePkce = true; # FIXME is it needed?
+        scopeMaps.roundcube_users = [
+          "email"
+          # "groups"
+          "profile"
+          "openid"
+          # "dovecotprofile"
+        ];
+      };
   };
 }
