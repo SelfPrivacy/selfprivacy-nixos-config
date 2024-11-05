@@ -3,5 +3,6 @@
   ["security", "acme", "certs"],
   ["selfprivacy", "domain"],
   ["selfprivacy", "modules"],
-  ["services"]
+  ["services"],
+  ["systemd", "services", "kanidm"]
 ]

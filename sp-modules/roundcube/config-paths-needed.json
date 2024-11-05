@@ -2,5 +2,6 @@
   ["selfprivacy", "domain"],
   ["selfprivacy", "modules", "roundcube"],
   ["selfprivacy", "modules", "auth"],
+  ["service", "kanidm"],
   ["mailserver", "fqdn"]
 ]

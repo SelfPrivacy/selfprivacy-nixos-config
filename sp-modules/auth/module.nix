@@ -53,18 +53,18 @@ in
       enableServer = true;
 
       # kanidm with Rust code patches for OAuth and admin passwords provisioning
-      # package = pkgs.kanidm.withSecretProvisioning;
+      package = pkgs.kanidm.withSecretProvisioning;
       # FIXME
-      package = pkgs.kanidm.withSecretProvisioning.overrideAttrs (_: {
-        version = "git";
-        src = pkgs.fetchFromGitHub {
-          owner = "AleXoundOS";
-          repo = "kanidm";
-          rev = "a1a55f2e53facbfa504c7d64c44c3b5d0eb796c2";
-          hash = "sha256-ADh4Zwn6EMt4CiOrvgG0RbmNMeR5i0ilVTxF46t/wm8=";
-        };
-        doCheck = false;
-      });
+      # package = pkgs.kanidm.withSecretProvisioning.overrideAttrs (_: {
+      #   version = "git";
+      #   src = pkgs.fetchFromGitHub {
+      #     owner = "AleXoundOS";
+      #     repo = "kanidm";
+      #     rev = "a1a55f2e53facbfa504c7d64c44c3b5d0eb796c2";
+      #     hash = "sha256-ADh4Zwn6EMt4CiOrvgG0RbmNMeR5i0ilVTxF46t/wm8=";
+      #   };
+      #   doCheck = false;
+      # });
 
       serverSettings = {
         inherit domain;
@@ -93,8 +93,8 @@ in
         autoRemove = false;
 
         # FIXME read randomly generated password from ?
-        adminPasswordFile = pkgs.writeText "admin-pw" provisionAdminPassword;
-        idmAdminPasswordFile = pkgs.writeText "idm-admin-pw" provisionIdmAdminPassword;
+        # adminPasswordFile = pkgs.writeText "admin-pw" provisionAdminPassword;
+        # idmAdminPasswordFile = pkgs.writeText "idm-admin-pw" provisionIdmAdminPassword;
       };
       enableClient = true;
       clientSettings = {

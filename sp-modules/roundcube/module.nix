@@ -59,38 +59,26 @@ in
         description = "Roundcube service slice";
       };
     };
-    services.kanidm.serverSettings.provision.systems.oauth2.roundcube =
-      lib.mkIf auth-module.enable {
-        displayName = "Roundcube";
-        originUrl = "https://${cfg.subdomain}.${domain}/";
-        originLanding = "https://${cfg.subdomain}.${domain}/";
-        basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE"; # FIXME
-        preferShortUsername = false;
-        allowInsecureClientDisablePkce = true; # FIXME is it required?
-        scopeMaps.roundcube_users = [
-          "email"
-          "openid"
-          "profile"
-          # "dovecotprofile"
-          # "groups"
-        ];
-      };
-    services.kanidm.provision.systems.oauth2.roundcube =
-      lib.mkIf auth-module.enable {
-        displayName = "Roundcube";
-        originUrl = "https://${cfg.subdomain}.${domain}/";
-        originLanding = "https://${cfg.subdomain}.${domain}/";
-        basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE";
-        # when true, name is passed to a service instead of name@domain
-        preferShortUsername = false;
-        allowInsecureClientDisablePkce = true; # FIXME is it needed?
-        scopeMaps.roundcube_users = [
-          "email"
-          # "groups"
-          "profile"
-          "openid"
-          # "dovecotprofile"
-        ];
-      };
+
+    services.kanidm.provision = lib.mkIf auth-module.enable {
+      groups.roundcube_users.present = true;
+      systems.oauth2.roundcube =
+        {
+          displayName = "Roundcube";
+          originUrl = "https://${cfg.subdomain}.${domain}/";
+          originLanding = "https://${cfg.subdomain}.${domain}/";
+          basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE";
+          # when true, name is passed to a service instead of name@domain
+          preferShortUsername = false;
+          allowInsecureClientDisablePkce = true; # FIXME is it needed?
+          scopeMaps.roundcube_users = [
+            "email"
+            # "groups"
+            "profile"
+            "openid"
+            # "dovecotprofile"
+          ];
+        };
+    };
   };
 }
