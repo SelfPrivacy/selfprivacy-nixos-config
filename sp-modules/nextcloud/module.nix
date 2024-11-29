@@ -12,6 +12,10 @@
       default = "cloud";
       type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
     };
+    enableImagemagick = lib.mkOption {
+      type = types.bool;
+      default = true;
+    };
   };
 
   config =
@@ -90,6 +94,8 @@
           adminpassFile = admin-pass-filepath;
           adminuser = "admin";
         };
+
+        enableImagemagick = cfg.enableImagemagick;
       };
       services.nginx.virtualHosts.${hostName} = {
         useACMEHost = sp.domain;
