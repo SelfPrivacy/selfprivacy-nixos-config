@@ -99,6 +99,6 @@
         useACMEHost = sp.domain;
         forceSSL = true;
       };
-      enableImageMagick = cfg.enableImageMagick;
+      enableImagemagick = cfg.enableImageMagick;
     };
 }
