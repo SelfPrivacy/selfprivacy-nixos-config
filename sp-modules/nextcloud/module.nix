@@ -12,6 +12,10 @@
       default = "cloud";
       type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
     };
+    enableImageMagick = lib.mkOption {
+      type = types.bool;
+      default = true;
+    };
   };
 
   config =
@@ -95,5 +99,6 @@
         useACMEHost = sp.domain;
         forceSSL = true;
       };
+      enableImageMagick = cfg.enableImageMagick;
     };
 }
