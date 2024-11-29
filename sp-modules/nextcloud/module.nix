@@ -81,6 +81,8 @@
         # set what time makes sense for you
         autoUpdateApps.startAt = "05:00:00";
 
+        enableImagemagick = cfg.enableImageMagick;
+
         settings = {
           # further forces Nextcloud to use HTTPS
           overwriteprotocol = "https";
@@ -99,6 +101,5 @@
         useACMEHost = sp.domain;
         forceSSL = true;
       };
-      enableImagemagick = cfg.enableImageMagick;
     };
 }
