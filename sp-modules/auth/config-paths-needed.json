@@ -2,6 +2,7 @@
   ["mailserver", "fqdn"],
   ["mailserver", "ldap"],
   ["mailserver", "vmailUID"],
+  ["passthru", "selfprivacy", "auth"],
   ["security", "acme", "certs"],
   ["selfprivacy", "domain"],
   ["selfprivacy", "modules"],

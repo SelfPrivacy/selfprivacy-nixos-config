@@ -36,11 +36,12 @@
           + /nixos/modules/services/security/oauth2-proxy-nginx.nix)
         ./module.nix
         ./ldap-postfix.nix
+        ./ldap-dovecot.nix
       ];
       nixpkgs.overlays = [ self.overlays.default ];
 
       selfprivacy.modules.auth.enable = true;
-      selfprivacy.modules.auth.debug = true;
+      selfprivacy.modules.auth.debug = false;
     };
 
     configPathsNeeded =

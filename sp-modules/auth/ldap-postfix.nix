@@ -1,25 +1,10 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }@nixos-args:
 let
+  inherit (import ./common.nix nixos-args)
+    appendLdapBindPwd
+    ;
+
   cfg = config.mailserver;
-
-  appendLdapBindPwd =
-    { name, file, prefix, suffix ? "", passwordFile, destination }:
-    pkgs.writeScript "append-ldap-bind-pwd-in-${name}" ''
-      #!${pkgs.stdenv.shell}
-      set -euo pipefail
-
-      baseDir=$(dirname ${destination})
-      if (! test -d "$baseDir"); then
-        mkdir -p $baseDir
-        chmod 755 $baseDir
-      fi
-
-      cat ${file} > ${destination}
-      echo -n '${prefix}' >> ${destination}
-      cat ${passwordFile} >> ${destination}
-      echo -n '${suffix}' >> ${destination}
-      chmod 600 ${destination}
-    '';
 
   ldapSenderLoginMapFile = "/run/postfix/ldap-sender-login-map.cf";
   submissionOptions.smtpd_sender_login_maps =
@@ -65,6 +50,10 @@ let
   };
 in
 {
+  mailserver.ldap = {
+    postfix.mailAttribute = "mail";
+    postfix.uidAttribute = "uid";
+  };
   systemd.services.postfix-setup = {
     preStart = ''
       ${appendPwdInVirtualMailboxMap}
@@ -75,7 +64,12 @@ in
   services.postfix = {
     # the list should be merged with other options from nixos-mailserver
     config.virtual_mailbox_maps = [ "ldap:${ldapVirtualMailboxMapFile}" ];
-    submissionOptions = submissionOptions;
+    inherit submissionOptions;
     submissionsOptions = submissionOptions;
+    # extraConfig = ''
+    #   debug_peer_list =
+    #   debug_peer_level = 3
+    #   smtp_tls_security_level = encrypt
+    # '';
   };
 }
