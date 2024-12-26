@@ -1,9 +1,8 @@
 [
-  ["mailserver", "fqdn"],
-  ["passthru", "selfprivacy", "auth", "auth-fqdn"],
-  ["passthru", "selfprivacy", "auth", "oauth2-provider-name"],
-  ["selfprivacy", "domain"],
-  ["selfprivacy", "modules", "auth"],
-  ["selfprivacy", "modules", "roundcube"],
-  ["service", "kanidm"]
+  [ "mailserver", "fqdn" ],
+  [ "passthru", "selfprivacy", "auth", "auth-fqdn" ],
+  [ "passthru", "selfprivacy", "auth", "oauth2-provider-name" ],
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "modules", "auth" ],
+  [ "selfprivacy", "modules", "roundcube" ]
 ]

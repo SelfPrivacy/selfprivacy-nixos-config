@@ -1,11 +1,10 @@
 [
-  ["mailserver", "fqdn"],
-  ["mailserver", "ldap"],
-  ["mailserver", "vmailUID"],
-  ["passthru", "selfprivacy", "auth"],
-  ["security", "acme", "certs"],
-  ["selfprivacy", "domain"],
-  ["selfprivacy", "modules"],
-  ["services"],
-  ["systemd", "services", "kanidm"]
+  [ "passthru", "selfprivacy", "auth" ],
+  [ "security", "acme", "certs" ],
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "modules", "auth" ],
+  [ "services", "kanidm" ],
+  [ "services", "oauth2-proxy", "enable" ],
+  [ "services", "oauth2-proxy", "nginx" ],
+  [ "systemd", "services", "kanidm" ]
 ]

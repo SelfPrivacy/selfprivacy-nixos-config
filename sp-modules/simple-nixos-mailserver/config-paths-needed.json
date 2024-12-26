@@ -13,6 +13,8 @@
   [ "services", "opendkim" ],
   [ "services", "postfix", "group" ],
   [ "services", "postfix", "user" ],
-  [ "services", "redis" ],
+  [ "services", "redis", "servers", "rspamd", "bind" ],
+  [ "services", "redis", "servers", "rspamd", "port" ],
+  [ "services", "redis", "servers", "rspamd", "requirePass" ],
   [ "services", "rspamd" ]
 ]
