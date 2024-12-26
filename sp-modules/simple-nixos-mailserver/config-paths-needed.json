@@ -1,8 +1,11 @@
 [
   [ "mailserver" ],
+  [ "passthru", "selfprivacy", "auth" ],
   [ "security", "acme", "certs" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "hashedMasterPassword" ],
+  [ "selfprivacy", "modules", "auth", "enable" ],
+  [ "selfprivacy", "modules", "simple-nixos-mailserver" ],
   [ "selfprivacy", "useBinds" ],
   [ "selfprivacy", "username" ],
   [ "selfprivacy", "users" ],
@@ -11,6 +14,5 @@
   [ "services", "postfix", "group" ],
   [ "services", "postfix", "user" ],
   [ "services", "redis" ],
-  [ "services", "rspamd" ],
-  [ "selfprivacy", "modules", "simple-nixos-mailserver" ]
+  [ "services", "rspamd" ]
 ]

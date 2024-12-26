@@ -10,6 +10,8 @@
         mailserver.nixosModules.default
         ./options.nix
         ./config.nix
+        ./ldap-postfix.nix
+        ./ldap-dovecot.nix
       ];
     };
     configPathsNeeded =

@@ -4,7 +4,7 @@ let
     appendLdapBindPwd
     cfg
     domain
-    passthru
+    auth-passthru
     ;
 
   ldapConfFile = "/run/dovecot2/dovecot-ldap.conf.ext"; # FIXME get "dovecot2" from `config`
@@ -46,21 +46,20 @@ let
     name = "dovecot-oauth2.conf.ext";
     text = ''
       introspection_mode = post
-      introspection_url = ${passthru.oauth2-introspection-url "roundcube" "VERYSTRONGSECRETFORROUNDCUBE"}
+      introspection_url = ${auth-passthru.oauth2-introspection-url "roundcube" "VERYSTRONGSECRETFORROUNDCUBE"}
       client_id = roundcube
       client_secret = VERYSTRONGSECRETFORROUNDCUBE # FIXME
       username_attribute = username
-      # scope = email groups profile openid dovecotprofile
       scope = email profile openid
       tls_ca_cert_file = /etc/ssl/certs/ca-certificates.crt
       active_attribute = active
       active_value = true
-      openid_configuration_url = ${passthru.oauth2-discovery-url "roundcube"}
-      debug = ${if cfg.debug then "yes" else "no"}
+      openid_configuration_url = ${auth-passthru.oauth2-discovery-url "roundcube"}
+      debug = "no"
     '';
   };
 in
-{
+lib.mkIf config.selfprivacy.modules.auth.enable {
   mailserver.ldap = {
     # note: in `ldapsearch` first comes filter, then attributes
     dovecot.userAttrs = "+"; # all operational attributes
@@ -121,6 +120,9 @@ in
   systemd.services.dovecot2 = {
     # TODO does it merge with existing preStart?
     preStart = setPwdInLdapConfFile + "\n";
+    # FIXME pass dependant services to auth module option instead
+    wants = [ "kanidm.service" ];
+    after = [ "kanidm.service" ];
   };
 
   # does it merge with existing restartTriggers?

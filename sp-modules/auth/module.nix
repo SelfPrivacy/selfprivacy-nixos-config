@@ -1,14 +1,12 @@
-{ config, lib, pkgs, ... }@nixos-args:
+{ config, lib, pkgs, ... }:
 let
-  inherit (import ./common.nix nixos-args)
-    auth-fqdn
-    cfg
-    domain
-    kanidm_ldap_port
-    ldap_base_dn
-    passthru
-    ;
+  passthru = config.passthru.selfprivacy.auth;
+  cfg = config.selfprivacy.modules.auth;
+  domain = config.selfprivacy.domain;
 
+  kanidm-bind-address = "127.0.0.1:3013";
+
+  # lua stuff for debugging only
   lua_core_path = "${pkgs.luajitPackages.lua-resty-core}/lib/lua/5.1/?.lua";
   lua_lrucache_path = "${pkgs.luajitPackages.lua-resty-lrucache}/lib/lua/5.1/?.lua";
   lua_path = "${lua_core_path};${lua_lrucache_path};";
@@ -34,6 +32,9 @@ in
     # FIXME revise this: maybe kanidm must not have access to a public TLS
     users.groups."acmereceivers".members = [ "kanidm" ];
 
+    # for ExecStartPost scripts to have access to /run/keys/*
+    users.groups.keys.members = [ "kanidm" ];
+
     services.kanidm = {
       enableServer = true;
 
@@ -46,7 +47,7 @@ in
         # included if it is non-standard (any port except 443). This must match or
         # be a descendent of the domain name you configure above. If these two
         # items are not consistent, the server WILL refuse to start!
-        origin = "https://" + auth-fqdn;
+        origin = "https://" + passthru.auth-fqdn;
 
         # TODO revise this: maybe kanidm must not have access to a public TLS
         tls_chain =
@@ -55,9 +56,9 @@ in
           "${config.security.acme.certs.${domain}.directory}/key.pem";
 
         # nginx should proxy requests to it
-        bindaddress = passthru.kanidm-bind-address;
+        bindaddress = kanidm-bind-address;
 
-        ldapbindaddress = "127.0.0.1:${toString kanidm_ldap_port}";
+        ldapbindaddress = "127.0.0.1:${toString passthru.ldap-port}";
 
         # kanidm is behind a proxy
         trust_x_forward_for = true;
@@ -70,7 +71,7 @@ in
       };
       enableClient = true;
       clientSettings = {
-        uri = "https://" + auth-fqdn;
+        uri = "https://" + passthru.auth-fqdn;
         verify_ca = false; # FIXME
         verify_hostnames = false; # FIXME
       };
@@ -79,19 +80,21 @@ in
     services.nginx = {
       enable = true;
       additionalModules =
-        lib.lists.optional cfg.debug pkgs.nginxModules.lua;
-      commonHttpConfig = lib.strings.optionalString cfg.debug ''
+        lib.mkIf cfg.debug pkgs.nginxModules.lua;
+      commonHttpConfig = lib.mkIf cfg.debug ''
         log_format kanidm escape=none '$request $status\n'
                                       '[Request body]: $request_body\n'
                                       '[Header]: $resp_header\n'
                                       '[Response Body]: $resp_body\n\n';
         lua_package_path "${lua_path}";
       '';
-      virtualHosts.${auth-fqdn} = {
+      virtualHosts.${passthru.auth-fqdn} = {
         useACMEHost = domain;
         forceSSL = true;
         locations."/" = {
-          extraConfig = lib.strings.optionalString cfg.debug ''
+          # be aware that such logging mechanism breaks Kanidm authentication
+          # (but authorization works)
+          extraConfig = lib.mkIf cfg.debug ''
             access_log /var/log/nginx/kanidm.log kanidm;
 
             lua_need_request_body on;
@@ -120,43 +123,27 @@ in
               end
             ';
           '';
-          proxyPass = "https://${passthru.kanidm-bind-address}";
+          proxyPass = "https://${kanidm-bind-address}";
         };
       };
     };
 
-    # TODO move to mailserver module everything below
-    mailserver.debug = cfg.debug; # FIXME
-    mailserver.mailDirectory = "/var/vmail";
-
-    mailserver.loginAccounts = lib.mkForce { };
-    mailserver.extraVirtualAliases = lib.mkForce { };
-    # LDAP is needed for Postfix to query Kanidm about email address ownership.
-    # LDAP is needed for Dovecot also.
-    mailserver.ldap = {
-      enable = false;
-      # bind.dn = "uid=mail,ou=persons," + ldap_base_dn;
-      bind.dn = "dn=token";
-      # TODO change in this file should trigger system restart dovecot
-      bind.passwordFile = "/run/keys/dovecot/kanidm-service-account-token"; # FIXME
-
-      # searchBase = "ou=persons," + ldap_base_dn;
-      searchBase = ldap_base_dn; # TODO refine this
-
-      # NOTE: 127.0.0.1 instead of localhost does not work for unknown reason
-      uris = [ "ldaps://localhost:${toString kanidm_ldap_port}" ];
-    };
-
-    environment.systemPackages = lib.lists.optionals cfg.debug [
-      pkgs.shelldap
-      pkgs.openldap
-    ];
-
-    passthru.selfprivacy.auth = {
-      kanidm-bind-address = "127.0.0.1:3013";
+    passthru.selfprivacy.auth = rec {
+      auth-fqdn = cfg.subdomain + "." + domain;
       oauth2-introspection-url = client_id: client_secret:
         "https://${client_id}:${client_secret}@${auth-fqdn}/oauth2/token/introspect";
-      oauth2-discovery-url = client_id: "https://${auth-fqdn}/oauth2/openid/${client_id}/.well-known/openid-configuration";
+      oauth2-discovery-url = client_id:
+        "https://${auth-fqdn}/oauth2/openid/${client_id}/.well-known/openid-configuration";
+      oauth2-provider-name = "kanidm";
+      oauth2-systemd-service = "kanidm.service";
+
+      # e.g. "dc=mydomain,dc=com"
+      ldap-base-dn =
+        lib.strings.concatMapStringsSep
+          ","
+          (x: "dc=" + x)
+          (lib.strings.splitString "." domain);
+      ldap-port = 3636;
     };
   };
 }

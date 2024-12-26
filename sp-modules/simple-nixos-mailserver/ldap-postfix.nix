@@ -2,6 +2,7 @@
 let
   inherit (import ./common.nix nixos-args)
     appendLdapBindPwd
+    auth-passthru
     ;
 
   cfg = config.mailserver;
@@ -49,7 +50,7 @@ let
     destination = ldapVirtualMailboxMapFile;
   };
 in
-{
+lib.mkIf config.selfprivacy.modules.auth.enable {
   mailserver.ldap = {
     postfix.mailAttribute = "mail";
     postfix.uidAttribute = "uid";
@@ -59,7 +60,10 @@ in
       ${appendPwdInVirtualMailboxMap}
       ${appendPwdInSenderLoginMap}
     '';
-    restartTriggers = [ appendPwdInVirtualMailboxMap appendPwdInSenderLoginMap ];
+    restartTriggers =
+      [ appendPwdInVirtualMailboxMap appendPwdInSenderLoginMap ];
+    wants = [ auth-passthru.oauth2-systemd-service ];
+    after = [ "kanidm.service" ];
   };
   services.postfix = {
     # the list should be merged with other options from nixos-mailserver

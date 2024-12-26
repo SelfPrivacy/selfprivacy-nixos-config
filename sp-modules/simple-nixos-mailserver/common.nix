@@ -1,18 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 rec {
+  auth-passthru = config.passthru.selfprivacy.auth;
   domain = config.selfprivacy.domain;
-  cfg = config.selfprivacy.modules.auth;
-  passthru = config.passthru.selfprivacy.auth;
-  auth-fqdn = cfg.subdomain + "." + domain;
-
-  kanidm_ldap_port = 3636;
-
-  # e.g. "dc=mydomain,dc=com"
-  ldap_base_dn =
-    lib.strings.concatMapStringsSep
-      ","
-      (x: "dc=" + x)
-      (lib.strings.splitString "." domain);
+  is-auth-enabled = config.selfprivacy.modules.auth.enable;
 
   appendLdapBindPwd =
     { name, file, prefix, suffix ? "", passwordFile, destination }:
