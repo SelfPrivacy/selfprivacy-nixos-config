@@ -14,8 +14,8 @@ let
     server_host = ${lib.concatStringsSep " " cfg.ldap.uris}
     start_tls = ${if cfg.ldap.startTls then "yes" else "no"}
     version = 3
-    # tls_ca_cert_file = ${cfg.ldap.tlsCAFile}
-    # tls_require_cert = yes
+    tls_ca_cert_file = ${cfg.ldap.tlsCAFile}
+    tls_require_cert = yes
 
     search_base = ${cfg.ldap.searchBase}
     scope = ${cfg.ldap.searchScope}
@@ -63,17 +63,12 @@ lib.mkIf config.selfprivacy.modules.auth.enable {
     restartTriggers =
       [ appendPwdInVirtualMailboxMap appendPwdInSenderLoginMap ];
     wants = [ auth-passthru.oauth2-systemd-service ];
-    after = [ "kanidm.service" ];
+    after = [ auth-passthru.oauth2-systemd-service ];
   };
   services.postfix = {
     # the list should be merged with other options from nixos-mailserver
     config.virtual_mailbox_maps = [ "ldap:${ldapVirtualMailboxMapFile}" ];
     inherit submissionOptions;
     submissionsOptions = submissionOptions;
-    # extraConfig = ''
-    #   debug_peer_list =
-    #   debug_peer_level = 3
-    #   smtp_tls_security_level = encrypt
-    # '';
   };
 }

@@ -21,8 +21,8 @@ let
       ${lib.optionalString config.mailserver.ldap.startTls ''
       tls = yes
       ''}
-      # tls_require_cert = hard
-      # tls_ca_cert_file = ${config.mailserver.ldap.tlsCAFile}
+      tls_require_cert = hard
+      tls_ca_cert_file = ${config.mailserver.ldap.tlsCAFile}
       dn = ${config.mailserver.ldap.bind.dn}
       sasl_bind = no
       auth_bind = no
@@ -108,24 +108,21 @@ lib.mkIf config.selfprivacy.modules.auth.enable {
       default_fields = home=/var/vmail/${domain}/%u uid=${toString config.mailserver.vmailUID} gid=${toString config.mailserver.vmailUID}
     }
 
-    #auth_username_format = %Ln
-
-    # FIXME
-    auth_debug = yes
-    auth_debug_passwords = yes  # Be cautious with this in production as it logs passwords
-    auth_verbose = yes
-    mail_debug = yes
+    # with debugging OAuth2 token gets printed in logs
+    # auth_debug = yes
+    # auth_debug_passwords = yes
+    # auth_verbose = yes
+    # mail_debug = yes
   '';
   services.dovecot2.enablePAM = false;
   systemd.services.dovecot2 = {
     # TODO does it merge with existing preStart?
     preStart = setPwdInLdapConfFile + "\n";
-    # FIXME pass dependant services to auth module option instead
-    wants = [ "kanidm.service" ];
-    after = [ "kanidm.service" ];
+    # FIXME pass dependant services to auth module option instead?
+    wants = [ auth-passthru.oauth2-systemd-service ];
+    after = [ auth-passthru.oauth2-systemd-service ];
   };
 
   # does it merge with existing restartTriggers?
   systemd.services.postfix.restartTriggers = [ setPwdInLdapConfFile ];
-
 }
