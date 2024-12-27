@@ -58,33 +58,34 @@ in
     systemd.slices.roundcube.description = "Roundcube service slice";
 
     services.kanidm.provision = lib.mkIf is-auth-enabled {
-      groups.roundcube_users.present = true;
+      groups = {
+        "sp.roundcube.admins".members = [ "sp.admins" ];
+        "sp.roundcube.users".present = true;
+      };
       systems.oauth2.roundcube = {
         displayName = "Roundcube";
         originUrl = "https://${cfg.subdomain}.${domain}/index.php/login/oauth";
         originLanding = "https://${cfg.subdomain}.${domain}/";
-        basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE";
+        basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE"; # FIXME
         # when true, name is passed to a service instead of name@domain
         preferShortUsername = false;
         allowInsecureClientDisablePkce = true; # FIXME is it needed?
-        scopeMaps.roundcube_users = [
-          "email"
-          "profile"
-          "openid"
-        ];
-        # scopeMaps."sp.roundcube.users" = [
-        #   "email"
-        #   "openid"
-        #   "dovecotprofile"
-        # ];
-
+        scopeMaps = {
+          "sp.roundcube.users" = [
+            "email"
+            "openid"
+            "profile"
+          ];
+        };
+        removeOrphanedClaimMaps = true;
         # add more scopes when a user is a member of specific group
-        # claimMaps.groups = {
-        #   joinType = "array";
-        #   valuesByGroup = {
-        #     "sp.roundcube.admins" = [ "admin" ];
-        #   };
-        # };
+        supplementaryScopeMaps."sp.roundcube.admins" = [ "admin" ];
+        claimMaps.groups = {
+          joinType = "array";
+          valuesByGroup = {
+            "sp.roundcube.admins" = [ "admin" "test" ];
+          };
+        };
       };
     };
   };

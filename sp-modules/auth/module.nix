@@ -67,7 +67,8 @@ in
       };
       provision = {
         enable = true;
-        autoRemove = false;
+        autoRemove = true; # if false, obsolete oauth2 scopeMaps remain
+        groups."sp.admins".present = true;
       };
       enableClient = true;
       clientSettings = {
