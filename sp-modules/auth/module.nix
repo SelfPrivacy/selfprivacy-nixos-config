@@ -58,7 +58,8 @@ in
         # nginx should proxy requests to it
         bindaddress = kanidm-bind-address;
 
-        ldapbindaddress = "127.0.0.1:${toString passthru.ldap-port}";
+        ldapbindaddress =
+          "${passthru.ldap-host}:${toString passthru.ldap-port}";
 
         # kanidm is behind a proxy
         trust_x_forward_for = true;
@@ -81,7 +82,7 @@ in
     services.nginx = {
       enable = true;
       additionalModules =
-        lib.mkIf cfg.debug pkgs.nginxModules.lua;
+        lib.mkIf cfg.debug [ pkgs.nginxModules.lua ];
       commonHttpConfig = lib.mkIf cfg.debug ''
         log_format kanidm escape=none '$request $status\n'
                                       '[Request body]: $request_body\n'
@@ -93,8 +94,6 @@ in
         useACMEHost = domain;
         forceSSL = true;
         locations."/" = {
-          # be aware that such logging mechanism breaks Kanidm authentication
-          # (but authorization works)
           extraConfig = lib.mkIf cfg.debug ''
             access_log /var/log/nginx/kanidm.log kanidm;
 
@@ -106,11 +105,19 @@ in
             header_filter_by_lua '
               local h = ngx.req.get_headers()
               for k, v in pairs(h) do
-                ngx.var.req_header = ngx.var.req_header .. k.."="..v.." "
+                if type(v) == "table" then
+                  ngx.var.req_header = ngx.var.req_header .. k .. "=" .. table.concat(v, ", ") .. " "
+                else
+                  ngx.var.req_header = ngx.var.req_header .. k .. "=" .. v .. " "
+                end
               end
               local rh = ngx.resp.get_headers()
               for k, v in pairs(rh) do
-                ngx.var.resp_header = ngx.var.resp_header .. k.."="..v.." "
+                if type(v) == "table" then
+                  ngx.var.resp_header = ngx.var.resp_header .. k .. "=" .. table.concat(v, ", ") .. " "
+                else
+                  ngx.var.resp_header = ngx.var.resp_header .. k .. "=" .. v .. " "
+                end
               end
             ';
 
@@ -144,6 +151,7 @@ in
           ","
           (x: "dc=" + x)
           (lib.strings.splitString "." domain);
+      ldap-host = "127.0.0.1";
       ldap-port = 3636;
     };
   };

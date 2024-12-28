@@ -37,9 +37,6 @@
         ./module.nix
       ];
       nixpkgs.overlays = [ self.overlays.default ];
-
-      selfprivacy.modules.auth.enable = true;
-      selfprivacy.modules.auth.debug = false;
     };
 
     configPathsNeeded =
