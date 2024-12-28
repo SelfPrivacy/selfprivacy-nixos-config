@@ -126,10 +126,14 @@ let
 
   filterPresent = filterAttrs (_: v: v.present);
 
+  selfprivacy-admin-groups-regex = "^sp\.([[:alnum:]]+\.|)admins$";
+  is-selfprivacy-admin-group = name:
+    ! builtins.isNull (builtins.match selfprivacy-admin-groups-regex name);
+
   isGroupNonOverwritable = g: false
     || ! g ? members
     || g ? members && g.members == [ ]
-    || g ? members && g.members == [ "sp.admins" ];
+    || g ? members && builtins.any is-selfprivacy-admin-group g.members;
 
   provisionStateJson = pkgs.writeText "provision-state.json" (
     builtins.toJSON {
