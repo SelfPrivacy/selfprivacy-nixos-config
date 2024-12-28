@@ -6,6 +6,72 @@ let
     then "/volumes/${cfg.location}/gitea"
     else "/var/lib/gitea";
   cfg = sp.modules.gitea;
+  is-auth-enabled = config.selfprivacy.modules.auth.enable;
+  oauth-client-id = "forgejo";
+  auth-passthru = config.passthru.selfprivacy.auth;
+  redirect-uri = "https://git.${sp.domain}/user/oauth2/OAUTH/callback";
+
+  admins-group = "sp.forgejo.admins";
+  users-group = "sp.forgejo.users";
+
+  kanidm-service-account-name = "sp.${oauth-client-id}.service-account";
+  kanidm-service-account-token-name = "${oauth-client-id}-service-account-token";
+  kanidm-service-account-token-fp =
+    "/run/keys/${oauth-client-id}/kanidm-service-account-token"; # FIXME sync with auth module
+  kanidmExecStartPostScriptRoot = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPost-root-script.sh"
+    ''
+      # set-group-ID bit allows for kanidm user to create files,
+      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${oauth-client-id}
+      chown kanidm:${config.services.forgejo.group} /run/keys/${oauth-client-id}
+    '';
+  kanidmExecStartPostScript = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPost-script.sh"
+    ''
+      export HOME=$RUNTIME_DIRECTORY/client_home
+      readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
+
+      # get Kanidm service account for mailserver
+      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidm-service-account-name}$")"
+      echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
+      if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
+      then
+          echo "kanidm service account \"${kanidm-service-account-name}\" is found"
+      else
+          echo "kanidm service account \"${kanidm-service-account-name}\" is not found"
+          echo "creating new kanidm service account \"${kanidm-service-account-name}\""
+          if $KANIDM service-account create --name idm_admin ${kanidm-service-account-name} ${kanidm-service-account-name} idm_admin
+          then
+              "kanidm service account \"${kanidm-service-account-name}\" created"
+          else
+              echo "error: cannot create kanidm service account \"${kanidm-service-account-name}\""
+              exit 1
+          fi
+      fi
+
+      # add Kanidm service account to `idm_mail_servers` group
+      $KANIDM group add-members idm_mail_servers ${kanidm-service-account-name}
+
+      # create a new read-only token for kanidm
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin ${kanidm-service-account-name} ${kanidm-service-account-token-name} --output json)"
+      then
+          echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
+          exit 1
+      fi
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN="$(echo "$KANIDM_SERVICE_ACCOUNT_TOKEN_JSON" | ${lib.getExe pkgs.jq} -r .result)"
+      then
+          echo "error: cannot get service-account API token from JSON"
+          exit 1
+      fi
+
+      if ! install --mode=640 \
+      <(printf "%s" "$KANIDM_SERVICE_ACCOUNT_TOKEN") \
+      ${kanidm-service-account-token-fp}
+      then
+          echo "error: cannot write token to \"${kanidm-service-account-token-fp}\""
+          exit 1
+      fi
+    '';
 in
 {
   options.selfprivacy.modules.gitea = {
@@ -47,6 +113,10 @@ in
       default = "forgejo-auto";
       type = lib.types.enum [ "forgejo-auto" "forgejo-light" "forgejo-dark" "auto" "gitea" "arc-green" ];
       description = "The default theme for the gitea instance";
+    };
+    debug = lib.mkOption {
+      default = false;
+      type = lib.types.bool;
     };
   };
 
@@ -113,14 +183,45 @@ in
         };
         log = {
           ROOT_PATH = "${stateDir}/log";
-          LEVEL = "Warn";
+          LEVEL = if cfg.debug then "Warn" else "Trace";
         };
         service = {
           DISABLE_REGISTRATION = cfg.disableRegistration;
           REQUIRE_SIGNIN_VIEW = cfg.requireSigninView;
         };
+      } // lib.attrsets.optionalAttrs is-auth-enabled {
+        auth.DISABLE_LOGIN_FORM = true;
+        service = {
+          DISABLE_REGISTRATION = cfg.disableRegistration;
+          REQUIRE_SIGNIN_VIEW = cfg.requireSigninView;
+          ALLOW_ONLY_EXTERNAL_REGISTRATION = true;
+          SHOW_REGISTRATION_BUTTON = false;
+          ENABLE_BASIC_AUTHENTICATION = false;
+          DEFAULT_USER_VISIBILITY = "limited";
+          DEFAULT_ORG_VISIBILITY = "limited";
+        };
+
+        # disallow explore page and access to private repositories, but allow public
+        "service.explore".REQUIRE_SIGNIN_VIEW = true;
+
+        # TODO control via selfprivacy parameter
+        # "service.explore".DISABLE_USERS_PAGE = true;
+
+        oauth2_client = {
+          REDIRECT_URI = redirect-uri;
+          ACCOUNT_LINKING = "auto";
+          ENABLE_AUTO_REGISTRATION = true;
+          OPENID_CONNECT_SCOPES = "email openid profile";
+        };
+        # doesn't work if LDAP auth source is not active!
+        "cron.sync_external_users" = {
+          ENABLED = true;
+          RUN_AT_START = true;
+          NOTICE_ON_SUCCESS = true;
+        };
       };
     };
+
     users.users.gitea = {
       home = "${stateDir}";
       useDefaultShell = true;
@@ -139,6 +240,10 @@ in
         add_header X-Content-Type-Options nosniff;
         add_header X-XSS-Protection "1; mode=block";
         proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
+      '' + lib.strings.optionalString is-auth-enabled ''
+        rewrite ^/user/login.*$ /user/oauth2/OAUTH last;
+        # FIXME is it needed?
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       '';
       locations = {
         "/" = {
@@ -152,11 +257,112 @@ in
         serviceConfig = {
           Slice = "gitea.slice";
         };
+        preStart =
+          let
+            exe = lib.getExe config.services.forgejo.package;
+            # FIXME skip-tls-verify, bind-password
+            ldapConfigArgs = ''
+              --name LDAP \
+              --active \
+              --security-protocol LDAPS \
+              --skip-tls-verify \
+              --host '${auth-passthru.ldap-host}' \
+              --port '${toString auth-passthru.ldap-port}' \
+              --user-search-base '${auth-passthru.ldap-base-dn}' \
+              --user-filter '(&(class=person)(memberof=${users-group})(name=%s))' \
+              --admin-filter '(&(class=person)(memberof=${admins-group}))' \
+              --username-attribute name \
+              --firstname-attribute name \
+              --surname-attribute displayname \
+              --email-attribute mail \
+              --public-ssh-key-attribute sshPublicKey \
+              --bind-dn 'dn=token' \
+              --bind-password "$(cat ${kanidm-service-account-token-fp})" \
+              --synchronize-users
+            '';
+            # FIXME secret
+            oauthConfigArgs = ''
+              --name OAUTH \
+              --provider openidConnect \
+              --key forgejo \
+              --secret VERYSTRONGSECRETFORFORGEJO \
+              --auto-discover-url '${auth-passthru.oauth2-discovery-url oauth-client-id}'
+            '';
+          in
+          lib.mkIf is-auth-enabled (lib.mkAfter ''
+            set -o xtrace
+
+            # Check if LDAP is already configured
+            ldap_line="$(${exe} admin auth list | grep LDAP | head -n 1)"
+
+            if [[ -n "$ldap_line" ]]; then
+              # update ldap config
+              id="$(echo "$ldap_line" | ${pkgs.gawk}/bin/awk '{print $1}')"
+              ${exe} admin auth update-ldap --id "$id" ${ldapConfigArgs}
+            else
+              # initially configure ldap
+              ${exe} admin auth add-ldap ${ldapConfigArgs}
+            fi
+
+            oauth_line="$(${exe} admin auth list | grep OAUTH | head -n 1)"
+            if [[ -n "$oauth_line" ]]; then
+              id="$(echo "$oauth_line" | ${pkgs.gawk}/bin/awk '{print $1}')"
+              ${exe} admin auth update-oauth --id "$id" ${oauthConfigArgs}
+            else
+              ${exe} admin auth add-oauth ${oauthConfigArgs}
+            fi
+          ''
+          );
+        # TODO consider passing oauth consumer service to auth module instead
+        wants = lib.mkIf is-auth-enabled
+          [ auth-passthru.oauth2-systemd-service ];
+        after = lib.mkIf is-auth-enabled
+          [ auth-passthru.oauth2-systemd-service ];
       };
       slices.gitea = {
         description = "Forgejo service slice";
       };
     };
 
+    # for ExecStartPre script to have access to /run/keys/*
+    users.groups.keys.members =
+      lib.mkIf is-auth-enabled [ config.services.forgejo.group ];
+
+    systemd.services.kanidm.serviceConfig.ExecStartPost =
+      lib.mkIf is-auth-enabled
+        (lib.mkAfter
+          [
+            ("+" + kanidmExecStartPostScriptRoot)
+            kanidmExecStartPostScript
+          ]
+        );
+    services.kanidm.provision = lib.mkIf is-auth-enabled {
+      groups = {
+        "${admins-group}".members = [ "sp.admins" ];
+        "${users-group}".members = [ admins-group ];
+      };
+      systems.oauth2.forgejo = {
+        displayName = "Forgejo";
+        originUrl = redirect-uri;
+        originLanding = "https://${cfg.subdomain}.${sp.domain}/";
+        basicSecretFile = pkgs.writeText "bs-forgejo" "VERYSTRONGSECRETFORFORGEJO"; # FIXME
+        # when true, name is passed to a service instead of name@domain
+        preferShortUsername = true;
+        allowInsecureClientDisablePkce = true; # FIXME is it needed?
+        scopeMaps = {
+          "${users-group}" = [
+            "email"
+            "openid"
+            "profile"
+          ];
+        };
+        removeOrphanedClaimMaps = true;
+        # NOTE https://github.com/oddlama/kanidm-provision/issues/15
+        # add more scopes when a user is a member of specific group
+        # currently not possible due to https://github.com/kanidm/kanidm/issues/2882#issuecomment-2564490144
+        # supplementaryScopeMaps."${admins-group}" =
+        #   [ "read:admin" "write:admin" ];
+      };
+    };
   };
 }

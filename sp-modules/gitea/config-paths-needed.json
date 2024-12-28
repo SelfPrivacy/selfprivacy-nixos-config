@@ -1,5 +1,15 @@
 [
+  [ "passthru", "selfprivacy", "auth", "auth-fqdn" ],
+  [ "passthru", "selfprivacy", "auth", "ldap-base-dn" ],
+  [ "passthru", "selfprivacy", "auth", "ldap-host" ],
+  [ "passthru", "selfprivacy", "auth", "ldap-port" ],
+  [ "passthru", "selfprivacy", "auth", "oauth2-discovery-url" ],
+  [ "passthru", "selfprivacy", "auth", "oauth2-provider-name" ],
+  [ "passthru", "selfprivacy", "auth", "oauth2-systemd-service" ],
   [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "modules", "auth", "enable" ],
+  [ "selfprivacy", "modules", "gitea" ],
   [ "selfprivacy", "useBinds" ],
-  [ "selfprivacy", "modules", "gitea" ]
+  [ "services", "forgejo", "group" ],
+  [ "services", "forgejo", "package" ]
 ]
