@@ -142,7 +142,7 @@ in
         "https://${client_id}:${client_secret}@${auth-fqdn}/oauth2/token/introspect";
       oauth2-discovery-url = client_id:
         "https://${auth-fqdn}/oauth2/openid/${client_id}/.well-known/openid-configuration";
-      oauth2-provider-name = "kanidm";
+      oauth2-provider-name = "Kanidm";
       oauth2-systemd-service = "kanidm.service";
 
       # e.g. "dc=mydomain,dc=com"
