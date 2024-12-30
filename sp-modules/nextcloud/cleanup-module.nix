@@ -1,6 +1,11 @@
 { config, lib, ... }:
 let
-  inherit (import ./common.nix config) sp db-pass-filepath admin-pass-filepath;
+  inherit (import ./common.nix config)
+    admin-pass-filepath
+    db-pass-filepath
+    override-config-fp
+    sp
+    ;
 in
 # FIXME do we really want to delete passwords on module deactivation!?
 {
@@ -9,11 +14,13 @@ in
       lib.trivial.warn
         (
           "nextcloud service is disabled, " +
-          "${db-pass-filepath} and ${admin-pass-filepath} will be removed!"
+          "${override-config-fp}, ${db-pass-filepath} and ${admin-pass-filepath} will be removed!"
         )
         ''
           rm -f -v ${db-pass-filepath}
           rm -f -v ${admin-pass-filepath}
+          [ ! -f "${override-config-fp}" && -L "${override-config-fp}" ] && \
+            rm -v "${override-config-fp}"
         '';
   };
 }
