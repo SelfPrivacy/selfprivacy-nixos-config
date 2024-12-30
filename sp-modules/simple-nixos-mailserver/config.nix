@@ -167,7 +167,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable
       # bind.dn = "uid=mail,ou=persons," + ldap_base_dn;
       bind.dn = "dn=token";
       # TODO change in this file should trigger system restart dovecot
-      bind.passwordFile = "/run/keys/mailserver/kanidm-service-account-token"; # FIXME
+      bind.passwordFile = mailserver-service-account-token-fp;
 
       # searchBase = "ou=persons," + ldap_base_dn;
       searchBase = auth-passthru.ldap-base-dn; # TODO refine this

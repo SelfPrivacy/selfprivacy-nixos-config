@@ -7,7 +7,9 @@ let
     auth-passthru
     ;
 
-  ldapConfFile = "/run/dovecot2/dovecot-ldap.conf.ext"; # FIXME get "dovecot2" from `config`
+  runtime-directory = "dovecot2";
+
+  ldapConfFile = "/run/${runtime-directory}/dovecot-ldap.conf.ext";
   mkLdapSearchScope = scope: (
     if scope == "sub" then "subtree"
     else if scope == "one" then "onelevel"
@@ -92,7 +94,7 @@ lib.mkIf config.selfprivacy.modules.auth.enable {
     service auth {
       unix_listener auth-userdb {
         mode = 0660
-        user = dovecot2
+        user = ${config.services.dovecot2.user}
       }
       unix_listener dovecot-auth {
         mode = 0660
@@ -107,12 +109,6 @@ lib.mkIf config.selfprivacy.modules.auth.enable {
       args = ${ldapConfFile}
       default_fields = home=/var/vmail/${domain}/%u uid=${toString config.mailserver.vmailUID} gid=${toString config.mailserver.vmailUID}
     }
-
-    # with debugging OAuth2 token gets printed in logs
-    # auth_debug = yes
-    # auth_debug_passwords = yes
-    # auth_verbose = yes
-    # mail_debug = yes
   '';
   services.dovecot2.enablePAM = false;
   systemd.services.dovecot2 = {
@@ -121,6 +117,7 @@ lib.mkIf config.selfprivacy.modules.auth.enable {
     # FIXME pass dependant services to auth module option instead?
     wants = [ auth-passthru.oauth2-systemd-service ];
     after = [ auth-passthru.oauth2-systemd-service ];
+    serviceConfig.RuntimeDirectory = lib.mkForce [ runtime-directory ];
   };
 
   # does it merge with existing restartTriggers?

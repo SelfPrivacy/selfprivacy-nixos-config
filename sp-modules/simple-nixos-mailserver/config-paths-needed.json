@@ -9,7 +9,7 @@
   [ "selfprivacy", "useBinds" ],
   [ "selfprivacy", "username" ],
   [ "selfprivacy", "users" ],
-  [ "services", "dovecot2" ],
+  [ "services", "dovecot2", "user" ],
   [ "services", "opendkim" ],
   [ "services", "postfix", "group" ],
   [ "services", "postfix", "user" ],
