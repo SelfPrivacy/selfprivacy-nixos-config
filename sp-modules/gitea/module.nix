@@ -9,7 +9,9 @@ let
   is-auth-enabled = config.selfprivacy.modules.auth.enable;
   oauth-client-id = "forgejo";
   auth-passthru = config.passthru.selfprivacy.auth;
-  redirect-uri = "https://git.${sp.domain}/user/oauth2/OAUTH/callback";
+  oauth2-provider-name = auth-passthru.oauth2-provider-name;
+  redirect-uri =
+    "https://git.${sp.domain}/user/oauth2/${oauth2-provider-name}/callback";
 
   admins-group = "sp.forgejo.admins";
   users-group = "sp.forgejo.users";
@@ -197,8 +199,6 @@ in
           ALLOW_ONLY_EXTERNAL_REGISTRATION = true;
           SHOW_REGISTRATION_BUTTON = false;
           ENABLE_BASIC_AUTHENTICATION = false;
-          DEFAULT_USER_VISIBILITY = "limited";
-          DEFAULT_ORG_VISIBILITY = "limited";
         };
 
         # disallow explore page and access to private repositories, but allow public
@@ -241,7 +241,7 @@ in
         add_header X-XSS-Protection "1; mode=block";
         proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
       '' + lib.strings.optionalString is-auth-enabled ''
-        rewrite ^/user/login.*$ /user/oauth2/OAUTH last;
+        rewrite ^/user/login$ /user/oauth2/${oauth2-provider-name} last;
         # FIXME is it needed?
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       '';
@@ -282,10 +282,12 @@ in
             '';
             # FIXME secret
             oauthConfigArgs = ''
-              --name OAUTH \
+              --name "${oauth2-provider-name}" \
               --provider openidConnect \
               --key forgejo \
               --secret VERYSTRONGSECRETFORFORGEJO \
+              --group-claim-name groups \
+              --admin-group admins \
               --auto-discover-url '${auth-passthru.oauth2-discovery-url oauth-client-id}'
             '';
           in
@@ -304,7 +306,7 @@ in
               ${exe} admin auth add-ldap ${ldapConfigArgs}
             fi
 
-            oauth_line="$(${exe} admin auth list | grep OAUTH | head -n 1)"
+            oauth_line="$(${exe} admin auth list | grep "${oauth2-provider-name}" | head -n 1)"
             if [[ -n "$oauth_line" ]]; then
               id="$(echo "$oauth_line" | ${pkgs.gawk}/bin/awk '{print $1}')"
               ${exe} admin auth update-oauth --id "$id" ${oauthConfigArgs}
@@ -324,7 +326,7 @@ in
       };
     };
 
-    # for ExecStartPre script to have access to /run/keys/*
+    # for ExecStartPost script to have access to /run/keys/*
     users.groups.keys.members =
       lib.mkIf is-auth-enabled [ config.services.forgejo.group ];
 
@@ -362,6 +364,10 @@ in
         # currently not possible due to https://github.com/kanidm/kanidm/issues/2882#issuecomment-2564490144
         # supplementaryScopeMaps."${admins-group}" =
         #   [ "read:admin" "write:admin" ];
+        claimMaps.groups = {
+          joinType = "array";
+          valuesByGroup.${admins-group} = [ "admins" ];
+        };
       };
     };
   };
