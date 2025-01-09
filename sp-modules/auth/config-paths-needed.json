@@ -1,0 +1,10 @@
+[
+  [ "passthru", "selfprivacy", "auth" ],
+  [ "security", "acme", "certs" ],
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "modules", "auth" ],
+  [ "services", "kanidm" ],
+  [ "services", "oauth2-proxy", "enable" ],
+  [ "services", "oauth2-proxy", "nginx" ],
+  [ "systemd", "services", "kanidm" ]
+]

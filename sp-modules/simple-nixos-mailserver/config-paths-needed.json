@@ -1,16 +1,20 @@
 [
   [ "mailserver" ],
+  [ "passthru", "selfprivacy", "auth" ],
   [ "security", "acme", "certs" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "hashedMasterPassword" ],
+  [ "selfprivacy", "modules", "auth", "enable" ],
+  [ "selfprivacy", "modules", "simple-nixos-mailserver" ],
   [ "selfprivacy", "useBinds" ],
   [ "selfprivacy", "username" ],
   [ "selfprivacy", "users" ],
-  [ "services", "dovecot2" ],
+  [ "services", "dovecot2", "user" ],
   [ "services", "opendkim" ],
   [ "services", "postfix", "group" ],
   [ "services", "postfix", "user" ],
-  [ "services", "redis" ],
-  [ "services", "rspamd" ],
-  [ "selfprivacy", "modules", "simple-nixos-mailserver" ]
+  [ "services", "redis", "servers", "rspamd", "bind" ],
+  [ "services", "redis", "servers", "rspamd", "port" ],
+  [ "services", "redis", "servers", "rspamd", "requirePass" ],
+  [ "services", "rspamd" ]
 ]

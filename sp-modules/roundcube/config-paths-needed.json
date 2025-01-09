@@ -1,5 +1,8 @@
 [
-  ["selfprivacy", "domain"],
-  ["selfprivacy", "modules", "roundcube"],
-  ["mailserver", "fqdn"]
+  [ "mailserver", "fqdn" ],
+  [ "passthru", "selfprivacy", "auth", "auth-fqdn" ],
+  [ "passthru", "selfprivacy", "auth", "oauth2-provider-name" ],
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "modules", "auth" ],
+  [ "selfprivacy", "modules", "roundcube" ]
 ]
