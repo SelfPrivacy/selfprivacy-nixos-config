@@ -224,7 +224,6 @@ in
             --scope="email openid profile" \
             --mapping-uid=preferred_username \
             --no-interaction \
-            --mapping-uid=name \
             --mapping-groups=groups \
             --group-provisioning=1 \
             -vvv
