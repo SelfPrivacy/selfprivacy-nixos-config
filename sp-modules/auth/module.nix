@@ -14,7 +14,7 @@ in
 {
   options.selfprivacy.modules.auth = {
     enable = lib.mkOption {
-      default = false;
+      default = true;
       type = lib.types.bool;
     };
     subdomain = lib.mkOption {
