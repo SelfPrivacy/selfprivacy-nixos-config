@@ -11,7 +11,7 @@ let
   lua_lrucache_path = "${pkgs.luajitPackages.lua-resty-lrucache}/lib/lua/5.1/?.lua";
   lua_path = "${lua_core_path};${lua_lrucache_path};";
 
-  spApiUserExecStartPostScript = pkgs.writeScript "spApiUserExecStartPostScript"
+  spApiUserExecStartPostScript = pkgs.writeShellScript "spApiUserExecStartPostScript"
   ''
     export HOME=$RUNTIME_DIRECTORY/client_home
     readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
