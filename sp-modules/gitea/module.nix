@@ -19,7 +19,7 @@ let
   auth-passthru = config.passthru.selfprivacy.auth;
   oauth2-provider-name = auth-passthru.oauth2-provider-name;
   redirect-uri =
-    "https://git.${sp.domain}/user/oauth2/${oauth2-provider-name}/callback";
+    "https://${cfg.subdomain}.${sp.domain}/user/oauth2/${oauth2-provider-name}/callback";
 
   admins-group = "sp.forgejo.admins";
   users-group = "sp.forgejo.users";
