@@ -10,6 +10,32 @@ let
   lua_core_path = "${pkgs.luajitPackages.lua-resty-core}/lib/lua/5.1/?.lua";
   lua_lrucache_path = "${pkgs.luajitPackages.lua-resty-lrucache}/lib/lua/5.1/?.lua";
   lua_path = "${lua_core_path};${lua_lrucache_path};";
+
+  spApiUserExecStartPostScript = pkgs.writeScript "spApiUserExecStartPostScript"
+  ''
+    export HOME=$RUNTIME_DIRECTORY/client_home
+    readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
+
+    # get Kanidm service account for SelfPrivacyAPI
+      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: sp.selfprivacy-api.service-account$")"
+      echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
+      if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
+      then
+          echo "kanidm service account \"sp.selfprivacy-api.service-account\" is found"
+      else
+          echo "kanidm service account \"sp.selfprivacy-api.service-account\" is not found"
+          echo "creating new kanidm service account \"sp.selfprivacy-api.service-account\""
+          if $KANIDM service-account create --name idm_admin sp.selfprivacy-api.service-account "SelfPrivacy API service account" idm_admin
+          then
+              "kanidm service account \"sp.selfprivacy-api.service-account\" created"
+          else
+              echo "error: cannot create kanidm service account \"sp.selfprivacy-api.service-account\""
+              exit 1
+          fi
+      fi
+
+      $KANIDM group add-members idm_admins sp.selfprivacy-api.service-account
+  '';
 in
 {
   options.selfprivacy.modules.auth = {
@@ -154,5 +180,11 @@ in
       ldap-host = "127.0.0.1";
       ldap-port = 3636;
     };
+
+    systemd.services.kanidm.serviceConfig.ExecStartPost = (
+      lib.mkAfter [
+        spApiUserExecStartPostScript
+      ]
+    );
   };
 }
