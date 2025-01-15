@@ -11,7 +11,7 @@ let
   auth-passthru = config.passthru.selfprivacy.auth;
   oauth2-provider-name = auth-passthru.oauth2-provider-name;
   redirect-uri =
-    "https://git.${sp.domain}/user/oauth2/${oauth2-provider-name}/callback";
+    "https://${cfg.subdomain}.${sp.domain}/user/oauth2/${oauth2-provider-name}/callback";
 
   admins-group = "sp.forgejo.admins";
   users-group = "sp.forgejo.users";
@@ -20,13 +20,21 @@ let
   kanidm-service-account-token-name = "${oauth-client-id}-service-account-token";
   kanidm-service-account-token-fp =
     "/run/keys/${oauth-client-id}/kanidm-service-account-token"; # FIXME sync with auth module
-  kanidmExecStartPostScriptRoot = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPost-root-script.sh"
+  # TODO rewrite to tmpfiles.d
+  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPre-root-script.sh"
     ''
-      # set-group-ID bit allows for kanidm user to create files,
+      # set-group-ID bit allows kanidm user to create files with another group
       mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${oauth-client-id}
       chown kanidm:${config.services.forgejo.group} /run/keys/${oauth-client-id}
     '';
+  kanidm-oauth-client-secret-fp =
+    "/run/keys/${oauth-client-id}/kanidm-oauth-client-secret";
+  kanidmExecStartPreScript = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
+    [ -f "${kanidm-oauth-client-secret-fp}" ] || \
+      "${lib.getExe pkgs.openssl}" rand -base64 -out "${kanidm-oauth-client-secret-fp}" 32
+  '';
   kanidmExecStartPostScript = pkgs.writeShellScript
     "${oauth-client-id}-kanidm-ExecStartPost-script.sh"
     ''
@@ -42,9 +50,9 @@ let
       else
           echo "kanidm service account \"${kanidm-service-account-name}\" is not found"
           echo "creating new kanidm service account \"${kanidm-service-account-name}\""
-          if $KANIDM service-account create --name idm_admin ${kanidm-service-account-name} ${kanidm-service-account-name} idm_admin
+          if $KANIDM service-account create --name idm_admin "${kanidm-service-account-name}" "${kanidm-service-account-name}" idm_admin
           then
-              "kanidm service account \"${kanidm-service-account-name}\" created"
+              echo "kanidm service account \"${kanidm-service-account-name}\" created"
           else
               echo "error: cannot create kanidm service account \"${kanidm-service-account-name}\""
               exit 1
@@ -52,10 +60,10 @@ let
       fi
 
       # add Kanidm service account to `idm_mail_servers` group
-      $KANIDM group add-members idm_mail_servers ${kanidm-service-account-name}
+      $KANIDM group add-members idm_mail_servers "${kanidm-service-account-name}"
 
       # create a new read-only token for kanidm
-      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin ${kanidm-service-account-name} ${kanidm-service-account-token-name} --output json)"
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidm-service-account-name}" "${kanidm-service-account-token-name}" --output json)"
       then
           echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
           exit 1
@@ -280,12 +288,11 @@ in
               --bind-password "$(cat ${kanidm-service-account-token-fp})" \
               --synchronize-users
             '';
-            # FIXME secret
             oauthConfigArgs = ''
               --name "${oauth2-provider-name}" \
               --provider openidConnect \
               --key forgejo \
-              --secret VERYSTRONGSECRETFORFORGEJO \
+              --secret "$(<${kanidm-oauth-client-secret-fp})" \
               --group-claim-name groups \
               --admin-group admins \
               --auto-discover-url '${auth-passthru.oauth2-discovery-url oauth-client-id}'
@@ -316,9 +323,7 @@ in
           ''
           );
         # TODO consider passing oauth consumer service to auth module instead
-        wants = lib.mkIf is-auth-enabled
-          [ auth-passthru.oauth2-systemd-service ];
-        after = lib.mkIf is-auth-enabled
+        requires = lib.mkIf is-auth-enabled
           [ auth-passthru.oauth2-systemd-service ];
       };
       slices.gitea = {
@@ -330,14 +335,14 @@ in
     users.groups.keys.members =
       lib.mkIf is-auth-enabled [ config.services.forgejo.group ];
 
+    systemd.services.kanidm.serviceConfig.ExecStartPre =
+      lib.mkIf is-auth-enabled [
+        ("-+" + kanidmExecStartPreScriptRoot)
+        ("-" + kanidmExecStartPreScript)
+      ];
     systemd.services.kanidm.serviceConfig.ExecStartPost =
       lib.mkIf is-auth-enabled
-        (lib.mkAfter
-          [
-            ("+" + kanidmExecStartPostScriptRoot)
-            kanidmExecStartPostScript
-          ]
-        );
+        (lib.mkAfter [ ("-" + kanidmExecStartPostScript) ]);
     services.kanidm.provision = lib.mkIf is-auth-enabled {
       groups = {
         "${admins-group}".members = [ "sp.admins" ];
@@ -347,7 +352,7 @@ in
         displayName = "Forgejo";
         originUrl = redirect-uri;
         originLanding = "https://${cfg.subdomain}.${sp.domain}/";
-        basicSecretFile = pkgs.writeText "bs-forgejo" "VERYSTRONGSECRETFORFORGEJO"; # FIXME
+        basicSecretFile = kanidm-oauth-client-secret-fp;
         # when true, name is passed to a service instead of name@domain
         preferShortUsername = true;
         allowInsecureClientDisablePkce = true; # FIXME is it needed?
