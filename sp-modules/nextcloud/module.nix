@@ -29,13 +29,21 @@ let
   kanidm-service-account-token-name = "${oauth-client-id}-service-account-token";
   kanidm-service-account-token-fp =
     "/run/keys/${oauth-client-id}/kanidm-service-account-token"; # FIXME sync with auth module
-  kanidmExecStartPostScriptRoot = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPost-root-script.sh"
+  # TODO rewrite to tmpfiles.d, but make sure the group exists first!
+  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPre-root-script.sh"
     ''
       # set-group-ID bit allows for kanidm user to create files,
       mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${oauth-client-id}
       chown kanidm:${nextcloud-setup-group} /run/keys/${oauth-client-id}
     '';
+  kanidm-oauth-client-secret-fp =
+    "/run/keys/${oauth-client-id}/kanidm-oauth-client-secret";
+  kanidmExecStartPreScript = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
+    [ -f "${kanidm-oauth-client-secret-fp}" ] || \
+      "${lib.getExe pkgs.openssl}" rand -base64 -out "${kanidm-oauth-client-secret-fp}" 32
+  '';
   kanidmExecStartPostScript = pkgs.writeShellScript
     "${oauth-client-id}-kanidm-ExecStartPost-script.sh"
     ''
@@ -51,9 +59,9 @@ let
       else
           echo "kanidm service account \"${kanidm-service-account-name}\" is not found"
           echo "creating new kanidm service account \"${kanidm-service-account-name}\""
-          if $KANIDM service-account create --name idm_admin ${kanidm-service-account-name} ${kanidm-service-account-name} idm_admin
+          if $KANIDM service-account create --name idm_admin "${kanidm-service-account-name}" "${kanidm-service-account-name}" idm_admin
           then
-              "kanidm service account \"${kanidm-service-account-name}\" created"
+              echo "kanidm service account \"${kanidm-service-account-name}\" created"
           else
               echo "error: cannot create kanidm service account \"${kanidm-service-account-name}\""
               exit 1
@@ -61,10 +69,10 @@ let
       fi
 
       # add Kanidm service account to `idm_mail_servers` group
-      $KANIDM group add-members idm_mail_servers ${kanidm-service-account-name}
+      $KANIDM group add-members idm_mail_servers "${kanidm-service-account-name}"
 
       # create a new read-only token for kanidm
-      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin ${kanidm-service-account-name} ${kanidm-service-account-token-name} --output json)"
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidm-service-account-name}" "${kanidm-service-account-token-name}" --output json)"
       then
           echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
           exit 1
@@ -125,14 +133,6 @@ in
         nextcloud-setup = {
           serviceConfig.Slice = "nextcloud.slice";
           serviceConfig.Group = config.services.phpfpm.pools.nextcloud.group;
-          # FIXME secret
-          preStart = lib.mkIf is-auth-enabled ''
-            cat <<EOF > "${nextcloud-secret-file}"
-            {
-              "oidc_login_client_secret": "VERY-STRONG-SECRET-FOR-NEXTCLOUD"
-            }
-            EOF
-          '';
           path = lib.mkIf is-auth-enabled [ pkgs.jq ];
           script = lib.mkIf is-auth-enabled ''
             ${lib.strings.optionalString cfg.debug "set -o xtrace"}
@@ -215,10 +215,9 @@ in
             ${occ} app:install user_oidc || :
             ${occ} app:enable  user_oidc
 
-            # FIXME clientsecret
             ${occ} user_oidc:provider ${auth-passthru.oauth2-provider-name} \
             --clientid="${oauth-client-id}" \
-            --clientsecret="VERY-STRONG-SECRET-FOR-NEXTCLOUD" \
+            --clientsecret="$(<${kanidm-oauth-client-secret-fp})" \
             --discoveryuri="${auth-passthru.oauth2-discovery-url "nextcloud"}" \
             --unique-uid=0 \
             --scope="email openid profile" \
@@ -229,16 +228,16 @@ in
             -vvv
           '';
           # TODO consider passing oauth consumer service to auth module instead
-          wants = lib.mkIf is-auth-enabled
-            [ auth-passthru.oauth2-systemd-service ];
-          after = lib.mkIf is-auth-enabled
+          requires = lib.mkIf is-auth-enabled
             [ auth-passthru.oauth2-systemd-service ];
         };
-        kanidm.serviceConfig.ExecStartPost = lib.mkIf is-auth-enabled
+        kanidm.serviceConfig.ExecStartPre = lib.mkIf is-auth-enabled
           (lib.mkAfter [
-            ("+" + kanidmExecStartPostScriptRoot)
-            kanidmExecStartPostScript
+            ("-+" + kanidmExecStartPreScriptRoot)
+            ("-" + kanidmExecStartPreScript)
           ]);
+        kanidm.serviceConfig.ExecStartPost = lib.mkIf is-auth-enabled
+          (lib.mkAfter [ ("-" + kanidmExecStartPostScript) ]);
         nextcloud-cron.serviceConfig.Slice = "nextcloud.slice";
         nextcloud-update-db.serviceConfig.Slice = "nextcloud.slice";
         nextcloud-update-plugins.serviceConfig.Slice = "nextcloud.slice";
@@ -317,10 +316,10 @@ in
     services.nginx.virtualHosts.${hostName} = {
       useACMEHost = sp.domain;
       forceSSL = true;
-      locations."/".extraConfig = lib.mkIf is-auth-enabled ''
-        # FIXME does not work
-        rewrite ^/login$ /apps/user_oidc/login/1 last;
-      '';
+      #locations."/".extraConfig = lib.mkIf is-auth-enabled ''
+      #  # FIXME does not work
+      #  rewrite ^/login$ /apps/user_oidc/login/1 last;
+      #'';
       # show an error instead of a blank page on Nextcloud PHP/FastCGI error
       locations."~ \\.php(?:$|/)".extraConfig = ''
         error_page 500 502 503 504 ${pkgs.nginx}/html/50x.html;
@@ -335,7 +334,7 @@ in
         displayName = "Nextcloud";
         originUrl = "https://${cfg.subdomain}.${domain}/apps/user_oidc/code";
         originLanding = "https://${cfg.subdomain}.${domain}/";
-        basicSecretFile = pkgs.writeText "bs-nextcloud" "VERY-STRONG-SECRET-FOR-NEXTCLOUD"; # FIXME
+        basicSecretFile = kanidm-oauth-client-secret-fp;
         # when true, name is passed to a service instead of name@domain
         preferShortUsername = true;
         allowInsecureClientDisablePkce = false;
