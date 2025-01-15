@@ -2,6 +2,7 @@
   [ "mailserver", "fqdn" ],
   [ "passthru", "selfprivacy", "auth", "auth-fqdn" ],
   [ "passthru", "selfprivacy", "auth", "oauth2-provider-name" ],
+  [ "passthru", "selfprivacy", "auth", "oauth2-systemd-service" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "modules", "auth" ],
   [ "selfprivacy", "modules", "roundcube" ]

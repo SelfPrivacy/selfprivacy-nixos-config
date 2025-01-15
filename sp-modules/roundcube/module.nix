@@ -6,6 +6,22 @@ let
   auth-passthru = config.passthru.selfprivacy.auth;
   auth-fqdn = auth-passthru.auth-fqdn;
   oauth-client-id = "roundcube";
+  roundcube-group = "roundcube";
+  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPre-root-script.sh"
+    ''
+      # set-group-ID bit allows for kanidm user to create files,
+      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${oauth-client-id}
+      chown kanidm:${roundcube-group} /run/keys/${oauth-client-id}
+    '';
+  kanidm-oauth-client-secret-fp =
+    "/run/keys/${oauth-client-id}/kanidm-oauth-client-secret";
+  kanidmExecStartPreScript = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
+    set -o xtrace
+    [ -f "${kanidm-oauth-client-secret-fp}" ] || \
+      "${lib.getExe pkgs.openssl}" rand -base64 -out "${kanidm-oauth-client-secret-fp}" 32
+  '';
 in
 {
   options.selfprivacy.modules.roundcube = {
@@ -35,7 +51,7 @@ in
         $config['oauth_provider'] = 'generic';
         $config['oauth_provider_name'] = '${auth-passthru.oauth2-provider-name}';
         $config['oauth_client_id'] = '${oauth-client-id}';
-        $config['oauth_client_secret'] = 'VERYSTRONGSECRETFORROUNDCUBE'; # FIXME
+        $config['oauth_client_secret'] = "$(<${kanidm-oauth-client-secret-fp})";
         $config['oauth_auth_uri'] = 'https://${auth-fqdn}/ui/oauth2';
         $config['oauth_token_uri'] = 'https://${auth-fqdn}/oauth2/token';
         $config['oauth_identity_uri'] = 'https://${auth-fqdn}/oauth2/openid/${oauth-client-id}/userinfo';
@@ -57,6 +73,14 @@ in
 
     systemd.slices.roundcube.description = "Roundcube service slice";
 
+    systemd.services.kanidm = lib.mkIf is-auth-enabled {
+      serviceConfig.ExecStartPre = lib.mkAfter [
+        ("-+" + kanidmExecStartPreScriptRoot)
+        ("-" + kanidmExecStartPreScript)
+      ];
+      requires = [ auth-passthru.oauth2-systemd-service ];
+    };
+
     services.kanidm.provision = lib.mkIf is-auth-enabled {
       groups = {
         "sp.roundcube.admins".members = [ "sp.admins" ];
@@ -66,7 +90,7 @@ in
         displayName = "Roundcube";
         originUrl = "https://${cfg.subdomain}.${domain}/index.php/login/oauth";
         originLanding = "https://${cfg.subdomain}.${domain}/";
-        basicSecretFile = pkgs.writeText "bs-roundcube" "VERYSTRONGSECRETFORROUNDCUBE"; # FIXME
+        basicSecretFile = kanidm-oauth-client-secret-fp;
         # when true, name is passed to a service instead of name@domain
         preferShortUsername = false;
         allowInsecureClientDisablePkce = true; # FIXME is it needed?
