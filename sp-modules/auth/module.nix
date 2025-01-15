@@ -6,6 +6,34 @@ let
 
   kanidm-bind-address = "127.0.0.1:3013";
 
+  selfprivacy-service-account-name = "sp.selfprivacy-api.service-account";
+
+  spApiUserExecStartPostScript =
+    pkgs.writeShellScript "spApiUserExecStartPostScript" ''
+      export HOME=$RUNTIME_DIRECTORY/client_home
+      readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
+
+      # get Kanidm service account for SelfPrivacyAPI
+      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${selfprivacy-service-account-name}$")"
+      echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
+      if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
+      then
+          echo "kanidm service account \"${selfprivacy-service-account-name}\" is found"
+      else
+          echo "kanidm service account \"${selfprivacy-service-account-name}\" is not found"
+          echo "creating new kanidm service account \"${selfprivacy-service-account-name}\""
+          if $KANIDM service-account create --name idm_admin "${selfprivacy-service-account-name}" "SelfPrivacy API service account" idm_admin
+          then
+              echo "kanidm service account \"${selfprivacy-service-account-name}\" created"
+          else
+              echo "error: cannot create kanidm service account \"${selfprivacy-service-account-name}\""
+              exit 1
+          fi
+      fi
+
+      $KANIDM group add-members idm_admins "${selfprivacy-service-account-name}"
+    '';
+
   # lua stuff for debugging only
   lua_core_path = "${pkgs.luajitPackages.lua-resty-core}/lib/lua/5.1/?.lua";
   lua_lrucache_path = "${pkgs.luajitPackages.lua-resty-lrucache}/lib/lua/5.1/?.lua";
@@ -135,6 +163,9 @@ in
         };
       };
     };
+
+    systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter
+      [ spApiUserExecStartPostScript ];
 
     passthru.selfprivacy.auth = rec {
       auth-fqdn = cfg.subdomain + "." + domain;
