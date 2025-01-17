@@ -1,11 +1,13 @@
 [
   [ "passthru", "selfprivacy", "auth" ],
+  [ "security", "acme", "certs" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "modules", "auth", "enable" ],
   [ "selfprivacy", "modules", "nextcloud" ],
   [ "selfprivacy", "useBinds" ],
   [ "services", "nextcloud" ],
   [ "services", "phpfpm", "pools", "nextcloud", "group" ],
+  [ "services", "phpfpm", "pools", "nextcloud", "user" ],
   [ "systemd", "services", "nextcloud" ],
   [ "systemd", "services", "nextcloud-setup" ]
 ]

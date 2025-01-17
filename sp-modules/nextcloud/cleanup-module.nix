@@ -19,7 +19,7 @@ in
         ''
           rm -f -v ${db-pass-filepath}
           rm -f -v ${admin-pass-filepath}
-          [ ! -f "${override-config-fp}" && -L "${override-config-fp}" ] && \
+          [[ ! -f "${override-config-fp}" && -L "${override-config-fp}" ]] && \
             rm -v "${override-config-fp}"
         '';
   };

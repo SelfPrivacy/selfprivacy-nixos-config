@@ -8,14 +8,15 @@ let
     secrets-filepath
     sp
     ;
+
   hostName = "${cfg.subdomain}.${sp.domain}";
-
   auth-passthru = config.passthru.selfprivacy.auth;
-
   is-auth-enabled = config.selfprivacy.modules.auth.enable;
+  cfg = sp.modules.nextcloud;
+  ldap_scheme_and_host = "ldaps://${auth-passthru.ldap-host}";
 
   occ = "${config.services.nextcloud.occ}/bin/nextcloud-occ";
-  cfg = sp.modules.nextcloud;
+
   nextcloud-secret-file = "/var/lib/nextcloud/secrets.json";
   nextcloud-setup-group =
     config.systemd.services.nextcloud-setup.serviceConfig.Group;
@@ -124,9 +125,15 @@ in
         ];
       };
     };
+
     # for ExecStartPost script to have access to /run/keys/*
     users.groups.keys.members =
       lib.mkIf is-auth-enabled [ nextcloud-setup-group ];
+
+    # not needed, due to turnOffCertCheck=1 in used_ldap
+    # users.groups.${config.security.acme.certs.${domain}.group}.members =
+    #   [ config.services.phpfpm.pools.nextcloud.user ];
+
     systemd = {
       services = {
         phpfpm-nextcloud.serviceConfig.Slice = lib.mkForce "nextcloud.slice";
@@ -135,6 +142,8 @@ in
           serviceConfig.Group = config.services.phpfpm.pools.nextcloud.group;
           path = lib.mkIf is-auth-enabled [ pkgs.jq ];
           script = lib.mkIf is-auth-enabled ''
+            set -o errexit
+            set -o nounset
             ${lib.strings.optionalString cfg.debug "set -o xtrace"}
 
             ${occ} app:install user_ldap || :
@@ -144,15 +153,14 @@ in
             # The criteria for matching is the ldapHost value.
 
             # remove broken link after previous nextcloud (un)installation
-            [ ! -f "${override-config-fp}" && -L "${override-config-fp}" ] && \
+            [[ ! -f "${override-config-fp}" && -L "${override-config-fp}" ]] && \
               rm -v "${override-config-fp}"
 
-            ALL_CONFIG="$(${occ} ldap:show-config --output=json --show-password)"
+            ALL_CONFIG="$(${occ} ldap:show-config --output=json)"
 
-            # TODO investigate this!
-            MATCHING_CONFIG_IDs="$(echo "$ALL_CONFIG" | jq '[to_entries[] | select(.value.ldapHost=="${auth-passthru.ldap-host}") | .key]')"
-            if [[ $(echo "$MATCHING_CONFIG_IDs" | jq 'length') > 0 ]]; then
-              CONFIG_ID="$(echo "$MATCHING_CONFIG_IDs" | jq --raw-output '.[0]')"
+            MATCHING_CONFIG_IDs="$(jq '[to_entries[] | select(.value.ldapHost=="${ldap_scheme_and_host}") | .key]' <<<"$ALL_CONFIG")"
+            if [[ $(jq 'length' <<<"$MATCHING_CONFIG_IDs") > 0 ]]; then
+              CONFIG_ID="$(jq --raw-output '.[0]' <<<"$MATCHING_CONFIG_IDs")"
             else
               CONFIG_ID="$(${occ} ldap:create-empty-config --only-print-prefix)"
             fi
@@ -162,10 +170,13 @@ in
             # The following CLI commands follow
             # https://github.com/lldap/lldap/blob/main/example_configs/nextcloud.md#nextcloud-config--the-cli-way
 
-            # FIXME
+            # StartTLS is not supported in Kanidm due to security risks, whereas
+            # user_ldap doesn't support SASL. Importing certificate doesn't
+            # help:
+            # ${occ} security:certificates:import "${config.security.acme.certs.${domain}.directory}/cert.pem"
             ${occ} ldap:set-config "$CONFIG_ID" 'turnOffCertCheck' '1'
 
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapHost' 'ldaps://${auth-passthru.ldap-host}'
+            ${occ} ldap:set-config "$CONFIG_ID" 'ldapHost' '${ldap_scheme_and_host}'
             ${occ} ldap:set-config "$CONFIG_ID" 'ldapPort' '${toString auth-passthru.ldap-port}'
             ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentName' 'dn=token'
             ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentPassword' "$(<${kanidm-service-account-token-fp})"
@@ -196,18 +207,17 @@ in
 
             ${occ} ldap:test-config -- "$CONFIG_ID"
 
-            # Only one active at the same time
-
-            # TODO investigate this! It takes a minute to deactivate all.
-            for configid in $(echo "$ALL_CONFIG" | jq --raw-output "keys[]"); do
+            # delete all configs except "$CONFIG_ID"
+            for configid in $(jq --raw-output "keys[] | select(. != \"$CONFIG_ID\")" <<<"$ALL_CONFIG"); do
               echo "Deactivating $configid"
-              ${occ} ldap:set-config "$configid" 'ldapConfigurationActive' \
-                        '0'
+              ${occ} ldap:set-config "$configid" 'ldapConfigurationActive' '0'
               echo "Deactivated $configid"
+              echo "Deleting $configid"
+              ${occ} ldap:delete-config "$configid"
+              echo "Deleted $configid"
             done
 
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapConfigurationActive' \
-                        '1'
+            ${occ} ldap:set-config "$CONFIG_ID" 'ldapConfigurationActive' '1'
 
             ############################################################################
             # OIDC app
