@@ -2,9 +2,10 @@
 let
   inherit (import ./common.nix nixos-args)
     appendLdapBindPwd
+    auth-passthru
     cfg
     domain
-    auth-passthru
+    is-auth-enabled
     ;
 
   runtime-directory = "dovecot2";
@@ -61,7 +62,7 @@ let
     '';
   };
 in
-lib.mkIf config.selfprivacy.modules.auth.enable {
+lib.mkIf is-auth-enabled {
   mailserver.ldap = {
     # note: in `ldapsearch` first comes filter, then attributes
     dovecot.userAttrs = "+"; # all operational attributes

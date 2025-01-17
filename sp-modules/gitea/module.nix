@@ -6,7 +6,7 @@ let
     then "/volumes/${cfg.location}/gitea"
     else "/var/lib/gitea";
   cfg = sp.modules.gitea;
-  is-auth-enabled = config.selfprivacy.modules.auth.enable;
+  is-auth-enabled = config.selfprivacy.modules.auth.enable or false;
   oauth-client-id = "forgejo";
   auth-passthru = config.passthru.selfprivacy.auth;
   oauth2-provider-name = auth-passthru.oauth2-provider-name;

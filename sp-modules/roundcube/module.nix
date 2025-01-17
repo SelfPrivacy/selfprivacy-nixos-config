@@ -2,7 +2,7 @@
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.roundcube;
-  is-auth-enabled = config.selfprivacy.modules.auth.enable;
+  is-auth-enabled = config.selfprivacy.modules.auth.enable or false;
   auth-passthru = config.passthru.selfprivacy.auth;
   auth-fqdn = auth-passthru.auth-fqdn;
   oauth-client-id = "roundcube";

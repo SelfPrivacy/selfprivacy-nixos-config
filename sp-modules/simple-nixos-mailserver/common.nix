@@ -2,7 +2,7 @@
 rec {
   auth-passthru = config.passthru.selfprivacy.auth;
   domain = config.selfprivacy.domain;
-  is-auth-enabled = config.selfprivacy.modules.auth.enable;
+  is-auth-enabled = config.selfprivacy.modules.auth.enable or false;
 
   appendLdapBindPwd =
     { name, file, prefix, suffix ? "", passwordFile, destination }:

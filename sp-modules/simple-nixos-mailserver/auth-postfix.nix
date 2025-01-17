@@ -3,6 +3,7 @@ let
   inherit (import ./common.nix nixos-args)
     appendLdapBindPwd
     auth-passthru
+    is-auth-enabled
     ;
 
   cfg = config.mailserver;
@@ -50,7 +51,7 @@ let
     destination = ldapVirtualMailboxMapFile;
   };
 in
-lib.mkIf config.selfprivacy.modules.auth.enable {
+lib.mkIf is-auth-enabled {
   mailserver.ldap = {
     postfix.mailAttribute = "mail";
     postfix.uidAttribute = "uid";
