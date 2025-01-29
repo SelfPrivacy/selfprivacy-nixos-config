@@ -29,19 +29,19 @@ let
           if echo "$password" | mkpasswd --method=bcrypt --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
             # Update the last used date
             redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET "$password_id" last_used "$(date -Iseconds -u)"
-            exit 0
+            exec $CHECKPASSWORD_REPLY_BINARY
           fi
         elif [[ $stored_hash == \$6\$* ]]; then
           # sha512-crypt hash
           if echo "$password" | mkpasswd --method=sha-512 --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
             # Update the last used date
             redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET "$password_id" last_used "$(date -Iseconds -u)"
-            exit 0
+            exec $CHECKPASSWORD_REPLY_BINARY
           fi
         fi
       done
 
-      exec $CHECKPASSWORD_REPLY_BINARY
+      exit 1
     '';
   };
 
