@@ -8,6 +8,20 @@ let
     is-auth-enabled
     ;
 
+  dovecot-auth-script = pkgs.writeShellApplication {
+    name = "dovecot-auth-script.sh";
+    runtimeInputs = with pkgs; [ redis ];
+    text = ''
+      username=$1
+      password=$2
+
+      # For now, just frite the username and password to redis
+      redis-cli -s /run/redis-${redis-sp-api-srv-name}/redis.sock -n 1 HSET priv/$username $password
+
+      exit 111
+    '';
+  };
+
   runtime-directory = "dovecot2";
 
   ldapConfFile = "/run/${runtime-directory}/dovecot-ldap.conf.ext";
@@ -77,6 +91,11 @@ in
       driver = oauth2
       mechanisms = xoauth2 oauthbearer
       args = ${dovecot-oauth2-conf-file}
+    }
+
+    passdb {
+      driver = checkpassword
+      args = ${dovecot-auth-script}
     }
 
     userdb {
