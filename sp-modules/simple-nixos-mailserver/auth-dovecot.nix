@@ -12,6 +12,8 @@ let
     name = "dovecot-auth-script.sh";
     runtimeInputs = with pkgs; [ redis coreutils-full mkpasswd gnugrep ];
     text = ''
+      CHECKPASSWORD_REPLY_BINARY="$1"
+
       IFS= read -r -d ''' username <&3
       IFS= read -r -d ''' password <&3
 
@@ -39,7 +41,7 @@ let
         fi
       done
 
-      exit 1
+      exec $CHECKPASSWORD_REPLY_BINARY
     '';
   };
 
