@@ -10,7 +10,7 @@ let
 
   dovecot-auth-script = pkgs.writeShellApplication {
     name = "dovecot-auth-script.sh";
-    runtimeInputs = with pkgs; [ redis coreutils-full mkpasswd ];
+    runtimeInputs = with pkgs; [ redis coreutils-full mkpasswd gnugrep ];
     text = ''
       IFS= read -r -d ''' username <&3
       IFS= read -r -d ''' password <&3
