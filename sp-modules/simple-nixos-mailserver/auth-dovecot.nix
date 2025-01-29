@@ -85,7 +85,7 @@ in
   };
 
   services.dovecot2.extraConfig = ''
-    auth_mechanisms = xoauth2 oauthbearer
+    auth_mechanisms = xoauth2 oauthbearer plain login
 
     passdb {
       driver = oauth2
@@ -95,6 +95,7 @@ in
 
     passdb {
       driver = checkpassword
+      mech = plain login
       args = ${dovecot-auth-script}/bin/dovecot-auth-script.sh
     }
 
