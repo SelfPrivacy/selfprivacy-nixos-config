@@ -20,20 +20,20 @@ let
 
       # Check if the provided password matches any of the stored hashed passwords
       for password_id in $password_ids; do
-        stored_hash=$(redis-cli -s /var/run/redis/redis.sock HGET $password_id password)
+        stored_hash=$(redis-cli -s /var/run/redis/redis.sock HGET "$password_id" password)
 
         if [[ $stored_hash == \$2[ayb]\$* ]]; then
           # bcrypt hash
           if echo "$password" | mkpasswd --method=bcrypt --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
             # Update the last used date
-            redis-cli -s /var/run/redis/redis.sock HSET $password_id last_used "$(date -Iseconds -u)"
+            redis-cli -s /var/run/redis/redis.sock HSET "$password_id" last_used "$(date -Iseconds -u)"
             exit 0
           fi
         elif [[ $stored_hash == \$6\$* ]]; then
           # sha512-crypt hash
           if echo "$password" | mkpasswd --method=sha-512 --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
             # Update the last used date
-            redis-cli -s /var/run/redis/redis.sock HSET $password_id last_used "$(date -Iseconds -u)"
+            redis-cli -s /var/run/redis/redis.sock HSET "$password_id" last_used "$(date -Iseconds -u)"
             exit 0
           fi
         fi
