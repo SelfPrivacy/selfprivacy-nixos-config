@@ -16,7 +16,7 @@ let
       password=$2
 
       # For now, just frite the username and password to redis
-      redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET priv/$username $password
+      redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET priv/"$username" "$password"
 
       exit 111
     '';
