@@ -6,6 +6,7 @@ let
   auth-passthru = config.passthru.selfprivacy.auth;
   auth-fqdn = auth-passthru.auth-fqdn;
   oauth-client-id = "roundcube";
+  roundcube-user = "roundcube";
   roundcube-group = "roundcube";
   kanidmExecStartPreScriptRoot = pkgs.writeShellScript
     "${oauth-client-id}-kanidm-ExecStartPre-root-script.sh"
@@ -76,11 +77,13 @@ in
     (lib.attrsets.optionalAttrs
       (options.selfprivacy.modules ? "auth")
       (lib.mkIf is-auth-enabled {
+        # for phpfpm-roundcube to have access to get through /run/keys directory
+        users.groups.keys.members = [ roundcube-user ];
         services.roundcube.extraConfig = lib.mkAfter ''
           $config['oauth_provider'] = 'generic';
           $config['oauth_provider_name'] = '${auth-passthru.oauth2-provider-name}';
           $config['oauth_client_id'] = '${oauth-client-id}';
-          $config['oauth_client_secret'] = "$(<${kanidm-oauth-client-secret-fp})";
+          $config['oauth_client_secret'] = file_get_contents('${kanidm-oauth-client-secret-fp}');
           $config['oauth_auth_uri'] = 'https://${auth-fqdn}/ui/oauth2';
           $config['oauth_token_uri'] = 'https://${auth-fqdn}/oauth2/token';
           $config['oauth_identity_uri'] = 'https://${auth-fqdn}/oauth2/openid/${oauth-client-id}/userinfo';
