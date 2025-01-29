@@ -12,8 +12,8 @@ let
     name = "dovecot-auth-script.sh";
     runtimeInputs = with pkgs; [ redis ];
     text = ''
-      username=$1
-      password=$2
+      IFS= read -r -d ''' username <&3
+      IFS= read -r -d ''' password <&3
 
       # For now, just frite the username and password to redis
       redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET priv/"$username" password "$password"
