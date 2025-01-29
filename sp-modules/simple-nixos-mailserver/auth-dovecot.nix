@@ -10,15 +10,36 @@ let
 
   dovecot-auth-script = pkgs.writeShellApplication {
     name = "dovecot-auth-script.sh";
-    runtimeInputs = with pkgs; [ redis ];
+    runtimeInputs = with pkgs; [ redis coreutils-full mkpasswd ];
     text = ''
       IFS= read -r -d ''' username <&3
       IFS= read -r -d ''' password <&3
 
-      # For now, just frite the username and password to redis
-      redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET priv/"$username" password "$password"
+      # Connect to Redis and retrieve all password hashes for the user
+      password_ids=$(redis-cli -s /var/run/redis/redis.sock KEYS priv/user/"$username"/passwords/*)
 
-      exit 111
+      # Check if the provided password matches any of the stored hashed passwords
+      for password_id in $password_ids; do
+        stored_hash=$(redis-cli -s /var/run/redis/redis.sock HGET $password_id password)
+
+        if [[ $stored_hash == \$2[ayb]\$* ]]; then
+          # bcrypt hash
+          if echo "$password" | mkpasswd --method=bcrypt --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
+            # Update the last used date
+            redis-cli -s /var/run/redis/redis.sock HSET $password_id last_used "$(date -Iseconds -u)"
+            exit 0
+          fi
+        elif [[ $stored_hash == \$6\$* ]]; then
+          # sha512-crypt hash
+          if echo "$password" | mkpasswd --method=sha-512 --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
+            # Update the last used date
+            redis-cli -s /var/run/redis/redis.sock HSET $password_id last_used "$(date -Iseconds -u)"
+            exit 0
+          fi
+        fi
+      done
+
+      exit 1
     '';
   };
 
