@@ -18,5 +18,14 @@
         type = "location";
       };
     };
+    enableSso = (lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Enable SSO for mail server";
+    }) // {
+      meta = {
+        type = "enable";
+      };
+    };
   };
 }

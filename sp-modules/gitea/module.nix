@@ -14,7 +14,7 @@ let
     "gitea-light"
     "gitea-dark"
   ];
-  is-auth-enabled = sp.modules.auth.enable or false;
+  is-auth-enabled = cfg.enableSso;
   oauth-client-id = "forgejo";
   auth-passthru = config.passthru.selfprivacy.auth;
   oauth2-provider-name = auth-passthru.oauth2-provider-name;
@@ -181,6 +181,15 @@ in
         type = "enum";
         options = themes;
         weight = 6;
+      };
+    };
+    enableSso = (lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Enable SSO for Forgejo";
+    }) // {
+      meta = {
+        type = "enable";
       };
     };
     debug = lib.mkOption {

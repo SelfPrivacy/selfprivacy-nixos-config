@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+nixpkgs-2411: { config, lib, pkgs, ... }:
 let
   cfg = config.selfprivacy.modules.auth;
   domain = config.selfprivacy.domain;
@@ -83,6 +83,25 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    nixpkgs.overlays = [
+      (
+        _final: prev: {
+          inherit (nixpkgs-2411.legacyPackages.${prev.system}) kanidm;
+          kanidm-provision =
+            nixpkgs-2411.legacyPackages.${prev.system}.kanidm-provision.overrideAttrs (_: {
+              version = "git";
+              src = prev.fetchFromGitHub {
+                owner = "oddlama";
+                repo = "kanidm-provision";
+                rev = "d1f55c9247a6b25d30bbe90a74307aaac6306db4";
+                hash = "sha256-cZ3QbowmWX7j1eJRiUP52ao28xZzC96OdZukdWDHfFI=";
+              };
+            });
+        }
+      )
+    ];
+
+
     # kanidm uses TLS in internal connection with nginx too
     # FIXME revise this: maybe kanidm must not have access to a public TLS
     users.groups."acmereceivers".members = [ "kanidm" ];

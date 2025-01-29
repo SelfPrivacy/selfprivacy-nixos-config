@@ -2,8 +2,9 @@
 rec {
   auth-passthru = config.passthru.selfprivacy.auth;
   domain = config.selfprivacy.domain;
-  is-auth-enabled = config.selfprivacy.modules.auth.enable or false;
   group = "dovecot2";
+  is-auth-enabled =
+    config.selfprivacy.modules.simple-nixos-mailserver.enableSso;
 
   appendSetting =
     { name, file, prefix, suffix ? "", passwordFile, destination }:

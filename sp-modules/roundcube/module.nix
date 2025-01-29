@@ -2,7 +2,7 @@
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.roundcube;
-  is-auth-enabled = config.selfprivacy.modules.auth.enable or false;
+  is-auth-enabled = cfg.enableSso;
   auth-passthru = config.passthru.selfprivacy.auth;
   auth-fqdn = auth-passthru.auth-fqdn;
   sp-module-name = "roundcube";
@@ -42,6 +42,15 @@ in
         type = "string";
         regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
         weight = 0;
+      };
+    };
+    enableSso = (lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Enable SSO for Roundcube";
+    }) // {
+      meta = {
+        type = "enable";
       };
     };
   };
