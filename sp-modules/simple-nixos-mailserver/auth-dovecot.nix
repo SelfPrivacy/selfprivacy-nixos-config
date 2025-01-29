@@ -95,7 +95,7 @@ in
 
     passdb {
       driver = checkpassword
-      mech = plain login
+      mechanisms = plain login
       args = ${dovecot-auth-script}/bin/dovecot-auth-script.sh
     }
 
