@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 
 with lib;
 {
@@ -138,6 +138,21 @@ with lib;
         type = types.nullOr types.str;
         default = null;
       };
+    };
+    ################
+    # passthrough  #
+    ################
+    passthru = mkOption {
+      type = types.submodule {
+        freeformType = (pkgs.formats.json { }).type;
+        options = { };
+      };
+      default = { };
+      visible = false;
+      description = ''
+        This attribute allows to share data between modules.
+        You can put whatever you want here.
+      '';
     };
   };
 }
