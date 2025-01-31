@@ -1,10 +1,11 @@
 { config, lib, pkgs, ... }@nixos-args:
 let
   inherit (import ./common.nix nixos-args)
-    appendLdapBindPwd
+    appendSetting
     auth-passthru
     cfg
     domain
+    group
     is-auth-enabled
     ;
 
@@ -45,7 +46,7 @@ let
     '';
   };
 
-  runtime-directory = "dovecot2";
+  runtime-directory = group;
 
   ldapConfFile = "/run/${runtime-directory}/dovecot-ldap.conf.ext";
   mkLdapSearchScope = scope: (
@@ -74,7 +75,7 @@ let
       user_filter = ${config.mailserver.ldap.dovecot.userFilter}
     '';
   };
-  setPwdInLdapConfFile = appendLdapBindPwd {
+  setPwdInLdapConfFile = appendSetting {
     name = "ldap-conf-file";
     file = dovecot-ldap-config;
     prefix = ''dnpass = "'';
@@ -82,24 +83,39 @@ let
     passwordFile = config.mailserver.ldap.bind.passwordFile;
     destination = ldapConfFile;
   };
-  dovecot-oauth2-conf-file = pkgs.writeTextFile {
-    name = "dovecot-oauth2.conf.ext";
-    text = ''
+  oauth-client-id = "mailserver";
+  oauth-client-secret-fp =
+    "/run/keys/${group}/kanidm-oauth-client-secret";
+  oauth-secret-ExecStartPreScript = pkgs.writeShellScript
+    "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
+    set -o xtrace
+    [ -f "${oauth-client-secret-fp}" ] || \
+      "${lib.getExe pkgs.openssl}" rand -base64 32 | tr -d "\n" > "${oauth-client-secret-fp}"
+  '';
+  dovecot-oauth2-conf-fp = "/run/${runtime-directory}/dovecot-oauth2.conf.ext";
+  write-dovecot-oauth2-conf = appendSetting {
+    name = "oauth2-conf-file";
+    file = builtins.toFile "dovecot-oauth2.conf.ext.template" ''
       introspection_mode = post
-      introspection_url = ${auth-passthru.oauth2-introspection-url "roundcube" "VERYSTRONGSECRETFORROUNDCUBE"}
-      client_id = roundcube
-      client_secret = VERYSTRONGSECRETFORROUNDCUBE # FIXME
       username_attribute = username
       scope = email profile openid
       tls_ca_cert_file = /etc/ssl/certs/ca-certificates.crt
       active_attribute = active
       active_value = true
-      openid_configuration_url = ${auth-passthru.oauth2-discovery-url "roundcube"}
+      openid_configuration_url = ${auth-passthru.oauth2-discovery-url oauth-client-id}
       debug = "no"
     '';
+    prefix = ''introspection_url = "'' +
+      (auth-passthru.oauth2-introspection-url-prefix oauth-client-id);
+    suffix = auth-passthru.oauth2-introspection-url-postfix + ''"'';
+    passwordFile = oauth-client-secret-fp;
+    destination = dovecot-oauth2-conf-fp;
   };
 in
 {
+  # for dovecot2 to have access to get through /run/keys directory
+  users.groups.keys.members = [ group ];
+
   mailserver.ldap = {
     # note: in `ldapsearch` first comes filter, then attributes
     dovecot.userAttrs = "+"; # all operational attributes
@@ -113,7 +129,13 @@ in
     passdb {
       driver = oauth2
       mechanisms = xoauth2 oauthbearer
-      args = ${dovecot-oauth2-conf-file}
+      args = ${dovecot-oauth2-conf-fp}
+    }
+
+    passdb {
+      driver = checkpassword
+      mechanisms = plain login
+      args = ${dovecot-auth-script}/bin/dovecot-auth-script.sh
     }
 
     passdb {
@@ -157,13 +179,22 @@ in
   services.dovecot2.enablePAM = false;
   systemd.services.dovecot2 = {
     # TODO does it merge with existing preStart?
-    preStart = setPwdInLdapConfFile + "\n";
+    preStart = setPwdInLdapConfFile + "\n" + write-dovecot-oauth2-conf + "\n";
     # FIXME pass dependant services to auth module option instead?
     wants = [ auth-passthru.oauth2-systemd-service ];
     after = [ auth-passthru.oauth2-systemd-service ];
     serviceConfig.RuntimeDirectory = lib.mkForce [ runtime-directory ];
   };
 
+  systemd.services.kanidm.serviceConfig.ExecStartPre = lib.mkAfter [
+    ("-" + oauth-secret-ExecStartPreScript)
+  ];
   # does it merge with existing restartTriggers?
-  systemd.services.postfix.restartTriggers = [ setPwdInLdapConfFile ];
+  systemd.services.postfix.restartTriggers = [
+    setPwdInLdapConfFile
+    write-dovecot-oauth2-conf
+  ];
+  selfprivacy.passthru.mailserver = {
+    inherit oauth-client-id oauth-client-secret-fp;
+  };
 }

@@ -5,24 +5,21 @@ let
   is-auth-enabled = config.selfprivacy.modules.auth.enable or false;
   auth-passthru = config.passthru.selfprivacy.auth;
   auth-fqdn = auth-passthru.auth-fqdn;
-  oauth-client-id = "roundcube";
-  roundcube-user = "roundcube";
-  roundcube-group = "roundcube";
-  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPre-root-script.sh"
-    ''
-      # set-group-ID bit allows for kanidm user to create files,
-      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${oauth-client-id}
-      chown kanidm:${roundcube-group} /run/keys/${oauth-client-id}
-    '';
+  sp-module-name = "roundcube";
+  user = "roundcube";
+  group = "roundcube";
+  oauth-donor = config.selfprivacy.passthru.mailserver;
   kanidm-oauth-client-secret-fp =
-    "/run/keys/${oauth-client-id}/kanidm-oauth-client-secret";
-  kanidmExecStartPreScript = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
-    set -o xtrace
-    [ -f "${kanidm-oauth-client-secret-fp}" ] || \
-      "${lib.getExe pkgs.openssl}" rand -base64 -out "${kanidm-oauth-client-secret-fp}" 32
-  '';
+    "/run/keys/${group}/kanidm-oauth-client-secret";
+  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
+    "${sp-module-name}-kanidm-ExecStartPre-root-script.sh"
+    ''
+      # set-group-ID bit allows for kanidm user to create files inheriting group
+      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${group}
+      chown kanidm:${group} /run/keys/${group}
+
+      install -v -m640 -o kanidm -g ${group} ${oauth-donor.oauth-client-secret-fp} ${kanidm-oauth-client-secret-fp}
+    '';
 in
 {
   options.selfprivacy.modules.roundcube = {
@@ -72,21 +69,23 @@ in
       };
 
       systemd.slices.roundcube.description = "Roundcube service slice";
+      # Roundcube depends on Dovecot and its OAuth2 client secret.
+      systemd.services.roundcube.after = [ "dovecot2.service" ];
     }
     # the following part is active only when "auth" module is enabled
     (lib.attrsets.optionalAttrs
       (options.selfprivacy.modules ? "auth")
       (lib.mkIf is-auth-enabled {
         # for phpfpm-roundcube to have access to get through /run/keys directory
-        users.groups.keys.members = [ roundcube-user ];
+        users.groups.keys.members = [ user ];
         services.roundcube.extraConfig = lib.mkAfter ''
           $config['oauth_provider'] = 'generic';
           $config['oauth_provider_name'] = '${auth-passthru.oauth2-provider-name}';
-          $config['oauth_client_id'] = '${oauth-client-id}';
+          $config['oauth_client_id'] = '${oauth-donor.oauth-client-id}';
           $config['oauth_client_secret'] = file_get_contents('${kanidm-oauth-client-secret-fp}');
           $config['oauth_auth_uri'] = 'https://${auth-fqdn}/ui/oauth2';
           $config['oauth_token_uri'] = 'https://${auth-fqdn}/oauth2/token';
-          $config['oauth_identity_uri'] = 'https://${auth-fqdn}/oauth2/openid/${oauth-client-id}/userinfo';
+          $config['oauth_identity_uri'] = 'https://${auth-fqdn}/oauth2/openid/${oauth-donor.oauth-client-id}/userinfo';
           $config['oauth_scope'] = 'email profile openid'; # FIXME
           $config['oauth_auth_parameters'] = [];
           $config['oauth_identity_fields'] = ['email'];
@@ -96,11 +95,9 @@ in
           # $config['oauth_pkce'] = 'S256'; # FIXME
         '';
         systemd.services.kanidm = {
-          serviceConfig.ExecStartPre = lib.mkAfter [
+          serviceConfig.ExecStartPre = lib.mkBefore [
             ("-+" + kanidmExecStartPreScriptRoot)
-            ("-" + kanidmExecStartPreScript)
           ];
-          requires = [ auth-passthru.oauth2-systemd-service ];
         };
         services.kanidm.provision = {
           groups = {
@@ -108,7 +105,7 @@ in
             "sp.roundcube.users".members =
               [ "sp.roundcube.admins" auth-passthru.full-users-group ];
           };
-          systems.oauth2.roundcube = {
+          systems.oauth2.${oauth-donor.oauth-client-id} = {
             displayName = "Roundcube";
             originUrl = "https://${cfg.subdomain}.${domain}/index.php/login/oauth";
             originLanding = "https://${cfg.subdomain}.${domain}/";

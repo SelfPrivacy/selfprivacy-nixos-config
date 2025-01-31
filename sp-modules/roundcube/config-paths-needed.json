@@ -7,5 +7,7 @@
   [ "passthru", "selfprivacy", "auth", "oauth2-systemd-service" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "modules", "auth" ],
-  [ "selfprivacy", "modules", "roundcube" ]
+  [ "selfprivacy", "modules", "roundcube" ],
+  [ "selfprivacy", "passthru", "mailserver", "oauth-client-id" ],
+  [ "selfprivacy", "passthru", "mailserver", "oauth-client-secret-fp" ]
 ]

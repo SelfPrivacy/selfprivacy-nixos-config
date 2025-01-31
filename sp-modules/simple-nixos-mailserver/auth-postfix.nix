@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }@nixos-args:
 let
   inherit (import ./common.nix nixos-args)
-    appendLdapBindPwd
+    appendSetting
     auth-passthru
     is-auth-enabled
     ;
@@ -29,7 +29,7 @@ let
     query_filter = ${cfg.ldap.postfix.filter}
     result_attribute = ${cfg.ldap.postfix.mailAttribute}
   '';
-  appendPwdInSenderLoginMap = appendLdapBindPwd {
+  appendPwdInSenderLoginMap = appendSetting {
     name = "ldap-sender-login-map";
     file = ldapSenderLoginMap;
     prefix = "bind_pw = ";
@@ -43,7 +43,7 @@ let
     result_attribute = ${cfg.ldap.postfix.uidAttribute}
   '';
   ldapVirtualMailboxMapFile = "/run/postfix/ldap-virtual-mailbox-map.cf";
-  appendPwdInVirtualMailboxMap = appendLdapBindPwd {
+  appendPwdInVirtualMailboxMap = appendSetting {
     name = "ldap-virtual-mailbox-map";
     file = ldapVirtualMailboxMap;
     prefix = "bind_pw = ";

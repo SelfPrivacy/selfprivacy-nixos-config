@@ -5,20 +5,22 @@ let
   inherit (import ./common.nix { inherit config pkgs; })
     auth-passthru
     domain
+    group
     is-auth-enabled
     ;
 
   mailserver-service-account-name = "sp.mailserver.service-account";
   mailserver-service-account-token-name = "mailserver-service-account-token";
   mailserver-service-account-token-fp =
-    "/run/keys/mailserver/kanidm-service-account-token"; # FIXME sync with auth module
-  kanidmExecStartPostScriptRoot = pkgs.writeShellScript
-    "mailserver-kanidm-ExecStartPost-root-script.sh"
+    "/run/keys/${group}/kanidm-service-account-token"; # FIXME sync with auth module
+  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
+    "mailserver-kanidm-ExecStartPre-root-script.sh"
     ''
-      # set-group-ID bit allows for kanidm user to create files,
-      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/mailserver
-      chown kanidm:kanidm /run/keys/mailserver
+      # set-group-ID bit allows for kanidm user to create files inheriting group
+      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${group}
+      chown kanidm:${group} /run/keys/${group}
     '';
+  # create service account token, needed for LDAP
   kanidmExecStartPostScript = pkgs.writeShellScript
     "mailserver-kanidm-ExecStartPost-script.sh"
     ''
@@ -173,7 +175,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (lib.mkMerge [
       };
     };
   }
-  # the following part is active only when "auth" module is enabled
+  # the following parts are active only when "auth" module is enabled
   (lib.attrsets.optionalAttrs
     (options.selfprivacy.modules ? "auth")
     (lib.mkIf is-auth-enabled {
@@ -199,9 +201,11 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (lib.mkMerge [
         };
       };
       # FIXME set auth module option instead
+      systemd.services.kanidm.serviceConfig.ExecStartPre = lib.mkBefore [
+        ("-+" + kanidmExecStartPreScriptRoot)
+      ];
       systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter [
-        ("+" + kanidmExecStartPostScriptRoot)
-        kanidmExecStartPostScript
+        ("-" + kanidmExecStartPostScript)
       ];
     }))
   (lib.attrsets.optionalAttrs
