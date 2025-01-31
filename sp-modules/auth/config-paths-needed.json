@@ -1,5 +1,4 @@
 [
-  [ "passthru", "selfprivacy", "auth" ],
   [ "security", "acme", "certs" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "modules", "auth" ],

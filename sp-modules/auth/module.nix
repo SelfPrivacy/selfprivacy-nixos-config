@@ -1,8 +1,20 @@
 { config, lib, pkgs, ... }:
 let
-  passthru = config.passthru.selfprivacy.auth;
   cfg = config.selfprivacy.modules.auth;
   domain = config.selfprivacy.domain;
+  auth-fqdn = cfg.subdomain + "." + domain;
+
+  # e.g. "dc=mydomain,dc=com"
+  ldap-base-dn =
+    lib.strings.concatMapStringsSep
+      ","
+      (x: "dc=" + x)
+      (lib.strings.splitString "." domain);
+  ldap-host = "127.0.0.1";
+  ldap-port = 3636;
+
+  admins-group = "sp.admins";
+  full-users-group = "sp.full_users";
 
   kanidm-bind-address = "127.0.0.1:3013";
 
@@ -75,7 +87,7 @@ in
         # included if it is non-standard (any port except 443). This must match or
         # be a descendent of the domain name you configure above. If these two
         # items are not consistent, the server WILL refuse to start!
-        origin = "https://" + passthru.auth-fqdn;
+        origin = "https://" + auth-fqdn;
 
         # TODO revise this: maybe kanidm must not have access to a public TLS
         tls_chain =
@@ -87,7 +99,7 @@ in
         bindaddress = kanidm-bind-address;
 
         ldapbindaddress =
-          "${passthru.ldap-host}:${toString passthru.ldap-port}";
+          "${ldap-host}:${toString ldap-port}";
 
         # kanidm is behind a proxy
         trust_x_forward_for = true;
@@ -97,12 +109,12 @@ in
       provision = {
         enable = true;
         autoRemove = true; # if false, obsolete oauth2 scopeMaps remain
-        groups.${passthru.admins-group}.present = true;
-        groups.${passthru.full-users-group}.present = true;
+        groups.${admins-group}.present = true;
+        groups.${full-users-group}.present = true;
       };
       enableClient = true;
       clientSettings = {
-        uri = "https://" + passthru.auth-fqdn;
+        uri = "https://" + auth-fqdn;
         verify_ca = false; # FIXME
         verify_hostnames = false; # FIXME
       };
@@ -119,7 +131,7 @@ in
                                       '[Response Body]: $resp_body\n\n';
         lua_package_path "${lua_path}";
       '';
-      virtualHosts.${passthru.auth-fqdn} = {
+      virtualHosts.${auth-fqdn} = {
         useACMEHost = domain;
         forceSSL = true;
         locations."/" = {
@@ -168,10 +180,17 @@ in
     systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter
       [ spApiUserExecStartPostScript ];
 
-    passthru.selfprivacy.auth = rec {
-      auth-fqdn = cfg.subdomain + "." + domain;
-      oauth2-introspection-url = client_id: client_secret:
-        "https://${client_id}:${client_secret}@${auth-fqdn}/oauth2/token/introspect";
+    passthru.selfprivacy.auth = {
+      inherit
+        admins-group
+        auth-fqdn
+        full-users-group
+        ldap-host
+        ldap-port
+        ;
+      oauth2-introspection-url-prefix = client_id: "https://${client_id}:";
+      oauth2-introspection-url-postfix =
+        "@${auth-fqdn}/oauth2/token/introspect";
       oauth2-discovery-url = client_id:
         "https://${auth-fqdn}/oauth2/openid/${client_id}/.well-known/openid-configuration";
       oauth2-provider-name = "Kanidm";
@@ -183,11 +202,6 @@ in
           ","
           (x: "dc=" + x)
           (lib.strings.splitString "." domain);
-      ldap-host = "127.0.0.1";
-      ldap-port = 3636;
-
-      admins-group = "sp.admins";
-      full-users-group = "sp.full_users";
     };
   };
 }
