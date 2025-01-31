@@ -53,17 +53,32 @@ let
 in
 {
   options.selfprivacy.modules.auth = {
-    enable = lib.mkOption {
+    enable = (lib.mkOption {
       default = false;
       type = lib.types.bool;
+    }) // {
+      meta = {
+        type = "enable";
+      };
     };
-    subdomain = lib.mkOption {
+    subdomain = (lib.mkOption {
       default = "auth";
       type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+    }) // {
+      meta = {
+        widget = "subdomain";
+        type = "string";
+        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        weight = 0;
+      };
     };
-    debug = lib.mkOption {
+    debug = (lib.mkOption {
       default = false;
       type = lib.types.bool;
+    }) // {
+      meta = {
+        type = "enable";
+      };
     };
   };
 
