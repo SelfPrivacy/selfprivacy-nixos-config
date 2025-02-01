@@ -41,5 +41,22 @@
 
     configPathsNeeded =
       builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
+
+    meta = { lib, ... }: {
+      spModuleSchemaVersion = 1;
+      id = "auth";
+      name = "Auth";
+      description = "Temporary auth module.";
+      svgIcon = builtins.readFile ./icon.svg;
+      isMovable = false;
+      isRequired = false;
+      backupDescription = "Useless service.";
+      systemdServices = [ "kanidm.service" ];
+      folders = [ ];
+      license = [ ];
+      homepage = "https://kanidm.com";
+      sourcePage = "https://github.com/kanidm";
+      supportLevel = "hallucinatory";
+    };
   };
 }
