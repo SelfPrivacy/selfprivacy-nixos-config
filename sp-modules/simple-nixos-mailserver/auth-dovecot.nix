@@ -181,8 +181,8 @@ in
     # TODO does it merge with existing preStart?
     preStart = setPwdInLdapConfFile + "\n" + write-dovecot-oauth2-conf + "\n";
     # FIXME pass dependant services to auth module option instead?
-    wants = [ auth-passthru.oauth2-systemd-service ];
     after = [ auth-passthru.oauth2-systemd-service ];
+    requires = [ auth-passthru.oauth2-systemd-service ];
     serviceConfig.RuntimeDirectory = lib.mkForce [ runtime-directory ];
   };
 

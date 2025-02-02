@@ -378,6 +378,7 @@ in
             -vvv
           '';
           # TODO consider passing oauth consumer service to auth module instead
+          after = [ auth-passthru.oauth2-systemd-service ];
           requires = [ auth-passthru.oauth2-systemd-service ];
         };
         services.kanidm.provision = {

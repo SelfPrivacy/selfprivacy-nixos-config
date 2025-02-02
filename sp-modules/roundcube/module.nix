@@ -103,6 +103,10 @@ in
           $config['oauth_verify_peer'] = false; # FIXME
           # $config['oauth_pkce'] = 'S256'; # FIXME
         '';
+        systemd.services.roundcube = {
+          after = [ auth-passthru.oauth2-systemd-service ];
+          requires = [ auth-passthru.oauth2-systemd-service ];
+        };
         systemd.services.kanidm = {
           serviceConfig.ExecStartPre = lib.mkBefore [
             ("-+" + kanidmExecStartPreScriptRoot)
