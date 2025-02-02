@@ -16,7 +16,7 @@ let
   ];
   is-auth-enabled = cfg.enableSso;
   oauth-client-id = "forgejo";
-  auth-passthru = config.passthru.selfprivacy.auth;
+  auth-passthru = config.selfprivacy.passthru.auth;
   oauth2-provider-name = auth-passthru.oauth2-provider-name;
   redirect-uri =
     "https://${cfg.subdomain}.${sp.domain}/user/oauth2/${oauth2-provider-name}/callback";

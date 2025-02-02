@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 rec {
-  auth-passthru = config.passthru.selfprivacy.auth;
+  auth-passthru = config.selfprivacy.passthru.auth;
   domain = config.selfprivacy.domain;
   group = "dovecot2";
   is-auth-enabled =

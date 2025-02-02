@@ -1,13 +1,13 @@
 [
   [ "mailserver", "fqdn" ],
-  [ "passthru", "selfprivacy", "auth", "admins-group" ],
-  [ "passthru", "selfprivacy", "auth", "auth-fqdn" ],
-  [ "passthru", "selfprivacy", "auth", "full-users-group" ],
-  [ "passthru", "selfprivacy", "auth", "oauth2-provider-name" ],
-  [ "passthru", "selfprivacy", "auth", "oauth2-systemd-service" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "modules", "auth" ],
   [ "selfprivacy", "modules", "roundcube" ],
+  [ "selfprivacy", "passthru", "auth", "admins-group" ],
+  [ "selfprivacy", "passthru", "auth", "auth-fqdn" ],
+  [ "selfprivacy", "passthru", "auth", "full-users-group" ],
+  [ "selfprivacy", "passthru", "auth", "oauth2-provider-name" ],
+  [ "selfprivacy", "passthru", "auth", "oauth2-systemd-service" ],
   [ "selfprivacy", "passthru", "mailserver", "oauth-client-id" ],
   [ "selfprivacy", "passthru", "mailserver", "oauth-client-secret-fp" ]
 ]

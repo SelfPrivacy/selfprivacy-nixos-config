@@ -3,7 +3,7 @@ let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.roundcube;
   is-auth-enabled = cfg.enableSso;
-  auth-passthru = config.passthru.selfprivacy.auth;
+  auth-passthru = config.selfprivacy.passthru.auth;
   auth-fqdn = auth-passthru.auth-fqdn;
   sp-module-name = "roundcube";
   user = "roundcube";

@@ -4,12 +4,6 @@ let
   domain = config.selfprivacy.domain;
   auth-fqdn = cfg.subdomain + "." + domain;
 
-  # e.g. "dc=mydomain,dc=com"
-  ldap-base-dn =
-    lib.strings.concatMapStringsSep
-      ","
-      (x: "dc=" + x)
-      (lib.strings.splitString "." domain);
   ldap-host = "127.0.0.1";
   ldap-port = 3636;
 
@@ -214,7 +208,7 @@ in
     systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter
       [ spApiUserExecStartPostScript ];
 
-    passthru.selfprivacy.auth = {
+    selfprivacy.passthru.auth = {
       inherit
         admins-group
         auth-fqdn
