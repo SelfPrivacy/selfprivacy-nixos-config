@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, ... }:
 
 with lib;
 {
@@ -144,7 +144,7 @@ with lib;
     ################
     passthru = mkOption {
       type = types.submodule {
-        freeformType = (pkgs.formats.json { }).type;
+        freeformType = with types; lazyAttrsOf (uniq unspecified);
         options = { };
       };
       default = { };
