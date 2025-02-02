@@ -11,6 +11,7 @@
   [ "selfprivacy", "passthru", "auth", "oauth2-discovery-url" ],
   [ "selfprivacy", "passthru", "auth", "oauth2-provider-name" ],
   [ "selfprivacy", "passthru", "auth", "oauth2-systemd-service" ],
+  [ "selfprivacy", "sso", "enable" ],
   [ "selfprivacy", "useBinds" ],
   [ "services", "nextcloud" ],
   [ "services", "phpfpm", "pools", "nextcloud", "group" ],

@@ -71,6 +71,15 @@ let
 in
 lib.mkIf sp.modules.simple-nixos-mailserver.enable (lib.mkMerge [
   {
+    assertions = [
+      {
+        assertion =
+          config.selfprivacy.modules.simple-nixos-mailserver.enableSso
+          -> config.selfprivacy.sso.enable;
+        message =
+          "SSO cannot be enabled for Roundcube when SSO is disabled globally.";
+      }
+    ];
     fileSystems = lib.mkIf sp.useBinds
       {
         "/var/vmail" = {

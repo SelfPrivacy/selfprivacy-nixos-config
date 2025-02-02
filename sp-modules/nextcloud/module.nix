@@ -152,6 +152,13 @@ in
   # config = lib.mkIf sp.modules.nextcloud.enable
   config = lib.mkIf sp.modules.nextcloud.enable (lib.mkMerge [
     {
+      assertions = [
+        {
+          assertion = cfg.enableSso -> sp.sso.enable;
+          message =
+            "SSO cannot be enabled for Nextcloud when SSO is disabled globally.";
+        }
+      ];
       fileSystems = lib.mkIf sp.useBinds {
         "/var/lib/nextcloud" = {
           device = "/volumes/${cfg.location}/nextcloud";

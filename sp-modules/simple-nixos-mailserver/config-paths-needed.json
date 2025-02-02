@@ -15,6 +15,7 @@
   [ "selfprivacy", "passthru", "auth", "oauth2-systemd-service" ],
   [ "selfprivacy", "passthru", "roundcube", "oauth-client-id" ],
   [ "selfprivacy", "passthru", "roundcube", "oauth-client-secret-fp" ],
+  [ "selfprivacy", "sso", "enable" ],
   [ "selfprivacy", "useBinds" ],
   [ "selfprivacy", "username" ],
   [ "selfprivacy", "users" ],

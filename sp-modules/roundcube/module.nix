@@ -57,6 +57,13 @@ in
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
     {
+      assertions = [
+        {
+          assertion = cfg.enableSso -> config.selfprivacy.sso.enable;
+          message =
+            "SSO cannot be enabled for Roundcube when SSO is disabled globally.";
+        }
+      ];
       services.roundcube = {
         enable = true;
         # this is the url of the vhost, not necessarily the same as the fqdn of

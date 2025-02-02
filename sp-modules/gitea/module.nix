@@ -200,6 +200,13 @@ in
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
     {
+      assertions = [
+        {
+          assertion = cfg.enableSso -> sp.sso.enable;
+          message =
+            "SSO cannot be enabled for Forgejo when SSO is disabled globally.";
+        }
+      ];
       fileSystems = lib.mkIf sp.useBinds {
         "/var/lib/gitea" = {
           device = "/volumes/${cfg.location}/gitea";

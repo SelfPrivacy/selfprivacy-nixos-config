@@ -9,5 +9,6 @@
   [ "selfprivacy", "passthru", "auth", "oauth2-provider-name" ],
   [ "selfprivacy", "passthru", "auth", "oauth2-systemd-service" ],
   [ "selfprivacy", "passthru", "mailserver", "oauth-client-id" ],
-  [ "selfprivacy", "passthru", "mailserver", "oauth-client-secret-fp" ]
+  [ "selfprivacy", "passthru", "mailserver", "oauth-client-secret-fp" ],
+  [ "selfprivacy", "sso", "enable" ]
 ]
