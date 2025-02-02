@@ -34,6 +34,18 @@ with lib;
         type = types.nullOr types.bool;
       };
     };
+    sso = {
+      enable = mkOption {
+        description = "Enable SSO.";
+        default = true;
+        type = types.nullOr types.bool;
+      };
+      debug = mkOption {
+        description = "Enable debug for SSO.";
+        default = false;
+        type = types.nullOr types.bool;
+      };
+    };
     stateVersion = mkOption {
       description = "State version of the server";
       type = types.nullOr types.str;

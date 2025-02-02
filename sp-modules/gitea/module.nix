@@ -14,7 +14,7 @@ let
     "gitea-light"
     "gitea-dark"
   ];
-  is-auth-enabled = cfg.enableSso;
+  is-auth-enabled = cfg.enableSso && config.selfprivacy.sso.enable;
   oauth-client-id = "forgejo";
   auth-passthru = config.selfprivacy.passthru.auth;
   oauth2-provider-name = auth-passthru.oauth2-provider-name;

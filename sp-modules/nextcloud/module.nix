@@ -12,7 +12,7 @@ let
   hostName = "${cfg.subdomain}.${sp.domain}";
   auth-passthru = config.selfprivacy.passthru.auth;
   cfg = sp.modules.nextcloud;
-  is-auth-enabled = cfg.enableSso;
+  is-auth-enabled = cfg.enableSso && config.selfprivacy.sso.enable;
   ldap_scheme_and_host = "ldaps://${auth-passthru.ldap-host}";
 
   occ = "${config.services.nextcloud.occ}/bin/nextcloud-occ";

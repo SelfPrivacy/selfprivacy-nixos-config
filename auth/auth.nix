@@ -1,8 +1,8 @@
 nixpkgs-2411: { config, lib, pkgs, ... }:
 let
-  cfg = config.selfprivacy.modules.auth;
   domain = config.selfprivacy.domain;
-  auth-fqdn = cfg.subdomain + "." + domain;
+  subdomain = "auth";
+  auth-fqdn = subdomain + "." + domain;
 
   ldap-host = "127.0.0.1";
   ldap-port = 3636;
@@ -46,37 +46,7 @@ let
   lua_path = "${lua_core_path};${lua_lrucache_path};";
 in
 {
-  options.selfprivacy.modules.auth = {
-    enable = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-    }) // {
-      meta = {
-        type = "enable";
-      };
-    };
-    subdomain = (lib.mkOption {
-      default = "auth";
-      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-    }) // {
-      meta = {
-        widget = "subdomain";
-        type = "string";
-        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-        weight = 0;
-      };
-    };
-    debug = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-    }) // {
-      meta = {
-        type = "enable";
-      };
-    };
-  };
-
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf config.selfprivacy.sso.enable {
     nixpkgs.overlays = [
       (
         _final: prev: {
@@ -132,7 +102,7 @@ in
         # kanidm is behind a proxy
         trust_x_forward_for = true;
 
-        log_level = if cfg.debug then "trace" else "info";
+        log_level = if config.selfprivacy.sso.debug then "trace" else "info";
       };
       provision = {
         enable = true;
@@ -151,8 +121,8 @@ in
     services.nginx = {
       enable = true;
       additionalModules =
-        lib.mkIf cfg.debug [ pkgs.nginxModules.lua ];
-      commonHttpConfig = lib.mkIf cfg.debug ''
+        lib.mkIf config.selfprivacy.sso.debug [ pkgs.nginxModules.lua ];
+      commonHttpConfig = lib.mkIf config.selfprivacy.sso.debug ''
         log_format kanidm escape=none '$request $status\n'
                                       '[Request body]: $request_body\n'
                                       '[Header]: $resp_header\n'
@@ -163,7 +133,7 @@ in
         useACMEHost = domain;
         forceSSL = true;
         locations."/" = {
-          extraConfig = lib.mkIf cfg.debug ''
+          extraConfig = lib.mkIf config.selfprivacy.sso.debug ''
             access_log /var/log/nginx/kanidm.log kanidm;
 
             lua_need_request_body on;

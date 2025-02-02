@@ -4,7 +4,8 @@ rec {
   domain = config.selfprivacy.domain;
   group = "dovecot2";
   is-auth-enabled =
-    config.selfprivacy.modules.simple-nixos-mailserver.enableSso;
+    config.selfprivacy.modules.simple-nixos-mailserver.enableSso
+    && config.selfprivacy.sso.enable;
 
   appendSetting =
     { name, file, prefix, suffix ? "", passwordFile, destination }:
