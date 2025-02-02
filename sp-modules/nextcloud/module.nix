@@ -1,4 +1,4 @@
-{ config, lib, options, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   inherit (import ./common.nix config)
     admin-pass-filepath
@@ -276,133 +276,131 @@ in
       };
     }
     # the following part is active only when "auth" module is enabled
-    (lib.attrsets.optionalAttrs
-      (options.selfprivacy.modules ? "auth")
-      (lib.mkIf is-auth-enabled {
-        systemd.services.nextcloud-setup = {
-          path = [ pkgs.jq ];
-          script = ''
-            set -o errexit
-            set -o nounset
-            ${lib.strings.optionalString cfg.debug "set -o xtrace"}
+    (lib.mkIf is-auth-enabled {
+      systemd.services.nextcloud-setup = {
+        path = [ pkgs.jq ];
+        script = ''
+          set -o errexit
+          set -o nounset
+          ${lib.strings.optionalString cfg.debug "set -o xtrace"}
 
-            ${occ} app:install user_ldap || :
-            ${occ} app:enable  user_ldap
+          ${occ} app:install user_ldap || :
+          ${occ} app:enable  user_ldap
 
-            # The following code tries to match an existing config or creates a new one.
-            # The criteria for matching is the ldapHost value.
+          # The following code tries to match an existing config or creates a new one.
+          # The criteria for matching is the ldapHost value.
 
-            # remove broken link after previous nextcloud (un)installation
-            [[ ! -f "${override-config-fp}" && -L "${override-config-fp}" ]] && \
-              rm -v "${override-config-fp}"
+          # remove broken link after previous nextcloud (un)installation
+          [[ ! -f "${override-config-fp}" && -L "${override-config-fp}" ]] && \
+            rm -v "${override-config-fp}"
 
-            ALL_CONFIG="$(${occ} ldap:show-config --output=json)"
+          ALL_CONFIG="$(${occ} ldap:show-config --output=json)"
 
-            MATCHING_CONFIG_IDs="$(jq '[to_entries[] | select(.value.ldapHost=="${ldap_scheme_and_host}") | .key]' <<<"$ALL_CONFIG")"
-            if [[ $(jq 'length' <<<"$MATCHING_CONFIG_IDs") > 0 ]]; then
-              CONFIG_ID="$(jq --raw-output '.[0]' <<<"$MATCHING_CONFIG_IDs")"
-            else
-              CONFIG_ID="$(${occ} ldap:create-empty-config --only-print-prefix)"
-            fi
+          MATCHING_CONFIG_IDs="$(jq '[to_entries[] | select(.value.ldapHost=="${ldap_scheme_and_host}") | .key]' <<<"$ALL_CONFIG")"
+          if [[ $(jq 'length' <<<"$MATCHING_CONFIG_IDs") > 0 ]]; then
+            CONFIG_ID="$(jq --raw-output '.[0]' <<<"$MATCHING_CONFIG_IDs")"
+          else
+            CONFIG_ID="$(${occ} ldap:create-empty-config --only-print-prefix)"
+          fi
 
-            echo "Using configId $CONFIG_ID"
+          echo "Using configId $CONFIG_ID"
 
-            # The following CLI commands follow
-            # https://github.com/lldap/lldap/blob/main/example_configs/nextcloud.md#nextcloud-config--the-cli-way
+          # The following CLI commands follow
+          # https://github.com/lldap/lldap/blob/main/example_configs/nextcloud.md#nextcloud-config--the-cli-way
 
-            # StartTLS is not supported in Kanidm due to security risks, whereas
-            # user_ldap doesn't support SASL. Importing certificate doesn't
-            # help:
-            # ${occ} security:certificates:import "${config.security.acme.certs.${domain}.directory}/cert.pem"
-            ${occ} ldap:set-config "$CONFIG_ID" 'turnOffCertCheck' '1'
+          # StartTLS is not supported in Kanidm due to security risks, whereas
+          # user_ldap doesn't support SASL. Importing certificate doesn't
+          # help:
+          # ${occ} security:certificates:import "${config.security.acme.certs.${domain}.directory}/cert.pem"
+          ${occ} ldap:set-config "$CONFIG_ID" 'turnOffCertCheck' '1'
 
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapHost' '${ldap_scheme_and_host}'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapPort' '${toString auth-passthru.ldap-port}'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentName' 'dn=token'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentPassword' "$(<${kanidm-service-account-token-fp})"
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapBase' '${auth-passthru.ldap-base-dn}'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapBaseGroups' '${auth-passthru.ldap-base-dn}'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapBaseUsers' '${auth-passthru.ldap-base-dn}'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapEmailAttribute' 'mail'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupFilter' \
-                      '(&(class=group)(${wildcard-group}))'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupFilterGroups' \
-                      '(&(class=group)(${wildcard-group}))'
-            # ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupFilterObjectclass' \
-            #           'groupOfUniqueNames'
-            # ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupMemberAssocAttr' \
-            #           'uniqueMember'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapLoginFilter' \
-                      '(&(class=person)(memberof=${users-group})(uid=%uid))'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapLoginFilterAttributes' \
-                      'uid'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserDisplayName' \
-                      'displayname'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserFilter' \
-                      '(&(class=person)(memberof=${users-group})(name=%s))'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserFilterMode' \
-                      '1'
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserFilterObjectclass' \
-                      'person'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapHost' '${ldap_scheme_and_host}'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapPort' '${toString auth-passthru.ldap-port}'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentName' 'dn=token'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentPassword' "$(<${kanidm-service-account-token-fp})"
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapBase' '${auth-passthru.ldap-base-dn}'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapBaseGroups' '${auth-passthru.ldap-base-dn}'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapBaseUsers' '${auth-passthru.ldap-base-dn}'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapEmailAttribute' 'mail'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupFilter' \
+                    '(&(class=group)(${wildcard-group})'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupFilterGroups' \
+                    '(&(class=group)(${wildcard-group}))'
+          # ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupFilterObjectclass' \
+          #           'groupOfUniqueNames'
+          # ${occ} ldap:set-config "$CONFIG_ID" 'ldapGroupMemberAssocAttr' \
+          #           'uniqueMember'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapLoginFilter' \
+                    '(&(class=person)(memberof=${users-group})(uid=%uid))'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapLoginFilterAttributes' \
+                    'uid'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserDisplayName' \
+                    'displayname'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserFilter' \
+                    '(&(class=person)(memberof=${users-group})(name=%s))'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserFilterMode' \
+                    '1'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapUserFilterObjectclass' \
+                    'person'
 
-            ${occ} ldap:test-config -- "$CONFIG_ID"
+          ${occ} ldap:test-config -- "$CONFIG_ID"
 
-            # delete all configs except "$CONFIG_ID"
-            for configid in $(jq --raw-output "keys[] | select(. != \"$CONFIG_ID\")" <<<"$ALL_CONFIG"); do
-              echo "Deactivating $configid"
-              ${occ} ldap:set-config "$configid" 'ldapConfigurationActive' '0'
-              echo "Deactivated $configid"
-              echo "Deleting $configid"
-              ${occ} ldap:delete-config "$configid"
-              echo "Deleted $configid"
-            done
+          # delete all configs except "$CONFIG_ID"
+          for configid in $(jq --raw-output "keys[] | select(. != \"$CONFIG_ID\")" <<<"$ALL_CONFIG"); do
+            echo "Deactivating $configid"
+            ${occ} ldap:set-config "$configid" 'ldapConfigurationActive' '0'
+            echo "Deactivated $configid"
+            echo "Deleting $configid"
+            ${occ} ldap:delete-config "$configid"
+            echo "Deleted $configid"
+          done
 
-            ${occ} ldap:set-config "$CONFIG_ID" 'ldapConfigurationActive' '1'
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapConfigurationActive' '1'
 
-            ############################################################################
-            # OIDC app
-            ############################################################################
-            ${occ} app:install user_oidc || :
-            ${occ} app:enable  user_oidc
+          ############################################################################
+          # OIDC app
+          ############################################################################
+          ${occ} app:install user_oidc || :
+          ${occ} app:enable  user_oidc
 
-            ${occ} user_oidc:provider ${auth-passthru.oauth2-provider-name} \
-            --clientid="${oauth-client-id}" \
-            --clientsecret="$(<${kanidm-oauth-client-secret-fp})" \
-            --discoveryuri="${auth-passthru.oauth2-discovery-url "nextcloud"}" \
-            --unique-uid=0 \
-            --scope="email openid profile" \
-            --mapping-uid=preferred_username \
-            --no-interaction \
-            --mapping-groups=groups \
-            --group-provisioning=1 \
-            -vvv
-          '';
-          # TODO consider passing oauth consumer service to auth module instead
-          after = [ auth-passthru.oauth2-systemd-service ];
-          requires = [ auth-passthru.oauth2-systemd-service ];
+          ${occ} user_oidc:provider ${auth-passthru.oauth2-provider-name} \
+          --clientid="${oauth-client-id}" \
+          --clientsecret="$(<${kanidm-oauth-client-secret-fp})" \
+          --discoveryuri="${auth-passthru.oauth2-discovery-url "nextcloud"}" \
+          --unique-uid=0 \
+          --scope="email openid profile" \
+          --mapping-uid=preferred_username \
+          --no-interaction \
+          --mapping-groups=groups \
+          --group-provisioning=1 \
+          -vvv
+        '';
+        # TODO consider passing oauth consumer service to auth module instead
+        after = [ auth-passthru.oauth2-systemd-service ];
+        requires = [ auth-passthru.oauth2-systemd-service ];
+      };
+      services.kanidm.provision = {
+        groups = {
+          "${admins-group}".members = [ auth-passthru.admins-group ];
+          "${users-group}".members =
+            [ admins-group auth-passthru.full-users-group ];
         };
-        services.kanidm.provision = {
-          groups = {
-            "${admins-group}".members = [ auth-passthru.admins-group ];
-            "${users-group}".members =
-              [ admins-group auth-passthru.full-users-group ];
-          };
-          systems.oauth2.${oauth-client-id} = {
-            displayName = "Nextcloud";
-            originUrl = "https://${cfg.subdomain}.${domain}/apps/user_oidc/code";
-            originLanding = "https://${cfg.subdomain}.${domain}/";
-            basicSecretFile = kanidm-oauth-client-secret-fp;
-            # when true, name is passed to a service instead of name@domain
-            preferShortUsername = true;
-            allowInsecureClientDisablePkce = false;
-            scopeMaps.${users-group} = [ "email" "openid" "profile" ];
-            removeOrphanedClaimMaps = true;
-            claimMaps.groups = {
-              joinType = "array";
-              valuesByGroup.${admins-group} = [ "admin" ];
-            };
+        systems.oauth2.${oauth-client-id} = {
+          displayName = "Nextcloud";
+          originUrl = "https://${cfg.subdomain}.${domain}/apps/user_oidc/code";
+          originLanding = "https://${cfg.subdomain}.${domain}/";
+          basicSecretFile = kanidm-oauth-client-secret-fp;
+          # when true, name is passed to a service instead of name@domain
+          preferShortUsername = true;
+          allowInsecureClientDisablePkce = false;
+          scopeMaps.${users-group} = [ "email" "openid" "profile" ];
+          removeOrphanedClaimMaps = true;
+          claimMaps.groups = {
+            joinType = "array";
+            valuesByGroup.${admins-group} = [ "admin" ];
           };
         };
-      }))
+      };
+    })
   ]);
 }

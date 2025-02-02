@@ -1,4 +1,4 @@
-{ config, lib, options, pkgs, ... }@nixos-args:
+{ config, lib, pkgs, ... }@nixos-args:
 let
   sp = config.selfprivacy;
 
@@ -176,42 +176,36 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (lib.mkMerge [
     };
   }
   # the following parts are active only when "auth" module is enabled
-  (lib.attrsets.optionalAttrs
-    (options.selfprivacy.modules ? "auth")
-    (lib.mkIf is-auth-enabled {
-      mailserver = {
-        extraVirtualAliases = lib.mkForce { };
-        loginAccounts = lib.mkForce { };
-        # LDAP is needed for Postfix to query Kanidm about email address ownership.
-        # LDAP is needed for Dovecot also.
-        ldap = {
-          # false; otherwise, simple-nixos-mailserver enables auth via LDAP
-          enable = false;
+  (lib.mkIf is-auth-enabled {
+    mailserver = {
+      extraVirtualAliases = lib.mkForce { };
+      loginAccounts = lib.mkForce { };
+      # LDAP is needed for Postfix to query Kanidm about email address ownership.
+      # LDAP is needed for Dovecot also.
+      ldap = {
+        # false; otherwise, simple-nixos-mailserver enables auth via LDAP
+        enable = false;
 
-          # bind.dn = "uid=mail,ou=persons," + ldap_base_dn;
-          bind.dn = "dn=token";
-          # TODO change in this file should trigger system restart dovecot
-          bind.passwordFile = mailserver-service-account-token-fp;
+        # bind.dn = "uid=mail,ou=persons," + ldap_base_dn;
+        bind.dn = "dn=token";
+        # TODO change in this file should trigger system restart dovecot
+        bind.passwordFile = mailserver-service-account-token-fp;
 
-          # searchBase = "ou=persons," + ldap_base_dn;
-          searchBase = auth-passthru.ldap-base-dn; # TODO refine this
+        # searchBase = "ou=persons," + ldap_base_dn;
+        searchBase = auth-passthru.ldap-base-dn; # TODO refine this
 
-          # NOTE: 127.0.0.1 instead of localhost doesn't work (maybe because of TLS)
-          uris = [ "ldaps://localhost:${toString auth-passthru.ldap-port}" ];
-        };
+        # NOTE: 127.0.0.1 instead of localhost doesn't work (maybe because of TLS)
+        uris = [ "ldaps://localhost:${toString auth-passthru.ldap-port}" ];
       };
-      # FIXME set auth module option instead
-      systemd.services.kanidm.serviceConfig.ExecStartPre = lib.mkBefore [
-        ("-+" + kanidmExecStartPreScriptRoot)
-      ];
-      systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter [
-        ("-" + kanidmExecStartPostScript)
-      ];
-    }))
-  (lib.attrsets.optionalAttrs
-    (options.selfprivacy.modules ? "auth")
-    (lib.mkIf is-auth-enabled (import ./auth-dovecot.nix nixos-args)))
-  (lib.attrsets.optionalAttrs
-    (options.selfprivacy.modules ? "auth")
-    (lib.mkIf is-auth-enabled (import ./auth-postfix.nix nixos-args)))
+    };
+    # FIXME set auth module option instead
+    systemd.services.kanidm.serviceConfig.ExecStartPre = lib.mkBefore [
+      ("-+" + kanidmExecStartPreScriptRoot)
+    ];
+    systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter [
+      ("-" + kanidmExecStartPostScript)
+    ];
+  })
+  (lib.mkIf is-auth-enabled (import ./auth-dovecot.nix nixos-args))
+  (lib.mkIf is-auth-enabled (import ./auth-postfix.nix nixos-args))
 ])
