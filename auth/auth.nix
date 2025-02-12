@@ -12,7 +12,21 @@ let
 
   kanidm-bind-address = "127.0.0.1:3013";
 
+  selfprivacy-group = config.users.users."selfprivacy-api".group;
+
   selfprivacy-service-account-name = "sp.selfprivacy-api.service-account";
+
+  kanidm-service-account-token-name =
+    "${selfprivacy-group}-service-account-token";
+  kanidm-service-account-token-fp =
+    "/run/keys/${selfprivacy-group}/kanidm-service-account-token";
+  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
+    "${selfprivacy-group}-kanidm-ExecStartPre-root-script.sh"
+    ''
+      # set-group-ID bit allows for kanidm user to create files,
+      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${selfprivacy-group}
+      chown kanidm:${selfprivacy-group} /run/keys/${selfprivacy-group}
+    '';
 
   spApiUserExecStartPostScript =
     pkgs.writeShellScript "spApiUserExecStartPostScript" ''
@@ -38,6 +52,26 @@ let
       fi
 
       $KANIDM group add-members idm_admins "${selfprivacy-service-account-name}"
+
+      # create a new read-write token for kanidm
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${selfprivacy-service-account-name}" "${kanidm-service-account-token-name}" --output json)"
+      then
+          echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
+          exit 1
+      fi
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN="$(echo "$KANIDM_SERVICE_ACCOUNT_TOKEN_JSON" | ${lib.getExe pkgs.jq} -r .result)"
+      then
+          echo "error: cannot get service-account API token from JSON"
+          exit 1
+      fi
+
+      if ! install --mode=640 \
+      <(printf "%s" "$KANIDM_SERVICE_ACCOUNT_TOKEN") \
+      ${kanidm-service-account-token-fp}
+      then
+          echo "error: cannot write token to \"${kanidm-service-account-token-fp}\""
+          exit 1
+      fi
     '';
 
   # lua stuff for debugging only
@@ -175,6 +209,8 @@ in
       };
     };
 
+    systemd.services.kanidm.serviceConfig.ExecStartPre =
+      [ ("+" + kanidmExecStartPreScriptRoot) ];
     systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter
       [ spApiUserExecStartPostScript ];
 
