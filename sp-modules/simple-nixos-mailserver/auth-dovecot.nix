@@ -9,43 +9,6 @@ let
     is-auth-enabled
     ;
 
-  dovecot-auth-script = pkgs.writeShellApplication {
-    name = "dovecot-auth-script.sh";
-    runtimeInputs = with pkgs; [ redis coreutils-full mkpasswd gnugrep ];
-    text = ''
-      CHECKPASSWORD_REPLY_BINARY="$1"
-
-      IFS= read -r -d ''' username <&3
-      IFS= read -r -d ''' password <&3
-
-      # Connect to Redis and retrieve all password hashes for the user
-      password_ids=$(redis-cli -s /run/redis-sp-api/redis.sock -n 1 KEYS priv/user/"$username"/passwords/*)
-
-      # Check if the provided password matches any of the stored hashed passwords
-      for password_id in $password_ids; do
-        stored_hash=$(redis-cli -s /run/redis-sp-api/redis.sock -n 1 HGET "$password_id" password)
-
-        if [[ $stored_hash == \$2[ayb]\$* ]]; then
-          # bcrypt hash
-          if echo "$password" | mkpasswd --method=bcrypt --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
-            # Update the last used date
-            redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET "$password_id" last_used "$(date -Iseconds -u)"
-            exec $CHECKPASSWORD_REPLY_BINARY
-          fi
-        elif [[ $stored_hash == \$6\$* ]]; then
-          # sha512-crypt hash
-          if echo "$password" | mkpasswd --method=sha-512 --stdin --salt="''${stored_hash#\$6\$}" | grep -q "^$stored_hash\$"; then
-            # Update the last used date
-            redis-cli -s /run/redis-sp-api/redis.sock -n 1 HSET "$password_id" last_used "$(date -Iseconds -u)"
-            exec $CHECKPASSWORD_REPLY_BINARY
-          fi
-        fi
-      done
-
-      exit 1
-    '';
-  };
-
   runtime-directory = group;
 
   ldapConfFile = "/run/${runtime-directory}/dovecot-ldap.conf.ext";
@@ -130,18 +93,6 @@ in
       driver = oauth2
       mechanisms = xoauth2 oauthbearer
       args = ${dovecot-oauth2-conf-fp}
-    }
-
-    passdb {
-      driver = checkpassword
-      mechanisms = plain login
-      args = ${dovecot-auth-script}/bin/dovecot-auth-script.sh
-    }
-
-    passdb {
-      driver = checkpassword
-      mechanisms = plain login
-      args = ${dovecot-auth-script}/bin/dovecot-auth-script.sh
     }
 
     userdb {
