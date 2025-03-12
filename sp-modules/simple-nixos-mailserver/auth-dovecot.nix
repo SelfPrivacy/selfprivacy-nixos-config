@@ -86,7 +86,7 @@ in
     # dovecot.userFilter = "(&(class=person)(uid=%n))";
   };
 
-  services.dovecot2.extraConfig = ''
+  services.dovecot2.extraConfig = [ ''
     auth_mechanisms = xoauth2 oauthbearer plain login
 
     passdb {
@@ -126,7 +126,7 @@ in
       args = ${ldapConfFile}
       default_fields = home=/var/vmail/${domain}/%u uid=${toString config.mailserver.vmailUID} gid=${toString config.mailserver.vmailUID}
     }
-  '';
+  '' ];
   services.dovecot2.enablePAM = false;
   systemd.services.dovecot2 = {
     # TODO does it merge with existing preStart?
