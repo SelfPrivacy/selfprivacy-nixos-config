@@ -105,8 +105,6 @@ in
         $config['oauth_identity_fields'] = ['email'];
         $config['oauth_login_redirect'] = true;
         $config['auto_create_user'] = true;
-        $config['oauth_verify_peer'] = false; # FIXME
-        # $config['oauth_pkce'] = 'S256'; # FIXME
       '';
       systemd.services.roundcube = {
         after = [ auth-passthru.oauth2-systemd-service ];
