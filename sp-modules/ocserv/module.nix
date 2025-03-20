@@ -16,18 +16,6 @@ in
         type = "enable";
       };
     };
-    subdomain = (lib.mkOption {
-      default = "vpn";
-      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-      description = "Subdomain";
-    }) // {
-      meta = {
-        widget = "subdomain";
-        type = "string";
-        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-        weight = 0;
-      };
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -61,7 +49,7 @@ in
         idle-timeout=1200
         mobile-idle-timeout=2400
 
-        default-domain = ${cfg.subdomain}.${domain}
+        default-domain = ${domain}
 
         device = vpn0
 
@@ -73,19 +61,6 @@ in
         dns = 1.0.0.1
 
         route = default
-      '';
-    };
-    services.nginx.virtualHosts."${cfg.subdomain}.${domain}" = {
-      useACMEHost = domain;
-      forceSSL = true;
-      extraConfig = ''
-        add_header Strict-Transport-Security $hsts_header;
-        #add_header Content-Security-Policy "script-src 'self'; object-src 'none'; base-uri 'none';" always;
-        add_header 'Referrer-Policy' 'origin-when-cross-origin';
-        add_header X-Frame-Options DENY;
-        add_header X-Content-Type-Options nosniff;
-        add_header X-XSS-Protection "1; mode=block";
-        proxy_cookie_path / "/; secure; HttpOnly; SameSite=strict";
       '';
     };
     systemd = {
