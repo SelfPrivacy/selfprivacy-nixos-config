@@ -143,9 +143,15 @@ in
         weight = 1;
       };
     };
-    debug = lib.mkOption {
+    debug = (lib.mkOption {
       default = false;
       type = lib.types.bool;
+      description = "Enable debug logging";
+    }) // {
+      meta = {
+        type = "bool";
+        weight = 2;
+      };
     };
   };
 
