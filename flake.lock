@@ -45,11 +45,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1742475070,
-        "narHash": "sha256-Xmfglt8VK2FPp8aiGYuUhM8dlM7hT/k/9eCcqvEUnjk=",
+        "lastModified": 1742475352,
+        "narHash": "sha256-8uGnMavoU/eutOwx+axTcmojY9F+WOGDNAqTlyC2Q8w=",
         "ref": "inex/add-oauth",
-        "rev": "07275944a9565b3958ee89f432de7816e7aa7af6",
-        "revCount": 1664,
+        "rev": "c67549736649d6ae10392e9a98fd2541025ba09f",
+        "revCount": 1665,
         "type": "git",
         "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
       },
