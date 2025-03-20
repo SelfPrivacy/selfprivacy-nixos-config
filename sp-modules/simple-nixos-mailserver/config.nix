@@ -56,6 +56,14 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (lib.mkMerge [
 
     users.groups.acmereceivers.members = [ "dovecot2" "postfix" "virtualMail" ];
 
+    services.postfix = {
+      config.smtpd_tls_security_level = lib.mkForce "required";
+      config.smtpd_tls_protocols = lib.mkForce "TLSv1.3, TLSv1.2, !TLSv1.1, !TLSv1, !SSLv2, !SSLv3";
+      config.smtp_tls_protocols = lib.mkForce "TLSv1.3, TLSv1.2, !TLSv1.1, !TLSv1, !SSLv2, !SSLv3";
+      config.smtpd_tls_mandatory_protocols = lib.mkForce "TLSv1.3, TLSv1.2, TLSv1.1, !TLSv1, !SSLv2, !SSLv3";
+      config.smtp_tls_mandatory_protocols = lib.mkForce "TLSv1.3, TLSv1.2, TLSv1.1, !TLSv1, !SSLv2, !SSLv3";
+    };
+
     mailserver = {
       enable = true;
       fqdn = sp.domain;
