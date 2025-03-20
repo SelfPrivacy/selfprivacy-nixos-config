@@ -27,6 +27,10 @@
       homepage = "https://roundcube.net/";
       sourcePage = "https://github.com/roundcube/roundcubemail";
       supportLevel = "normal";
+      sso = {
+        accessGroup = "sp.roundcube.users";
+        adminGroup = "sp.roundcube.admins";
+      };
     };
   };
 }

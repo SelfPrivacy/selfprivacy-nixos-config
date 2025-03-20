@@ -28,6 +28,10 @@
       homepage = "https://nextcloud.com/";
       sourcePage = "https://github.com/nextcloud";
       supportLevel = "normal";
+      sso = {
+        accessGroup = "sp.nextcloud.users";
+        adminGroup = "sp.nextcloud.admins";
+      };
     };
   };
 }
