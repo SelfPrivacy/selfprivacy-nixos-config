@@ -6,7 +6,7 @@
     nixpkgs-2411.url = github:nixos/nixpkgs/nixos-24.11;
 
     selfprivacy-api.url =
-      git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git;
+      git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git?ref=def/add_users_repositories;
     # make selfprivacy-api use the same shared nixpkgs
     selfprivacy-api.inputs.nixpkgs.follows = "nixpkgs";
   };
