@@ -680,16 +680,16 @@ in
           { }
           entities;
 
-        # assertGroupsKnown =
-        #   opt: groups:
-        #   let
-        #     knownGroups = attrNames (filterPresent cfg.provision.groups);
-        #     unknownGroups = subtractLists knownGroups groups;
-        #   in
-        #   {
-        #     assertion = (cfg.enableServer && cfg.provision.enable) -> unknownGroups == [ ];
-        #     message = "${opt} refers to unknown groups: ${toString unknownGroups}";
-        #   };
+        assertGroupsKnown =
+          opt: groups:
+          let
+            knownGroups = attrNames (filterPresent cfg.provision.groups) ++ [ "idm_all_persons" ];
+            unknownGroups = subtractLists knownGroups groups;
+          in
+          {
+            assertion = (cfg.enableServer && cfg.provision.enable) -> unknownGroups == [ ];
+            message = "${opt} refers to unknown groups: ${toString unknownGroups}";
+          };
 
         assertEntitiesKnown =
           opt: entities:
