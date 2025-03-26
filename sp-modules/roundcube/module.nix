@@ -47,7 +47,7 @@ in
     enableSso = (lib.mkOption {
       default = false;
       type = lib.types.bool;
-      description = "Enable SSO for Roundcube";
+      description = "Enable Single Sign-On";
     }) // {
       meta = {
         type = "bool";
