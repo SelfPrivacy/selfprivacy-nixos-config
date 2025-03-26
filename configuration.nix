@@ -98,9 +98,8 @@ in
   services.openssh = {
     enable = config.selfprivacy.ssh.enable;
     settings = {
-      PasswordAuthentication = config.selfprivacy.ssh.passwordAuthentication;
+      PasswordAuthentication = false;
       PermitRootLogin = "yes";
-      LoginGraceTime = 0;
     };
     openFirewall = false;
 

@@ -108,13 +108,6 @@ with lib;
         type = types.nullOr (types.listOf types.str);
         default = [ "" ];
       };
-      passwordAuthentication = mkOption {
-        description = ''
-          Password authentication for SSH
-        '';
-        default = false;
-        type = types.nullOr types.bool;
-      };
     };
     ###########
     #  Users  #
