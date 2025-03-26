@@ -295,7 +295,6 @@ in
          , originUrl
          , scopeMaps
          , useShortPreferredUsername
-         , subdomain
          , usersGroup
          , ...
          }: {
