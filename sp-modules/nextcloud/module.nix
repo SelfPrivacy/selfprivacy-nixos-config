@@ -104,15 +104,6 @@ in
         type = "enable";
       };
     };
-    enableSso = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable SSO for Nextcloud";
-    }) // {
-      meta = {
-        type = "enable";
-      };
-    };
     location = (lib.mkOption {
       type = lib.types.str;
       description = "Nextcloud location";
@@ -143,6 +134,16 @@ in
         weight = 1;
       };
     };
+    enableSso = (lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Enable Single Sign-On";
+    }) // {
+      meta = {
+        type = "bool";
+        weight = 2;
+      };
+    };
     debug = (lib.mkOption {
       default = false;
       type = lib.types.bool;
@@ -150,7 +151,7 @@ in
     }) // {
       meta = {
         type = "bool";
-        weight = 2;
+        weight = 3;
       };
     };
   };

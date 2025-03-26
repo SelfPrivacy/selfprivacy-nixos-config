@@ -189,7 +189,8 @@ in
       description = "Enable SSO for Forgejo";
     }) // {
       meta = {
-        type = "enable";
+        type = "bool";
+        weight = 7;
       };
     };
     debug = (lib.mkOption {
@@ -199,7 +200,7 @@ in
     }) // {
       meta = {
         type = "bool";
-        weight = 7;
+        weight = 8;
       };
     };
   };

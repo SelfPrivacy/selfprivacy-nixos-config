@@ -50,7 +50,8 @@ in
       description = "Enable SSO for Roundcube";
     }) // {
       meta = {
-        type = "enable";
+        type = "bool";
+        weight = 1;
       };
     };
   };
