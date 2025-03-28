@@ -357,6 +357,7 @@ in
 
       selfprivacy.auth.clients."${oauthClientID}" = {
         inherit adminsGroup usersGroup;
+        displayName = "Forgejo";
         subdomain = cfg.subdomain;
         isTokenNeeded = true;
         originLanding =
