@@ -23,75 +23,15 @@ let
 
   admins-group = "sp.nextcloud.admins";
   users-group = "sp.nextcloud.users";
+
   wildcard-group = "sp.nextcloud.*";
 
-  oauth-client-id = "nextcloud";
-  kanidm-service-account-name = "sp.${oauth-client-id}.service-account";
-  kanidm-service-account-token-name = "${oauth-client-id}-service-account-token";
-  kanidm-service-account-token-fp =
-    "/run/keys/${oauth-client-id}/kanidm-service-account-token"; # FIXME sync with auth module
-  # TODO rewrite to tmpfiles.d, but make sure the group exists first!
-  kanidmExecStartPreScriptRoot = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPre-root-script.sh"
-    ''
-      # set-group-ID bit allows for kanidm user to create files,
-      mkdir -p -v --mode=u+rwx,g+rs,g-w,o-rwx /run/keys/${oauth-client-id}
-      chown kanidm:${nextcloud-setup-group} /run/keys/${oauth-client-id}
-    '';
-  kanidm-oauth-client-secret-fp =
-    "/run/keys/${oauth-client-id}/kanidm-oauth-client-secret";
-  kanidmExecStartPreScript = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
-    [ -f "${kanidm-oauth-client-secret-fp}" ] || \
-      "${lib.getExe pkgs.openssl}" rand -base64 -out "${kanidm-oauth-client-secret-fp}" 32
-  '';
-  kanidmExecStartPostScript = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPost-script.sh"
-    ''
-      export HOME=$RUNTIME_DIRECTORY/client_home
-      readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
+  oauthClientID = "nextcloud";
 
-      # get Kanidm service account for mailserver
-      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidm-service-account-name}$")"
-      echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
-      if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
-      then
-          echo "kanidm service account \"${kanidm-service-account-name}\" is found"
-      else
-          echo "kanidm service account \"${kanidm-service-account-name}\" is not found"
-          echo "creating new kanidm service account \"${kanidm-service-account-name}\""
-          if $KANIDM service-account create --name idm_admin "${kanidm-service-account-name}" "${kanidm-service-account-name}" idm_admin
-          then
-              echo "kanidm service account \"${kanidm-service-account-name}\" created"
-          else
-              echo "error: cannot create kanidm service account \"${kanidm-service-account-name}\""
-              exit 1
-          fi
-      fi
-
-      # add Kanidm service account to `idm_mail_servers` group
-      $KANIDM group add-members idm_mail_servers "${kanidm-service-account-name}"
-
-      # create a new read-only token for kanidm
-      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidm-service-account-name}" "${kanidm-service-account-token-name}" --output json)"
-      then
-          echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
-          exit 1
-      fi
-      if ! KANIDM_SERVICE_ACCOUNT_TOKEN="$(echo "$KANIDM_SERVICE_ACCOUNT_TOKEN_JSON" | ${lib.getExe pkgs.jq} -r .result)"
-      then
-          echo "error: cannot get service-account API token from JSON"
-          exit 1
-      fi
-
-      if ! install --mode=640 \
-      <(printf "%s" "$KANIDM_SERVICE_ACCOUNT_TOKEN") \
-      ${kanidm-service-account-token-fp}
-      then
-          echo "error: cannot write token to \"${kanidm-service-account-token-fp}\""
-          exit 1
-      fi
-    '';
+  serviceAccountTokenFP =
+    auth-passthru.mkServiceAccountTokenFP oauthClientID;
+  oauthClientSecretFP =
+    auth-passthru.mkOAuth2ClientSecretFP oauthClientID;
 in
 {
   options.selfprivacy.modules.nextcloud = with lib; {
@@ -187,13 +127,6 @@ in
             serviceConfig.Slice = "nextcloud.slice";
             serviceConfig.Group = config.services.phpfpm.pools.nextcloud.group;
           };
-          kanidm.serviceConfig.ExecStartPre = lib.mkIf is-auth-enabled
-            (lib.mkAfter [
-              ("-+" + kanidmExecStartPreScriptRoot)
-              ("-" + kanidmExecStartPreScript)
-            ]);
-          kanidm.serviceConfig.ExecStartPost = lib.mkIf is-auth-enabled
-            (lib.mkAfter [ ("-" + kanidmExecStartPostScript) ]);
           nextcloud-cron.serviceConfig.Slice = "nextcloud.slice";
           nextcloud-update-db.serviceConfig.Slice = "nextcloud.slice";
           nextcloud-update-plugins.serviceConfig.Slice = "nextcloud.slice";
@@ -324,7 +257,7 @@ in
           ${occ} ldap:set-config "$CONFIG_ID" 'ldapHost' '${ldap_scheme_and_host}'
           ${occ} ldap:set-config "$CONFIG_ID" 'ldapPort' '${toString auth-passthru.ldap-port}'
           ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentName' 'dn=token'
-          ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentPassword' "$(<${kanidm-service-account-token-fp})"
+          ${occ} ldap:set-config "$CONFIG_ID" 'ldapAgentPassword' "$(<${serviceAccountTokenFP})"
           ${occ} ldap:set-config "$CONFIG_ID" 'ldapBase' '${auth-passthru.ldap-base-dn}'
           ${occ} ldap:set-config "$CONFIG_ID" 'ldapBaseGroups' '${auth-passthru.ldap-base-dn}'
           ${occ} ldap:set-config "$CONFIG_ID" 'ldapBaseUsers' '${auth-passthru.ldap-base-dn}'
@@ -371,8 +304,8 @@ in
           ${occ} app:enable  user_oidc
 
           ${occ} user_oidc:provider ${auth-passthru.oauth2-provider-name} \
-          --clientid="${oauth-client-id}" \
-          --clientsecret="$(<${kanidm-oauth-client-secret-fp})" \
+          --clientid="${oauthClientID}" \
+          --clientsecret="$(<${oauthClientSecretFP})" \
           --discoveryuri="${auth-passthru.oauth2-discovery-url "nextcloud"}" \
           --unique-uid=0 \
           --scope="email openid profile" \
@@ -382,21 +315,11 @@ in
           --group-provisioning=1 \
           -vvv
         '';
-        # TODO consider passing oauth consumer service to auth module instead
-        after = [ auth-passthru.oauth2-systemd-service ];
-        requires = [ auth-passthru.oauth2-systemd-service ];
       };
       services.kanidm.provision = {
-        groups = {
-          "${admins-group}".members = [ auth-passthru.admins-group ];
-          "${users-group}".members =
-            [ admins-group auth-passthru.full-users-group ];
-        };
-        systems.oauth2.${oauth-client-id} = {
-          displayName = "Nextcloud";
-          originUrl = "https://${cfg.subdomain}.${domain}/apps/user_oidc/code";
+        systems.oauth2.${oauthClientID} = {
           originLanding = "https://${cfg.subdomain}.${domain}/";
-          basicSecretFile = kanidm-oauth-client-secret-fp;
+          basicSecretFile = oauthClientSecretFP;
           # when true, name is passed to a service instead of name@domain
           preferShortUsername = true;
           allowInsecureClientDisablePkce = false;
@@ -407,6 +330,20 @@ in
             valuesByGroup.${admins-group} = [ "admin" ];
           };
         };
+      };
+
+      selfprivacy.auth.clients."${oauthClientID}" = {
+        inherit adminsGroup usersGroup;
+        displayName = "Nextcloud";
+        subdomain = cfg.subdomain;
+        isTokenNeeded = true;
+        originLanding =
+          "https://${cfg.subdomain}.${sp.domain}/user/login?redirect_to=%2f";
+        originUrl = "https://${cfg.subdomain}.${domain}/apps/user_oidc/code";
+        clientSystemdUnits = [ "forgejo.service" ];
+        enablePkce = lib.versionAtLeast forgejoPackage.version "8.0";
+        linuxUserOfClient = linuxUserOfService;
+        linuxGroupOfClient = linuxGroupOfService;
       };
     })
   ]);
