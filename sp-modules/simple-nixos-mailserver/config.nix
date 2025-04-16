@@ -23,7 +23,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (lib.mkMerge [
           config.selfprivacy.modules.simple-nixos-mailserver.enableSso
           -> config.selfprivacy.sso.enable;
         message =
-          "SSO cannot be enabled for Roundcube when SSO is disabled globally.";
+          "SSO cannot be enabled for Mailserver when SSO is disabled globally.";
       }
     ];
     fileSystems = lib.mkIf sp.useBinds
