@@ -87,15 +87,9 @@ lib.mkIf config.selfprivacy.sso.enable {
       _final: prev: {
         inherit (nixpkgs-2411.legacyPackages.${prev.system}) kanidm;
         kanidm-provision =
-          nixpkgs-2411.legacyPackages.${prev.system}.kanidm-provision.overrideAttrs (_: {
-            version = "git";
-            src = prev.fetchFromGitHub {
-              owner = "oddlama";
-              repo = "kanidm-provision";
-              rev = "d1f55c9247a6b25d30bbe90a74307aaac6306db4";
-              hash = "sha256-cZ3QbowmWX7j1eJRiUP52ao28xZzC96OdZukdWDHfFI=";
-            };
-          });
+          (nixpkgs-2411.legacyPackages.${prev.system}).callPackage
+            ./kanidm-provision.nix
+            { };
       }
     )
   ];

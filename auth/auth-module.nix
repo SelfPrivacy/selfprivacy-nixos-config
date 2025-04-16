@@ -199,6 +199,13 @@ in
                 }
               );
             };
+            imageFile = mkOption {
+              type = types.nullOr lib.types.path;
+              description = ''
+                Filepath of an image which is displayed in Kanidm web GUI for a service.
+              '';
+              default = null;
+            };
           };
         }
       );
@@ -294,6 +301,7 @@ in
          , clientID
          , displayName
          , enablePkce
+         , imageFile
          , originLanding
          , originUrl
          , scopeMaps
@@ -312,8 +320,9 @@ in
               basicSecretFile
               claimMaps
               displayName
-              originUrl
+              imageFile
               originLanding
+              originUrl
               scopeMaps
               ;
             preferShortUsername = useShortPreferredUsername;
