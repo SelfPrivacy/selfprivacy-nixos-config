@@ -163,6 +163,39 @@ in {
             DynamicUser = lib.mkForce false;
             User = "vikunja";
             Group = "vikunja";
+
+            AmbientCapabilities = [""];
+
+            LockPersonality = true;
+            MemoryDenyWriteExecute = true;
+            NoNewPrivileges = true;
+            PrivateDevices = true;
+            PrivateTmp = true;
+
+            PrivateUsers = true;
+            ProcSubset = "pid";
+            ProtectClock = true;
+            ProtectControlGroups = true;
+            ProtectHome = true;
+            ProtectHostname = true;
+            ProtectKernelLogs = true;
+            ProtectKernelModules = true;
+            ProtectKernelTunables = true;
+
+            ProtectProc = "invisible";
+
+            ProtectSystem = "strict";
+
+            RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
+
+            RestrictNamespaces = true;
+            RestrictRealtime = true;
+            RestrictSUIDSGID = true;
+            SystemCallArchitectures = "native";
+
+            RemoveIPC = true;
+
+            SystemCallFilter = ["@system-service" "~@cpu-emulation" "~@debug" "~@keyring" "~@memlock" "~@obsolete" "~@privileged" "~@setuid"];
           };
           environment.SP_VIKUNJA_CLIENT_SECRET_PATH = "%d/oauth2-secret";
         };
@@ -174,7 +207,7 @@ in {
       selfprivacy.auth.clients.${oauthClientID} = {
         inherit usersGroup;
         subdomain = cfg.subdomain;
-        isTokenNeeded = true;
+        isTokenNeeded = false;
         originLanding = "https://${cfg.subdomain}.${sp.domain}/";
         originUrl = "https://${cfg.subdomain}.${sp.domain}/auth/openid/${lib.strings.toLower oauth2-provider-name}";
         clientSystemdUnits = ["vikunja.service"];
