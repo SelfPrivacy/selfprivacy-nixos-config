@@ -156,10 +156,16 @@ lib.mkIf config.selfprivacy.sso.enable {
     };
   };
 
-  systemd.services.kanidm.serviceConfig.ExecStartPre =
-    # idempotent script to run on each startup only for kanidm v1.5.0
-    lib.mkIf (pkgs.kanidm.version == "1.5.0")
-      (lib.mkBefore [ kanidmMigrateDbScript ]);
+  systemd.services.kanidm = {
+    # for tls_chain and tls_key
+    after = [ "acme-${domain}.service" ];
+    requires = [ "acme-${domain}.service" ];
+
+    serviceConfig.ExecStartPre =
+      # idempotent script to run on each startup only for kanidm v1.5.0
+      lib.mkIf (pkgs.kanidm.version == "1.5.0")
+        (lib.mkBefore [ kanidmMigrateDbScript ]);
+  };
 
   selfprivacy.passthru.auth = {
     inherit
