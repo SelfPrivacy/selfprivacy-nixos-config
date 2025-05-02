@@ -6,21 +6,23 @@ in
   users = {
     mutableUsers = false;
     allowNoPasswordLogin = true;
-    users = {
-      "${cfg.username}" = {
-        isNormalUser = true;
-        hashedPassword = cfg.hashedMasterPassword;
-        openssh.authorizedKeys.keys = cfg.sshKeys;
-      };
-    } // builtins.listToAttrs (builtins.map
-      (user: {
-        name = "${user.username}";
-        value = {
+    users =
+      {
+        "${cfg.username}" = {
           isNormalUser = true;
-          hashedPassword = user.hashedPassword;
-          openssh.authorizedKeys.keys = (if user ? sshKeys then user.sshKeys else [ ]);
+          hashedPassword = cfg.hashedMasterPassword;
+          openssh.authorizedKeys.keys = cfg.sshKeys;
         };
-      })
-      cfg.users);
+      }
+      // builtins.listToAttrs (
+        builtins.map (user: {
+          name = "${user.username}";
+          value = {
+            isNormalUser = true;
+            hashedPassword = user.hashedPassword;
+            openssh.authorizedKeys.keys = (if user ? sshKeys then user.sshKeys else [ ]);
+          };
+        }) cfg.users
+      );
   };
 }

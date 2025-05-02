@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   domain = config.selfprivacy.domain;
   sp = config.selfprivacy;
@@ -6,55 +11,65 @@ let
 in
 {
   options.selfprivacy.modules.mumble = {
-    enable = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable Mumble";
-    }) // {
-      meta = {
-        type = "enable";
+    enable =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable Mumble";
+      })
+      // {
+        meta = {
+          type = "enable";
+        };
       };
-    };
-    subdomain = (lib.mkOption {
-      default = "mumble";
-      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-      description = "Subdomain";
-    }) // {
-      meta = {
-        widget = "subdomain";
-        type = "string";
-        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-        weight = 0;
+    subdomain =
+      (lib.mkOption {
+        default = "mumble";
+        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        description = "Subdomain";
+      })
+      // {
+        meta = {
+          widget = "subdomain";
+          type = "string";
+          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          weight = 0;
+        };
       };
-    };
-    location = (lib.mkOption {
-      type = lib.types.str;
-      description = "Location";
-    }) // {
-      meta = {
-        type = "location";
+    location =
+      (lib.mkOption {
+        type = lib.types.str;
+        description = "Location";
+      })
+      // {
+        meta = {
+          type = "location";
+        };
       };
-    };
-    appName = (lib.mkOption {
-      default = "SelfPrivacy Mumble Service";
-      type = lib.types.str;
-      description = "The name of your Mumble server";
-    }) // {
-      meta = {
-        type = "string";
-        weight = 1;
+    appName =
+      (lib.mkOption {
+        default = "SelfPrivacy Mumble Service";
+        type = lib.types.str;
+        description = "The name of your Mumble server";
+      })
+      // {
+        meta = {
+          type = "string";
+          weight = 1;
+        };
       };
-    };
-    welcomeText = (lib.mkOption {
-      default = "Welcome to my Mumble server!";
-      type = lib.types.str;
-      description = "Welcome message";
-    }) // {
-      meta = {
-        type = "string";
-        weight = 2;
+    welcomeText =
+      (lib.mkOption {
+        default = "Welcome to my Mumble server!";
+        type = lib.types.str;
+        description = "Welcome message";
+      })
+      // {
+        meta = {
+          type = "string";
+          weight = 2;
+        };
       };
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -79,7 +94,9 @@ in
     };
     systemd = {
       services = {
-        murmur = { serviceConfig.Slice = "mumble.slice"; };
+        murmur = {
+          serviceConfig.Slice = "mumble.slice";
+        };
         murmur-ensure-folder-ownership = {
           description = "Ensure murmur folder ownership";
           before = [ "murmur.service" ];

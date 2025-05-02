@@ -1,6 +1,4 @@
-system:
-_final: _prev:
-{
+system: _final: _prev: {
   # Here is a template to bring a specific package from a given nixpkgs commit:
   #   PACKAGE_NAME = (builtins.getFlake "github:nixos/nixpkgs/NIXPKGS_COMMIT_SHA1").legacyPackages.${system}.PACKAGE_NAME;
   # Substitute `PACKAGE_NAME` and `NIXPKGS_COMMIT_SHA1` accordingly.

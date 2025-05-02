@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   secrets-filepath = "/etc/selfprivacy/secrets.json";
   backup-dir = "/var/lib/bitwarden/backup";
@@ -7,65 +12,77 @@ let
 in
 {
   options.selfprivacy.modules.bitwarden = {
-    enable = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable Vaultwarden";
-    }) // {
-      meta = {
-        type = "enable";
+    enable =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable Vaultwarden";
+      })
+      // {
+        meta = {
+          type = "enable";
+        };
       };
-    };
-    location = (lib.mkOption {
-      type = lib.types.str;
-      description = "Vaultwarden location";
-    }) // {
-      meta = {
-        type = "location";
+    location =
+      (lib.mkOption {
+        type = lib.types.str;
+        description = "Vaultwarden location";
+      })
+      // {
+        meta = {
+          type = "location";
+        };
       };
-    };
-    subdomain = (lib.mkOption {
-      default = "password";
-      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-      description = "Subdomain";
-    }) // {
-      meta = {
-        widget = "subdomain";
-        type = "string";
-        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-        weight = 0;
+    subdomain =
+      (lib.mkOption {
+        default = "password";
+        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        description = "Subdomain";
+      })
+      // {
+        meta = {
+          widget = "subdomain";
+          type = "string";
+          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          weight = 0;
+        };
       };
-    };
-    signupsAllowed = (lib.mkOption {
-      default = true;
-      type = lib.types.bool;
-      description = "Allow new user signups";
-    }) // {
-      meta = {
-        type = "bool";
-        weight = 1;
+    signupsAllowed =
+      (lib.mkOption {
+        default = true;
+        type = lib.types.bool;
+        description = "Allow new user signups";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 1;
+        };
       };
-    };
-    sendsAllowed = (lib.mkOption {
-      default = true;
-      type = lib.types.bool;
-      description = "Allow users to use Bitwarden Send";
-    }) // {
-      meta = {
-        type = "bool";
-        weight = 2;
+    sendsAllowed =
+      (lib.mkOption {
+        default = true;
+        type = lib.types.bool;
+        description = "Allow users to use Bitwarden Send";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 2;
+        };
       };
-    };
-    emergencyAccessAllowed = (lib.mkOption {
-      default = true;
-      type = lib.types.bool;
-      description = "Allow users to enable Emergency Access";
-    }) // {
-      meta = {
-        type = "bool";
-        weight = 3;
+    emergencyAccessAllowed =
+      (lib.mkOption {
+        default = true;
+        type = lib.types.bool;
+        description = "Allow users to enable Emergency Access";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 3;
+        };
       };
-    };
   };
 
   config = lib.mkIf config.selfprivacy.modules.bitwarden.enable {
@@ -118,7 +135,10 @@ in
           before = [ "vaultwarden.service" ];
           requiredBy = [ "vaultwarden.service" ];
           serviceConfig.Type = "oneshot";
-          path = with pkgs; [ coreutils jq ];
+          path = with pkgs; [
+            coreutils
+            jq
+          ];
           script = ''
             set -o nounset
 

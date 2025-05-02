@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }@nixos-args:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}@nixos-args:
 let
   inherit (import ./common.nix nixos-args)
     appendSetting
@@ -9,8 +14,7 @@ let
   cfg = config.mailserver;
 
   ldapSenderLoginMapFile = "/run/postfix/ldap-sender-login-map.cf";
-  submissionOptions.smtpd_sender_login_maps =
-    lib.mkForce "hash:/etc/postfix/vaccounts,ldap:${ldapSenderLoginMapFile}";
+  submissionOptions.smtpd_sender_login_maps = lib.mkForce "hash:/etc/postfix/vaccounts,ldap:${ldapSenderLoginMapFile}";
   commonLdapConfig = ''
     server_host = ${lib.concatStringsSep " " cfg.ldap.uris}
     start_tls = ${if cfg.ldap.startTls then "yes" else "no"}
@@ -61,8 +65,10 @@ in
       ${appendPwdInVirtualMailboxMap}
       ${appendPwdInSenderLoginMap}
     '';
-    restartTriggers =
-      [ appendPwdInVirtualMailboxMap appendPwdInSenderLoginMap ];
+    restartTriggers = [
+      appendPwdInVirtualMailboxMap
+      appendPwdInSenderLoginMap
+    ];
     wants = [ auth-passthru.oauth2-systemd-service ];
     after = [ auth-passthru.oauth2-systemd-service ];
   };

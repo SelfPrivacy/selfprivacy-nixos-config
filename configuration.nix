@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   redis-sp-api-srv-name = "sp-api";
   sp-print-api-token = pkgs.writeShellApplication {
@@ -76,7 +81,8 @@ in
     };
   };
 
-  services.do-agent.enable = if config.selfprivacy.server.provider == "DIGITALOCEAN" then true else false;
+  services.do-agent.enable =
+    if config.selfprivacy.server.provider == "DIGITALOCEAN" then true else false;
 
   boot.tmp.cleanOnBoot = true;
   networking = {
@@ -84,14 +90,31 @@ in
     domain = config.selfprivacy.domain;
     usePredictableInterfaceNames = false;
     firewall = {
-      allowedTCPPorts = [ 22 25 80 143 443 465 587 993 4443 8443 ];
-      allowedUDPPorts = [ 8443 10000 ];
+      allowedTCPPorts = [
+        22
+        25
+        80
+        143
+        443
+        465
+        587
+        993
+        4443
+        8443
+      ];
+      allowedUDPPorts = [
+        8443
+        10000
+      ];
       extraCommands = ''
         iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE
         iptables --append FORWARD --in-interface vpn00 -j ACCEPT
       '';
     };
-    nameservers = [ "1.1.1.1" "1.0.0.1" ];
+    nameservers = [
+      "1.1.1.1"
+      "1.0.0.1"
+    ];
   };
   time.timeZone = config.selfprivacy.timezone;
   i18n.defaultLocale = "en_GB.UTF-8";
@@ -107,8 +130,15 @@ in
   };
   services.fail2ban.enable = true;
   programs.ssh = {
-    pubkeyAcceptedKeyTypes = [ "ssh-ed25519" "ssh-rsa" "ecdsa-sha2-nistp256" ];
-    hostKeyAlgorithms = [ "ssh-ed25519" "ssh-rsa" ];
+    pubkeyAcceptedKeyTypes = [
+      "ssh-ed25519"
+      "ssh-rsa"
+      "ecdsa-sha2-nistp256"
+    ];
+    hostKeyAlgorithms = [
+      "ssh-ed25519"
+      "ssh-rsa"
+    ];
   };
   environment.systemPackages = with pkgs; [
     git
@@ -124,9 +154,9 @@ in
     "R! /old-root"
     "d /etc/selfprivacy/dump 0700 0700 selfprivacy-api selfprivacy-api"
   ];
-  system.stateVersion =
-    lib.mkIf (config.selfprivacy.stateVersion != null)
-      config.selfprivacy.stateVersion;
+  system.stateVersion = lib.mkIf (
+    config.selfprivacy.stateVersion != null
+  ) config.selfprivacy.stateVersion;
   system.autoUpgrade = {
     enable = config.selfprivacy.autoUpgrade.enable;
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
@@ -168,7 +198,11 @@ in
   };
   nix.settings = {
     sandbox = true;
-    experimental-features = [ "nix-command" "flakes" "repl-flake" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+      "repl-flake"
+    ];
     # auto-optimise-store = true;
 
     # evaluation restrictions:

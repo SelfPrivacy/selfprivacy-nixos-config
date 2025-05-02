@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.selfprivacy;
   dnsCredentialsTemplates = {
@@ -27,7 +32,11 @@ in
     acceptTerms = true;
     defaults = {
       email = "${cfg.username}@${cfg.domain}";
-      server = if cfg.dns.useStagingACME then "https://acme-staging-v02.api.letsencrypt.org/directory" else "https://acme-v02.api.letsencrypt.org/directory";
+      server =
+        if cfg.dns.useStagingACME then
+          "https://acme-staging-v02.api.letsencrypt.org/directory"
+        else
+          "https://acme-v02.api.letsencrypt.org/directory";
       reloadServices = [ "nginx" ];
       dnsResolver = "8.8.8.8:53";
     };
@@ -38,7 +47,9 @@ in
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         credentialsFile = acme-env-filepath;
         dnsPropagationCheck =
-          ! ((lib.elem cfg.dns.provider dnsPropagationCheckExceptions) || cfg.dns.forceDisableDnsPropagationCheck);
+          !(
+            (lib.elem cfg.dns.provider dnsPropagationCheckExceptions) || cfg.dns.forceDisableDnsPropagationCheck
+          );
       };
       "root-${cfg.domain}" = {
         domain = cfg.domain;
@@ -51,7 +62,10 @@ in
     before = [ "acme-${cfg.domain}.service" ];
     requiredBy = [ "acme-${cfg.domain}.service" ];
     serviceConfig.Type = "oneshot";
-    path = with pkgs; [ coreutils jq ];
+    path = with pkgs; [
+      coreutils
+      jq
+    ];
     script = ''
       set -o nounset
 

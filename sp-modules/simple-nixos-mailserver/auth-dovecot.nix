@@ -1,8 +1,14 @@
-{ mailserver-service-account-name
-, mailserver-service-account-token-name
-, mailserver-service-account-token-fp
+{
+  mailserver-service-account-name,
+  mailserver-service-account-token-name,
+  mailserver-service-account-token-fp,
 }:
-{ config, lib, pkgs, ... }@nixos-args:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}@nixos-args:
 let
   inherit (import ./common.nix nixos-args)
     appendSetting
@@ -17,67 +23,70 @@ let
   keysPath = auth-passthru.keys-path;
 
   # create service account token, needed for LDAP
-  kanidmExecStartPostScript = pkgs.writeShellScript
-    "mailserver-kanidm-ExecStartPost-script.sh"
-    ''
-      export HOME=$RUNTIME_DIRECTORY/client_home
-      readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
+  kanidmExecStartPostScript = pkgs.writeShellScript "mailserver-kanidm-ExecStartPost-script.sh" ''
+    export HOME=$RUNTIME_DIRECTORY/client_home
+    readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
 
-      # get Kanidm service account for mailserver
-      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${mailserver-service-account-name}$")"
-      echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
-      if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
-      then
-          echo "kanidm service account \"${mailserver-service-account-name}\" is found"
-      else
-          echo "kanidm service account \"${mailserver-service-account-name}\" is not found"
-          echo "creating new kanidm service account \"${mailserver-service-account-name}\""
-          if $KANIDM service-account create --name idm_admin ${mailserver-service-account-name} ${mailserver-service-account-name} idm_admin
-          then
-              "kanidm service account \"${mailserver-service-account-name}\" created"
-          else
-              echo "error: cannot create kanidm service account \"${mailserver-service-account-name}\""
-              exit 1
-          fi
-      fi
+    # get Kanidm service account for mailserver
+    KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${mailserver-service-account-name}$")"
+    echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
+    if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
+    then
+        echo "kanidm service account \"${mailserver-service-account-name}\" is found"
+    else
+        echo "kanidm service account \"${mailserver-service-account-name}\" is not found"
+        echo "creating new kanidm service account \"${mailserver-service-account-name}\""
+        if $KANIDM service-account create --name idm_admin ${mailserver-service-account-name} ${mailserver-service-account-name} idm_admin
+        then
+            "kanidm service account \"${mailserver-service-account-name}\" created"
+        else
+            echo "error: cannot create kanidm service account \"${mailserver-service-account-name}\""
+            exit 1
+        fi
+    fi
 
-      # add Kanidm service account to `idm_mail_servers` group
-      $KANIDM group add-members idm_mail_servers ${mailserver-service-account-name}
+    # add Kanidm service account to `idm_mail_servers` group
+    $KANIDM group add-members idm_mail_servers ${mailserver-service-account-name}
 
-      # create a new read-only token for mailserver
-      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin ${mailserver-service-account-name} ${mailserver-service-account-token-name} --output json)"
-      then
-          echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
-          exit 1
-      fi
-      if ! KANIDM_SERVICE_ACCOUNT_TOKEN="$(echo "$KANIDM_SERVICE_ACCOUNT_TOKEN_JSON" | ${lib.getExe pkgs.jq} -r .result)"
-      then
-          echo "error: cannot get service-account API token from JSON"
-          exit 1
-      fi
+    # create a new read-only token for mailserver
+    if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin ${mailserver-service-account-name} ${mailserver-service-account-token-name} --output json)"
+    then
+        echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
+        exit 1
+    fi
+    if ! KANIDM_SERVICE_ACCOUNT_TOKEN="$(echo "$KANIDM_SERVICE_ACCOUNT_TOKEN_JSON" | ${lib.getExe pkgs.jq} -r .result)"
+    then
+        echo "error: cannot get service-account API token from JSON"
+        exit 1
+    fi
 
-      if ! install --mode=640 \
-      <(printf "%s" "$KANIDM_SERVICE_ACCOUNT_TOKEN") \
-      ${mailserver-service-account-token-fp}
-      then
-          echo "error: cannot write token to \"${mailserver-service-account-token-fp}\""
-          exit 1
-      fi
-    '';
+    if ! install --mode=640 \
+    <(printf "%s" "$KANIDM_SERVICE_ACCOUNT_TOKEN") \
+    ${mailserver-service-account-token-fp}
+    then
+        echo "error: cannot write token to \"${mailserver-service-account-token-fp}\""
+        exit 1
+    fi
+  '';
 
   ldapConfFile = "/run/${runtime-folder}/dovecot-ldap.conf.ext";
-  mkLdapSearchScope = scope: (
-    if scope == "sub" then "subtree"
-    else if scope == "one" then "onelevel"
-    else scope
-  );
+  mkLdapSearchScope =
+    scope:
+    (
+      if scope == "sub" then
+        "subtree"
+      else if scope == "one" then
+        "onelevel"
+      else
+        scope
+    );
   dovecot-ldap-config = pkgs.writeTextFile {
     name = "dovecot-ldap.conf.ext.template";
     text = ''
       ldap_version = 3
       uris = ${lib.concatStringsSep " " config.mailserver.ldap.uris}
       ${lib.optionalString config.mailserver.ldap.startTls ''
-      tls = yes
+        tls = yes
       ''}
       tls_require_cert = hard
       tls_ca_cert_file = ${config.mailserver.ldap.tlsCAFile}
@@ -87,7 +96,7 @@ let
       base = ${config.mailserver.ldap.searchBase}
       scope = ${mkLdapSearchScope config.mailserver.ldap.searchScope}
       ${lib.optionalString (config.mailserver.ldap.dovecot.userAttrs != null) ''
-      user_attrs = ${config.mailserver.ldap.dovecot.userAttrs}
+        user_attrs = ${config.mailserver.ldap.dovecot.userAttrs}
       ''}
       user_filter = ${config.mailserver.ldap.dovecot.userFilter}
     '';
@@ -101,10 +110,8 @@ let
     destination = ldapConfFile;
   };
   oauth-client-id = "mailserver";
-  oauth-client-secret-fp =
-    "${keysPath}/${group}/kanidm-oauth-client-secret";
-  oauth-secret-ExecStartPreScript = pkgs.writeShellScript
-    "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
+  oauth-client-secret-fp = "${keysPath}/${group}/kanidm-oauth-client-secret";
+  oauth-secret-ExecStartPreScript = pkgs.writeShellScript "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
     set -o xtrace
     [ -f "${oauth-client-secret-fp}" ] || \
       "${lib.getExe pkgs.openssl}" rand -base64 32 | tr "\n:@/+=" "012345" > "${oauth-client-secret-fp}"
@@ -122,8 +129,8 @@ let
       openid_configuration_url = ${auth-passthru.oauth2-discovery-url oauth-client-id}
       debug = "no"
     '';
-    prefix = ''introspection_url = "'' +
-      (auth-passthru.oauth2-introspection-url-prefix oauth-client-id);
+    prefix =
+      ''introspection_url = "'' + (auth-passthru.oauth2-introspection-url-prefix oauth-client-id);
     suffix = auth-passthru.oauth2-introspection-url-postfix + ''"'';
     passwordFile = oauth-client-secret-fp;
     destination = dovecot-oauth2-conf-fp;

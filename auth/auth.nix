@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   domain = config.selfprivacy.domain;
   subdomain = "auth";
@@ -38,7 +43,6 @@ lib.mkIf config.selfprivacy.sso.enable {
     "127.0.0.1" = [ auth-fqdn ];
   };
 
-
   # kanidm uses TLS in internal connection with nginx too
   # FIXME revise this: maybe kanidm must not have access to a public TLS
   users.groups."acmereceivers".members = [ "kanidm" ];
@@ -69,16 +73,13 @@ lib.mkIf config.selfprivacy.sso.enable {
       origin = "https://" + auth-fqdn;
 
       # TODO revise this: maybe kanidm must not have access to a public TLS
-      tls_chain =
-        "${config.security.acme.certs.${domain}.directory}/fullchain.pem";
-      tls_key =
-        "${config.security.acme.certs.${domain}.directory}/key.pem";
+      tls_chain = "${config.security.acme.certs.${domain}.directory}/fullchain.pem";
+      tls_key = "${config.security.acme.certs.${domain}.directory}/key.pem";
 
       # nginx should proxy requests to it
       bindaddress = kanidm-bind-address;
 
-      ldapbindaddress =
-        "${ldap-host}:${toString ldap-port}";
+      ldapbindaddress = "${ldap-host}:${toString ldap-port}";
 
       # kanidm is behind a proxy
       trust_x_forward_for = true;
@@ -101,8 +102,7 @@ lib.mkIf config.selfprivacy.sso.enable {
 
   services.nginx = {
     enable = true;
-    additionalModules =
-      lib.mkIf config.selfprivacy.sso.debug [ pkgs.nginxModules.lua ];
+    additionalModules = lib.mkIf config.selfprivacy.sso.debug [ pkgs.nginxModules.lua ];
     commonHttpConfig = lib.mkIf config.selfprivacy.sso.debug ''
       log_format kanidm escape=none '$request $status\n'
                                     '[Request body]: $request_body\n'
@@ -158,8 +158,7 @@ lib.mkIf config.selfprivacy.sso.enable {
 
   systemd.services.kanidm.serviceConfig.ExecStartPre =
     # idempotent script to run on each startup only for kanidm v1.5.0
-    lib.mkIf (pkgs.kanidm.version == "1.5.0")
-      (lib.mkBefore [ kanidmMigrateDbScript ]);
+    lib.mkIf (pkgs.kanidm.version == "1.5.0") (lib.mkBefore [ kanidmMigrateDbScript ]);
 
   selfprivacy.passthru.auth = {
     inherit
@@ -171,25 +170,20 @@ lib.mkIf config.selfprivacy.sso.enable {
       keys-path
       ;
     oauth2-introspection-url-prefix = client_id: "https://${client_id}:";
-    oauth2-introspection-url-postfix =
-      "@${auth-fqdn}/oauth2/token/introspect";
-    oauth2-discovery-url = client_id:
-      "https://${auth-fqdn}/oauth2/openid/${client_id}/.well-known/openid-configuration";
+    oauth2-introspection-url-postfix = "@${auth-fqdn}/oauth2/token/introspect";
+    oauth2-discovery-url =
+      client_id: "https://${auth-fqdn}/oauth2/openid/${client_id}/.well-known/openid-configuration";
     oauth2-provider-name = "Kanidm";
     oauth2-systemd-service = "kanidm.service";
 
     # e.g. "dc=mydomain,dc=com"
-    ldap-base-dn =
-      lib.strings.concatMapStringsSep
-        ","
-        (x: "dc=" + x)
-        (lib.strings.splitString "." domain);
+    ldap-base-dn = lib.strings.concatMapStringsSep "," (x: "dc=" + x) (
+      lib.strings.splitString "." domain
+    );
 
     # TODO consider to pass a value or throw exception if token is not generated
-    mkServiceAccountTokenFP = linuxGroup:
-      "${keys-path}/${linuxGroup}/kanidm-service-account-token";
+    mkServiceAccountTokenFP = linuxGroup: "${keys-path}/${linuxGroup}/kanidm-service-account-token";
 
-    mkOAuth2ClientSecretFP = linuxGroup:
-      "${keys-path}/${linuxGroup}/kanidm-oauth-client-secret";
+    mkOAuth2ClientSecretFP = linuxGroup: "${keys-path}/${linuxGroup}/kanidm-oauth-client-secret";
   };
 }
