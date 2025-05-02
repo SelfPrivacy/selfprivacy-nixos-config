@@ -112,30 +112,30 @@ in
           weight = 3;
         };
       };
-    debug =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable debug logging";
-      })
-      // {
-        meta = {
-          type = "bool";
-          weight = 4;
+      debug =
+        (lib.mkOption {
+          default = false;
+          type = lib.types.bool;
+          description = "Enable debug logging";
+        })
+        // {
+          meta = {
+            type = "bool";
+            weight = 4;
+          };
         };
-      };
-    disableMaintenanceModeAtStart =
-      (lib.mkOption {
-        type = types.bool;
-        default = false;
-        description = "Disable maintenance mode at Nextcloud service startup";
-      })
-      // {
-        meta = {
-          type = "bool";
-          weight = 5;
+      disableMaintenanceModeAtStart =
+        (lib.mkOption {
+          type = types.bool;
+          default = false;
+          description = "Disable maintenance mode at Nextcloud service startup";
+        })
+        // {
+          meta = {
+            type = "bool";
+            weight = 5;
+          };
         };
-      };
   };
 
   # config = lib.mkIf sp.modules.nextcloud.enable
