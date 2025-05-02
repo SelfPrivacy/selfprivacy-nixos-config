@@ -57,8 +57,8 @@ Overriding is more powerful (for non-nested flakes) as it allows to change a fla
 
 Example:
 ```console
-$ nix flake lock --override-input nixpkgs github:nixos/nixpkgs?ref=nixos-24.05
-$ nix flake lock --override-input selfprivacy-api git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git?ref=flakes
+$ nix flake lock --override-input nixpkgs 'github:nixos/nixpkgs?ref=nixos-24.11'
+$ nix flake lock --override-input selfprivacy-api 'git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git?ref=flakes'
 ```
 
 Similarly to update mechanism (described above), depending on the "precision" of an URL, its update scope varies accordingly.
