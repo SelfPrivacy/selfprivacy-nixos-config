@@ -46,7 +46,7 @@ in
 
   config = lib.mkIf cfg.enable {
     nixpkgs.config.permittedInsecurePackages = [
-      "jitsi-meet-1.0.7952"
+      "jitsi-meet-1.0.8043"
     ];
     services.jitsi-meet = {
       enable = true;
