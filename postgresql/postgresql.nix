@@ -64,7 +64,7 @@ in
       '';
     };
     postgresqlUpgrade12to16 = {
-      enable = enable;
+      enable = false;
       pleromaEnabled = pleroma_enabled;
     };
   };
