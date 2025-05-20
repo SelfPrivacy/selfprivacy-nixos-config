@@ -231,6 +231,8 @@ in
   systemd.coredump.enable = false;
 
   environment.memoryAllocator.provider = "libc"; # Scudo has problems with PHP, which may cause PHP to segfault...
+
+  security.sudo.enable = false;
   
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1; # TODO why is it here by default, for VPN only?
