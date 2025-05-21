@@ -60,6 +60,11 @@ in
           };
         };
       };
+      "_" = {
+        useACMEHost = domain;
+        forceSSL = true;
+        extraConfig = "return 404;";
+      };
     };
   };
   systemd.tmpfiles.rules = [
