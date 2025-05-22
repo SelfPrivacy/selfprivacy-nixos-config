@@ -25,7 +25,7 @@ let
   # create service account token, needed for LDAP
   kanidmExecStartPostScript = pkgs.writeShellScript "mailserver-kanidm-ExecStartPost-script.sh" ''
     export HOME=$RUNTIME_DIRECTORY/client_home
-    readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
+    readonly KANIDM="${config.services.kanidm.package}/bin/kanidm"
 
     # get Kanidm service account for mailserver
     KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${mailserver-service-account-name}$")"

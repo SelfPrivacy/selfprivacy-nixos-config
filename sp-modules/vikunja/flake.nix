@@ -1,14 +1,10 @@
 {
   description = "PoC SP module for Vikunja service";
 
-  inputs = {
-    nixpkgs-24-11.url = "github:NixOS/nixpkgs/nixos-24.11";
-  };
-
   outputs =
-    { nixpkgs-24-11, ... }:
+    { ... }:
     {
-      nixosModules.default = import ./module.nix nixpkgs-24-11.legacyPackages.x86_64-linux;
+      nixosModules.default = import ./module.nix;
       configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
       meta =
         { lib, ... }:

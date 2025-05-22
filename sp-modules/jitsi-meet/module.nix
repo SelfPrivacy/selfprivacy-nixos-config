@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+oldPkgs: { config, lib, ... }:
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.jitsi-meet;
@@ -46,13 +46,13 @@ in
 
   config = lib.mkIf cfg.enable {
     nixpkgs.overlays = [
-      (_: prev: {
-        # We disable E2E for clients below
-        jitsi-meet = prev.jitsi-meet.overrideAttrs (old: {
-          meta = old.meta // {
-            knownVulnerabilities = [ ];
-          };
+      (final: prev: {
+        jicofo = oldPkgs.jicofo;
+        jitsi-meet = oldPkgs.jitsi-meet.overrideAttrs (old: {
+          meta = old.meta // { knownVulnerabilities = [ ]; };
         });
+        jitsi-videobridge = oldPkgs.jitsi-videobridge;
+        jitsi-meet-prosody = oldPkgs.jitsi-meet-prosody;
       })
     ];
 

@@ -30,5 +30,6 @@
   [ "services", "redis", "servers", "rspamd", "bind" ],
   [ "services", "redis", "servers", "rspamd", "port" ],
   [ "services", "redis", "servers", "rspamd", "requirePass" ],
-  [ "services", "rspamd" ]
+  [ "services", "rspamd" ],
+  [ "services", "kanidm", "package" ]
 ]

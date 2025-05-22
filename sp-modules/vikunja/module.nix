@@ -1,7 +1,7 @@
-latestPkgs:
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -17,7 +17,7 @@ let
 
   oauthClientSecretFP = auth-passthru.mkOAuth2ClientSecretFP oauthClientID;
 
-  vikunjaPackage = latestPkgs.vikunja.overrideAttrs (old: {
+  vikunjaPackage = pkgs.vikunja.overrideAttrs (old: {
     doCheck = false; # Tests are slow.
     patches = (old.patches or [ ]) ++ [
       ./load-client-secret-from-env.patch

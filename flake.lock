@@ -1,39 +1,23 @@
 {
   "nodes": {
-    "nixos-unstable": {
-      "locked": {
-        "lastModified": 1745930157,
-        "narHash": "sha256-y3h3NLnzRSiUkYpnfvnS669zWZLoqqI6NprtLQ+5dck=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "46e634be05ce9dc6d4db8e664515ba10b78151ae",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1746055187,
-        "narHash": "sha256-3dqArYSMP9hM7Qpy5YWhnSjiqniSaT2uc5h2Po7tmg0=",
-        "owner": "nixos",
+        "lastModified": 1747676747,
+        "narHash": "sha256-LXkWBVqilgx7Pohwqu/ABxDVw+Cmi5/Mj2S2mpUH0Fw=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "3e362ce63e16b9572d8c2297c04f7c19ab6725a5",
+        "rev": "72841a4a8761d1aed92ef6169a636872c986c76d",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "NixOS",
+        "ref": "nixos-24.11",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "root": {
       "inputs": {
-        "nixos-unstable": "nixos-unstable",
         "nixpkgs": "nixpkgs",
         "selfprivacy-api": "selfprivacy-api"
       }
@@ -45,17 +29,18 @@
         ]
       },
       "locked": {
-        "lastModified": 1746195080,
-        "narHash": "sha256-WIqCd8unsDW8QboNMVrqtsXYbsL2BF9L4uJ7DfmAsGo=",
-        "ref": "inex/nixos-24.11",
-        "rev": "8146a556fbac2180e009916ac2b459c5a5040574",
-        "revCount": 1776,
+        "lastModified": 1747923731,
+        "narHash": "sha256-vh1VdbWVq85ZTOTb5snYCwnWG21pdt1Wn6CW9QTSuQE=",
+        "ref": "nhnn/nixos-25.05",
+        "rev": "7e3526547923215a068fb7d9c2e81f8b9631a60c",
+        "revCount": 1777,
         "type": "git",
-        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
+        "url": "https://git.selfprivacy.org/nhnn/selfprivacy-rest-api.git"
       },
       "original": {
+        "ref": "nhnn/nixos-25.05",
         "type": "git",
-        "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
+        "url": "https://git.selfprivacy.org/nhnn/selfprivacy-rest-api.git"
       }
     }
   },

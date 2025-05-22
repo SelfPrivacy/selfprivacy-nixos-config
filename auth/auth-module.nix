@@ -38,7 +38,7 @@ let
     pkgs.writeShellScript "${oauthClientID}-kanidm-ExecStartPost-script.sh" (
       ''
         export HOME=$RUNTIME_DIRECTORY/client_home
-        readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
+        readonly KANIDM="${config.services.kanidm.package}/bin/kanidm"
 
         # try to get existing Kanidm service account
         KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidmServiceAccountName}$")"

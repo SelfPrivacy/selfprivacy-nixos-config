@@ -2,10 +2,9 @@
   description = "SelfPrivacy NixOS configuration flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
-    nixos-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
 
-    selfprivacy-api.url = "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git";
+    selfprivacy-api.url = "git+https://git.selfprivacy.org/nhnn/selfprivacy-rest-api.git?ref=nhnn/nixos-25.05";
     # make selfprivacy-api use the same shared nixpkgs
     selfprivacy-api.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -14,7 +13,6 @@
     {
       self,
       nixpkgs,
-      nixos-unstable,
       selfprivacy-api,
     }:
     {
@@ -35,15 +33,6 @@
                 ./configuration.nix
                 ./auth/auth.nix
                 {
-                  nixpkgs.overlays = [
-                    (_final: prev: {
-                      inherit (nixos-unstable.legacyPackages.${prev.system})
-                        kanidm
-                        kanidm-provision
-                        ;
-                      selfprivacy_nix_2_26 = nixos-unstable.legacyPackages.${prev.system}.nixVersions.nix_2_26;
-                    })
-                  ];
                   disabledModules = [ "services/security/kanidm.nix" ];
                   imports = [ ./auth/kanidm.nix ];
                 }
