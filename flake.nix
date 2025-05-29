@@ -2,7 +2,7 @@
   description = "SelfPrivacy NixOS configuration flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     selfprivacy-api.url = "git+https://git.selfprivacy.org/nhnn/selfprivacy-rest-api.git?ref=nhnn/nixos-25.05";
     # make selfprivacy-api use the same shared nixpkgs
