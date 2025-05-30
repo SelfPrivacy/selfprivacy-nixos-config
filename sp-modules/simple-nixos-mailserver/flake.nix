@@ -1,7 +1,7 @@
 {
   description = "PoC SP module for the simple-nixos-mailserver";
 
-  inputs.mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver";
+  inputs.mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-25.05";
 
   outputs =
     { self, mailserver }:

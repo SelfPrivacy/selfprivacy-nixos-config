@@ -27,9 +27,7 @@
   [ "services", "opendkim", "user" ],
   [ "services", "postfix", "group" ],
   [ "services", "postfix", "user" ],
-  [ "services", "redis", "servers", "rspamd", "bind" ],
-  [ "services", "redis", "servers", "rspamd", "port" ],
-  [ "services", "redis", "servers", "rspamd", "requirePass" ],
+  [ "services", "redis", "servers", "rspamd" ],
   [ "services", "rspamd" ],
   [ "services", "kanidm", "package" ]
 ]
