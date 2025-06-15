@@ -88,6 +88,16 @@ in
         weight = 2;
       };
     };
+    enableSambaFeatures = (lib.mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable support for Samba/CIFS features";
+    }) // {
+      meta = {
+        type = "bool";
+        weight = 3;
+      };
+    };
     debug = (lib.mkOption {
       default = false;
       type = lib.types.bool;
@@ -247,6 +257,13 @@ in
         };
       };
     }
+    # enables samba features when requested
+    (lib.mkIf cfg.enableSambaFeatures {
+      # only apply cifs-utils package to this module
+      services.phpfpm.pools.nextcloud.phpEnv.PATH = 
+        lib.mkForce "${pkgs.samba}/bin:${pkgs.cifs-utils}/bin:/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+      systemd.services.nextcloud-cron.path = [ pkgs.samba pkgs.cifs-utils ];
+    })
     # the following part is active only when "auth" module is enabled
     (lib.mkIf is-auth-enabled {
       systemd.services.nextcloud-setup = {
