@@ -1,4 +1,5 @@
-oldPkgs: { config, lib, ... }:
+oldPkgs:
+{ config, lib, ... }:
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.jitsi-meet;
@@ -49,7 +50,9 @@ in
       (final: prev: {
         jicofo = oldPkgs.jicofo;
         jitsi-meet = oldPkgs.jitsi-meet.overrideAttrs (old: {
-          meta = old.meta // { knownVulnerabilities = [ ]; };
+          meta = old.meta // {
+            knownVulnerabilities = [ ];
+          };
         });
         jitsi-videobridge = oldPkgs.jitsi-videobridge;
         jitsi-meet-prosody = oldPkgs.jitsi-meet-prosody;

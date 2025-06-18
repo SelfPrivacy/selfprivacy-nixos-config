@@ -158,7 +158,9 @@ lib.mkIf config.selfprivacy.sso.enable {
 
   systemd.services.kanidm.serviceConfig.ExecStartPre =
     # idempotent script to run on each startup only for kanidm v1.5.0
-    lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (lib.mkBefore [ kanidmMigrateDbScript ]);
+    lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (
+      lib.mkBefore [ kanidmMigrateDbScript ]
+    );
 
   selfprivacy.passthru.auth = {
     inherit
