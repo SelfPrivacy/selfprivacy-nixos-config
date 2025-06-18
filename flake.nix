@@ -41,6 +41,7 @@
                         kanidm
                         kanidm-provision
                         ;
+                      selfprivacy_nix_2_26 = nixos-unstable.legacyPackages.${prev.system}.nixVersions.nix_2_26;
                     })
                   ];
                   disabledModules = [ "services/security/kanidm.nix" ];

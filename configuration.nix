@@ -84,6 +84,8 @@ in
   services.do-agent.enable =
     if config.selfprivacy.server.provider == "DIGITALOCEAN" then true else false;
 
+  nix.package = pkgs.selfprivacy_nix_2_26;
+
   boot.tmp.cleanOnBoot = true;
   networking = {
     hostName = config.selfprivacy.hostname;
