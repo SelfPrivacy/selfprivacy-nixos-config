@@ -5,37 +5,43 @@ let
 in
 {
   options.selfprivacy.modules.jitsi-meet = {
-    enable = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable JitsiMeet";
-    }) // {
-      meta = {
-        type = "enable";
+    enable =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable JitsiMeet";
+      })
+      // {
+        meta = {
+          type = "enable";
+        };
       };
-    };
-    subdomain = (lib.mkOption {
-      default = "meet";
-      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-      description = "Subdomain";
-    }) // {
-      meta = {
-        widget = "subdomain";
-        type = "string";
-        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-        weight = 0;
+    subdomain =
+      (lib.mkOption {
+        default = "meet";
+        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        description = "Subdomain";
+      })
+      // {
+        meta = {
+          widget = "subdomain";
+          type = "string";
+          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          weight = 0;
+        };
       };
-    };
-    appName = (lib.mkOption {
-      default = "Jitsi Meet";
-      type = lib.types.str;
-      description = "The name displayed in the web interface";
-    }) // {
-      meta = {
-        type = "string";
-        weight = 1;
+    appName =
+      (lib.mkOption {
+        default = "Jitsi Meet";
+        type = lib.types.str;
+        description = "The name displayed in the web interface";
+      })
+      // {
+        meta = {
+          type = "string";
+          weight = 1;
+        };
       };
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -43,7 +49,9 @@ in
       (_: prev: {
         # We disable E2E for clients below
         jitsi-meet = prev.jitsi-meet.overrideAttrs (old: {
-          meta = old.meta // { knownVulnerabilities = [ ]; };
+          meta = old.meta // {
+            knownVulnerabilities = [ ];
+          };
         });
       })
     ];

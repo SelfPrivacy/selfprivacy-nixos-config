@@ -7,15 +7,17 @@ let
 in
 {
   options.selfprivacy.modules.ocserv = {
-    enable = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable";
-    }) // {
-      meta = {
-        type = "enable";
+    enable =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable";
+      })
+      // {
+        meta = {
+          type = "enable";
+        };
       };
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -66,7 +68,10 @@ in
     systemd = {
       services = {
         ocserv = {
-          unitConfig.ConditionPathExists = [ cert key ];
+          unitConfig.ConditionPathExists = [
+            cert
+            key
+          ];
           serviceConfig.Slice = "ocserv.slice";
         };
       };

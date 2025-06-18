@@ -4,23 +4,27 @@ let
 in
 {
   options.selfprivacy.modules.monitoring = {
-    enable = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable monitoring service";
-    }) // {
-      meta = {
-        type = "enable";
+    enable =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable monitoring service";
+      })
+      // {
+        meta = {
+          type = "enable";
+        };
       };
-    };
-    location = (lib.mkOption {
-      type = lib.types.str;
-      description = "Monitoring data location";
-    }) // {
-      meta = {
-        type = "location";
+    location =
+      (lib.mkOption {
+        type = lib.types.str;
+        description = "Monitoring data location";
+      })
+      // {
+        meta = {
+          type = "location";
+        };
       };
-    };
   };
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf config.selfprivacy.useBinds {
@@ -54,15 +58,19 @@ in
       scrapeConfigs = [
         {
           job_name = "node-exporter";
-          static_configs = [{
-            targets = [ "127.0.0.1:9002" ];
-          }];
+          static_configs = [
+            {
+              targets = [ "127.0.0.1:9002" ];
+            }
+          ];
         }
         {
           job_name = "cadvisor";
-          static_configs = [{
-            targets = [ "127.0.0.1:9003" ];
-          }];
+          static_configs = [
+            {
+              targets = [ "127.0.0.1:9003" ];
+            }
+          ];
         }
       ];
     };

@@ -1,22 +1,34 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   sp = config.selfprivacy;
   pleroma_location =
-    if lib.attrsets.hasAttr "pleroma" sp.modules && lib.attrsets.hasAttr "location" sp.modules.pleroma
-    then sp.modules.pleroma.location
-    else null;
+    if
+      lib.attrsets.hasAttr "pleroma" sp.modules && lib.attrsets.hasAttr "location" sp.modules.pleroma
+    then
+      sp.modules.pleroma.location
+    else
+      null;
   postgres_location =
-    if lib.attrsets.hasAttr "postgresql" sp && lib.attrsets.hasAttr "location" sp.postgresql
-    then sp.postgresql.location
-    else null;
+    if lib.attrsets.hasAttr "postgresql" sp && lib.attrsets.hasAttr "location" sp.postgresql then
+      sp.postgresql.location
+    else
+      null;
   # Priority: postgresql > pleroma
   location = if postgres_location != null then postgres_location else pleroma_location;
   # Active if there is a location
   enable = location != null;
   pleroma_enabled =
-    if lib.attrsets.hasAttr "pleroma" sp.modules && lib.attrsets.hasAttr "enable" sp.modules.pleroma
-    then sp.modules.pleroma.enable
-    else false;
+    if
+      lib.attrsets.hasAttr "pleroma" sp.modules && lib.attrsets.hasAttr "enable" sp.modules.pleroma
+    then
+      sp.modules.pleroma.enable
+    else
+      false;
 in
 {
   imports = [

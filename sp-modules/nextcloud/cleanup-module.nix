@@ -13,8 +13,8 @@ in
     system.activationScripts.nextcloudSecrets =
       lib.trivial.warn
         (
-          "nextcloud service is disabled, " +
-          "${override-config-fp}, ${db-pass-filepath} and ${admin-pass-filepath} will be removed!"
+          "nextcloud service is disabled, "
+          + "${override-config-fp}, ${db-pass-filepath} and ${admin-pass-filepath} will be removed!"
         )
         ''
           rm -f -v ${db-pass-filepath}

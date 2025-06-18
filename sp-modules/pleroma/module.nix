@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   secrets-filepath = "/etc/selfprivacy/secrets.json";
   cfg = config.selfprivacy.modules.pleroma;
@@ -6,35 +11,41 @@ let
 in
 {
   options.selfprivacy.modules.pleroma = {
-    enable = (lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable";
-    }) // {
-      meta = {
-        type = "enable";
+    enable =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable";
+      })
+      // {
+        meta = {
+          type = "enable";
+        };
       };
-    };
-    location = (lib.mkOption {
-      type = lib.types.str;
-      description = "Location";
-    }) // {
-      meta = {
-        type = "location";
+    location =
+      (lib.mkOption {
+        type = lib.types.str;
+        description = "Location";
+      })
+      // {
+        meta = {
+          type = "location";
+        };
       };
-    };
-    subdomain = (lib.mkOption {
-      default = "social";
-      type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-      description = "Subdomain";
-    }) // {
-      meta = {
-        widget = "subdomain";
-        type = "string";
-        regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
-        weight = 0;
+    subdomain =
+      (lib.mkOption {
+        default = "social";
+        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        description = "Subdomain";
+      })
+      // {
+        meta = {
+          widget = "subdomain";
+          type = "string";
+          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          weight = 0;
+        };
       };
-    };
   };
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
@@ -55,10 +66,9 @@ in
         user = "pleroma";
         group = "pleroma";
         configs = [
-          (builtins.replaceStrings
-            [ "$DOMAIN" "$LUSER" ]
-            [ sp.domain sp.username ]
-            (builtins.readFile ./config.exs.in))
+          (builtins.replaceStrings [ "$DOMAIN" "$LUSER" ] [ sp.domain sp.username ] (
+            builtins.readFile ./config.exs.in
+          ))
         ];
       };
       postgresql = {
@@ -94,7 +104,10 @@ in
           before = [ "pleroma.service" ];
           requiredBy = [ "pleroma.service" ];
           serviceConfig.Type = "oneshot";
-          path = with pkgs; [ coreutils jq ];
+          path = with pkgs; [
+            coreutils
+            jq
+          ];
           script = ''
             set -o nounset
 

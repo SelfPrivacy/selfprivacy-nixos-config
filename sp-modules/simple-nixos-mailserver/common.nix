@@ -4,11 +4,17 @@ rec {
   domain = config.selfprivacy.domain;
   group = "dovecot2";
   is-auth-enabled =
-    config.selfprivacy.modules.simple-nixos-mailserver.enableSso
-    && config.selfprivacy.sso.enable;
+    config.selfprivacy.modules.simple-nixos-mailserver.enableSso && config.selfprivacy.sso.enable;
 
   appendSetting =
-    { name, file, prefix, suffix ? "", passwordFile, destination }:
+    {
+      name,
+      file,
+      prefix,
+      suffix ? "",
+      passwordFile,
+      destination,
+    }:
     pkgs.writeScript "append-ldap-bind-pwd-in-${name}" ''
       #!${pkgs.stdenv.shell}
       set -euo pipefail

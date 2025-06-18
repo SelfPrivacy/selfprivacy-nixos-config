@@ -1,6 +1,6 @@
 config: rec {
   sp = config.selfprivacy;
-  domain= sp.domain;
+  domain = sp.domain;
   secrets-filepath = "/etc/selfprivacy/secrets.json";
   db-pass-filepath = "/var/lib/nextcloud/db-pass";
   admin-pass-filepath = "/var/lib/nextcloud/admin-pass";

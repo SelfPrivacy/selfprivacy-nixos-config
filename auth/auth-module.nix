@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   inherit (lib)
     mkOption
@@ -7,12 +12,12 @@ let
   auth-passthru = config.selfprivacy.passthru.auth;
   keys-path = auth-passthru.keys-path;
   # generate OAuth2 client secret
-  mkKanidmExecStartPreScript = oauthClientID: linuxGroup:
+  mkKanidmExecStartPreScript =
+    oauthClientID: linuxGroup:
     let
       secretFP = auth-passthru.mkOAuth2ClientSecretFP linuxGroup;
     in
-    pkgs.writeShellScript
-      "${oauthClientID}-kanidm-ExecStartPre-script.sh" ''
+    pkgs.writeShellScript "${oauthClientID}-kanidm-ExecStartPre-script.sh" ''
       set -o pipefail
       set -o errexit
       if ! [ -f "${secretFP}" ]
@@ -22,17 +27,16 @@ let
         chmod 640 "${secretFP}"
       fi
     '';
-  mkKanidmExecStartPostScript = oauthClientID: linuxGroup: isMailserver:
+  mkKanidmExecStartPostScript =
+    oauthClientID: linuxGroup: isMailserver:
     let
       kanidmServiceAccountName = "sp.${oauthClientID}.service-account";
       kanidmServiceAccountTokenName = "${oauthClientID}-service-account-token";
-      kanidmServiceAccountTokenFP =
-        auth-passthru.mkServiceAccountTokenFP linuxGroup;
+      kanidmServiceAccountTokenFP = auth-passthru.mkServiceAccountTokenFP linuxGroup;
       isRW = oauthClientID == "selfprivacy-api";
     in
-    pkgs.writeShellScript
-      "${oauthClientID}-kanidm-ExecStartPost-script.sh"
-      (''
+    pkgs.writeShellScript "${oauthClientID}-kanidm-ExecStartPost-script.sh" (
+      ''
         export HOME=$RUNTIME_DIRECTORY/client_home
         readonly KANIDM="${pkgs.kanidm}/bin/kanidm"
 
@@ -82,13 +86,12 @@ let
       + lib.strings.optionalString isRW ''
         $KANIDM group add-members idm_admins "${kanidmServiceAccountName}"
       ''
-      );
+    );
 in
 {
   options.selfprivacy.auth = {
     clients = mkOption {
-      description =
-        "Configurations for OAuth2 & LDAP servers clients services. Corresponding Kanidm provisioning configuration and systemd scripts are generated.";
+      description = "Configurations for OAuth2 & LDAP servers clients services. Corresponding Kanidm provisioning configuration and systemd scripts are generated.";
       default = { };
       type = types.attrsOf (
         types.submodule {
@@ -107,69 +110,58 @@ in
             };
             enablePkce = mkOption {
               type = lib.types.bool;
-              description =
-                "Whether PKCE must be used between client and Kanidm.";
+              description = "Whether PKCE must be used between client and Kanidm.";
               default = false;
             };
             adminsGroup = mkOption {
-              type =
-                types.nullOr (lib.types.strMatching "sp\.[A-Za-z0-9]+\.admins");
-              description =
-                "Name of admins group in Kanidm, whose members have admin level access to resources (service) associated with OAuth2 client authorization.";
+              type = types.nullOr (lib.types.strMatching "sp\.[A-Za-z0-9]+\.admins");
+              description = "Name of admins group in Kanidm, whose members have admin level access to resources (service) associated with OAuth2 client authorization.";
               default = null;
             };
             usersGroup = mkOption {
-              type =
-                types.nullOr (lib.types.strMatching "sp\.[A-Za-z0-9]+\.users");
-              description =
-                "Name of users group in Kanidm, whose members have user level access to resources (service) associated with OAuth2 client authorization.";
+              type = types.nullOr (lib.types.strMatching "sp\.[A-Za-z0-9]+\.users");
+              description = "Name of users group in Kanidm, whose members have user level access to resources (service) associated with OAuth2 client authorization.";
               default = null;
             };
             originLanding = mkOption {
               type = types.nullOr lib.types.str;
-              description =
-                "The origin landing of the service for OAuth2 redirects.";
+              description = "The origin landing of the service for OAuth2 redirects.";
             };
             originUrl = mkOption {
               type = types.nullOr lib.types.str;
-              description =
-                "The origin URL of the service for OAuth2 redirects.";
+              description = "The origin URL of the service for OAuth2 redirects.";
             };
             subdomain = lib.mkOption {
-              type =
-                lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+              type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
               description = "Subdomain of the service.";
             };
             # when true, "name" is passed to a service instead of "name@domain"
             useShortPreferredUsername = mkOption {
-              description =
-                "Use 'name' instead of 'spn' in the preferred_username claim.";
+              description = "Use 'name' instead of 'spn' in the preferred_username claim.";
               type = types.bool;
               default = true;
             };
             linuxUserOfClient = mkOption {
               type = types.nullOr lib.types.str;
-              description =
-                "Name of a Linux OAuth2 client user, under which it should get access through a folder with keys.";
+              description = "Name of a Linux OAuth2 client user, under which it should get access through a folder with keys.";
               default = null;
             };
             linuxGroupOfClient = mkOption {
               type = types.nullOr lib.types.str;
-              description =
-                "Name of Linux OAuth2 client group, under which it should read an OAuth2 client secret file.";
+              description = "Name of Linux OAuth2 client group, under which it should read an OAuth2 client secret file.";
               default = null;
             };
             isTokenNeeded = mkOption {
-              description =
-                "Whether a read-only needs to be generated for LDAP access.";
+              description = "Whether a read-only needs to be generated for LDAP access.";
               type = types.bool;
               default = false;
             };
             clientSystemdUnits = mkOption {
               description = "A list of systemd services, which depend on OAuth service";
               # taken from nixos/lib/systemd-lib.nix: unitNameType
-              type = types.listOf
-                (types.strMatching "[a-zA-Z0-9@%:_.\\-]+[.](service|socket|device|mount|automount|swap|target|path|timer|scope|slice)");
+              type = types.listOf (
+                types.strMatching "[a-zA-Z0-9@%:_.\\-]+[.](service|socket|device|mount|automount|swap|target|path|timer|scope|slice)"
+              );
             };
             scopeMaps = mkOption {
               description = ''
@@ -231,133 +223,132 @@ in
   };
   config = lib.mkIf config.selfprivacy.sso.enable (
     let
-      clientsAttrsList = lib.attrsets.mapAttrsToList
-        (name: attrs: attrs // rec {
-          clientID =
-            if attrs.clientID == null
-            then name
-            else attrs.clientID;
-          displayName =
-            if attrs.displayName == null
-            then clientID
-            else attrs.displayName;
-          adminsGroup =
-            if attrs.adminsGroup == null
-            then "sp.${clientID}.admins"
-            else attrs.adminsGroup;
-          usersGroup =
-            if attrs.usersGroup == null
-            then "sp.${clientID}.users"
-            else attrs.usersGroup;
-          basicSecretFile =
-            "${keys-path}/${linuxGroupOfClient}/kanidm-oauth-client-secret";
-          linuxUserOfClient =
-            if attrs.linuxUserOfClient == null
-            then clientID
-            else attrs.linuxUserOfClient;
+      clientsAttrsList = lib.attrsets.mapAttrsToList (
+        name: attrs:
+        attrs
+        // rec {
+          clientID = if attrs.clientID == null then name else attrs.clientID;
+          displayName = if attrs.displayName == null then clientID else attrs.displayName;
+          adminsGroup = if attrs.adminsGroup == null then "sp.${clientID}.admins" else attrs.adminsGroup;
+          usersGroup = if attrs.usersGroup == null then "sp.${clientID}.users" else attrs.usersGroup;
+          basicSecretFile = "${keys-path}/${linuxGroupOfClient}/kanidm-oauth-client-secret";
+          linuxUserOfClient = if attrs.linuxUserOfClient == null then clientID else attrs.linuxUserOfClient;
           linuxGroupOfClient =
-            if attrs.linuxGroupOfClient == null
-            then clientID
-            else attrs.linuxGroupOfClient;
+            if attrs.linuxGroupOfClient == null then clientID else attrs.linuxGroupOfClient;
           originLanding =
-            if attrs.originLanding == null
-            then "https://${attrs.subdomain}.${config.selfprivacy.domain}/"
-            else attrs.originLanding;
+            if attrs.originLanding == null then
+              "https://${attrs.subdomain}.${config.selfprivacy.domain}/"
+            else
+              attrs.originLanding;
           scopeMaps =
-            if attrs.scopeMaps == null
-            then { "${usersGroup}" = [ "email" "openid" "profile" ]; }
-            else attrs.scopeMaps;
-        })
-        config.selfprivacy.auth.clients;
+            if attrs.scopeMaps == null then
+              {
+                "${usersGroup}" = [
+                  "email"
+                  "openid"
+                  "profile"
+                ];
+              }
+            else
+              attrs.scopeMaps;
+        }
+      ) config.selfprivacy.auth.clients;
     in
     {
       # for each OAuth2 client: member of the `keys` group for directory access
-      users.groups.keys.members = lib.mkMerge (lib.forEach
-        clientsAttrsList
-        ({ linuxUserOfClient, ... }: [ linuxUserOfClient ])
+      users.groups.keys.members = lib.mkMerge (
+        lib.forEach clientsAttrsList ({ linuxUserOfClient, ... }: [ linuxUserOfClient ])
       );
 
-      systemd.tmpfiles.settings."kanidm-secrets" = lib.mkMerge (lib.forEach
-        clientsAttrsList
-        ({ linuxGroupOfClient, ... }: {
-          "${keys-path}/${linuxGroupOfClient}".d = {
-            user = "kanidm";
-            group = linuxGroupOfClient;
-            mode = "2750";
-          };
-        })
+      systemd.tmpfiles.settings."kanidm-secrets" = lib.mkMerge (
+        lib.forEach clientsAttrsList (
+          { linuxGroupOfClient, ... }:
+          {
+            "${keys-path}/${linuxGroupOfClient}".d = {
+              user = "kanidm";
+              group = linuxGroupOfClient;
+              mode = "2750";
+            };
+          }
+        )
       );
 
       # for each OAuth2 client: scripts with Kanidm CLI commands
       systemd.services.kanidm = {
-        before =
-          lib.lists.concatMap
-            ({ clientSystemdUnits, ... }: clientSystemdUnits)
-            clientsAttrsList;
-        serviceConfig =
-          lib.mkMerge (lib.forEach
-            clientsAttrsList
-            ({ clientID, isTokenNeeded, linuxGroupOfClient, isMailserver, ... }:
-              {
-                ExecStartPre = [
-                  # "-" prefix means to ignore exit code of prefixed script
-                  ("-" + mkKanidmExecStartPreScript clientID linuxGroupOfClient)
-                ];
-                ExecStartPost = lib.mkIf isTokenNeeded
-                  (lib.mkAfter [
-                    ("-" +
-                      mkKanidmExecStartPostScript
-                        clientID
-                        linuxGroupOfClient
-                        isMailserver)
-                  ]);
-              }));
+        before = lib.lists.concatMap ({ clientSystemdUnits, ... }: clientSystemdUnits) clientsAttrsList;
+        serviceConfig = lib.mkMerge (
+          lib.forEach clientsAttrsList (
+            {
+              clientID,
+              isTokenNeeded,
+              linuxGroupOfClient,
+              isMailserver,
+              ...
+            }:
+            {
+              ExecStartPre = [
+                # "-" prefix means to ignore exit code of prefixed script
+                ("-" + mkKanidmExecStartPreScript clientID linuxGroupOfClient)
+              ];
+              ExecStartPost = lib.mkIf isTokenNeeded (
+                lib.mkAfter [
+                  ("-" + mkKanidmExecStartPostScript clientID linuxGroupOfClient isMailserver)
+                ]
+              );
+            }
+          )
+        );
       };
 
       # for each OAuth2 client: Kanidm provisioning options
-      services.kanidm.provision = lib.mkMerge (lib.forEach
-        clientsAttrsList
-        ({ adminsGroup
-         , basicSecretFile
-         , claimMaps
-         , clientID
-         , displayName
-         , enablePkce
-         , imageFile
-         , originLanding
-         , originUrl
-         , scopeMaps
-         , useShortPreferredUsername
-         , usersGroup
-         , ...
-         }: {
-          groups = lib.mkIf (clientID != "selfprivacy-api") {
-            "${adminsGroup}".members =
-              [ auth-passthru.admins-group ];
-            "${usersGroup}".members =
-              [ adminsGroup auth-passthru.full-users-group ];
-          };
-          systems.oauth2.${clientID} = {
-            inherit
-              basicSecretFile
-              claimMaps
-              displayName
-              imageFile
-              originLanding
-              originUrl
-              scopeMaps
-              ;
-            preferShortUsername = useShortPreferredUsername;
-            allowInsecureClientDisablePkce = ! enablePkce;
-            removeOrphanedClaimMaps = true;
+      services.kanidm.provision = lib.mkMerge (
+        lib.forEach clientsAttrsList (
+          {
+            adminsGroup,
+            basicSecretFile,
+            claimMaps,
+            clientID,
+            displayName,
+            enablePkce,
+            imageFile,
+            originLanding,
+            originUrl,
+            scopeMaps,
+            useShortPreferredUsername,
+            usersGroup,
+            ...
+          }:
+          {
+            groups = lib.mkIf (clientID != "selfprivacy-api") {
+              "${adminsGroup}".members = [ auth-passthru.admins-group ];
+              "${usersGroup}".members = [
+                adminsGroup
+                auth-passthru.full-users-group
+              ];
+            };
+            systems.oauth2.${clientID} = {
+              inherit
+                basicSecretFile
+                claimMaps
+                displayName
+                imageFile
+                originLanding
+                originUrl
+                scopeMaps
+                ;
+              preferShortUsername = useShortPreferredUsername;
+              allowInsecureClientDisablePkce = !enablePkce;
+              removeOrphanedClaimMaps = true;
 
-            # NOTE https://github.com/oddlama/kanidm-provision/issues/15
-            # add more scopes when a user is a member of specific group
-            # currently not possible due to https://github.com/kanidm/kanidm/issues/2882#issuecomment-2564490144
-            # supplementaryScopeMaps."${admins-group}" =
-            #   [ "read:admin" "write:admin" ];
-          };
-        }));
+              # NOTE https://github.com/oddlama/kanidm-provision/issues/15
+              # add more scopes when a user is a member of specific group
+              # currently not possible due to https://github.com/kanidm/kanidm/issues/2882#issuecomment-2564490144
+              # supplementaryScopeMaps."${admins-group}" =
+              #   [ "read:admin" "write:admin" ];
+            };
+          }
+        )
+      );
     }
   );
 }
