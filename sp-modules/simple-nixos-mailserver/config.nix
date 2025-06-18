@@ -9,7 +9,6 @@ let
 
   inherit (import ./common.nix { inherit config pkgs; })
     auth-passthru
-    domain
     group
     is-auth-enabled
     ;
@@ -129,7 +128,6 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
           postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           redis-rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
-          opendkim.serviceConfig.Slice = "simple_nixos_mailserver.slice";
         };
         slices."simple_nixos_mailserver" = {
           name = "simple_nixos_mailserver.slice";
