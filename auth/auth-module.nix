@@ -34,11 +34,34 @@ let
       kanidmServiceAccountTokenName = "${oauthClientID}-service-account-token";
       kanidmServiceAccountTokenFP = auth-passthru.mkServiceAccountTokenFP linuxGroup;
       isRW = oauthClientID == "selfprivacy-api";
+
+      # TODO: Copied from Forgejo module. Maybe generalize as lib. function?
+      waitForURL = url: maxRetries: delaySec: ''
+        for ((i=1; i<=${toString maxRetries}; i++))
+        do
+            if ${lib.getExe pkgs.curl} -X GET --silent --fail "${url}" > /dev/null
+            then
+                echo "${url} responds to GET HTTP request (attempt #$i)"
+                break
+            else
+                echo "${url} does not respond to GET HTTP request (attempt #$i)"
+                echo sleeping for ${toString delaySec} seconds
+            fi
+            sleep ${toString delaySec}
+        done
+        if [[ "$i" -gt "${toString maxRetries}" ]]
+        then
+            echo "error, max attempts to access "${url}" have been used unsuccessfully!"
+            exit 124
+        fi
+      '';
     in
     pkgs.writeShellScript "${oauthClientID}-kanidm-ExecStartPost-script.sh" (
       ''
         export HOME=$RUNTIME_DIRECTORY/client_home
         readonly KANIDM="${config.services.kanidm.package}/bin/kanidm"
+
+        ${waitForURL config.services.kanidm.serverSettings.origin 10 10}
 
         # try to get existing Kanidm service account
         KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidmServiceAccountName}$")"
