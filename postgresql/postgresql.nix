@@ -71,6 +71,56 @@ in
   systemd = {
     services.postgresql = {
       serviceConfig.Slice = "postgresql.slice";
+      serviceConfig.ExecStartPost = pkgs.writeShellScript "update-pg-collation" ''
+        export PATH="${config.services.postgresql.package}/bin:$PATH"
+        GLIBC_VERSION="${pkgs.glibc.version}"
+
+        check_mismatches() {
+          local query="
+            SELECT datname, datcollversion
+            FROM pg_database
+            WHERE datcollversion IS NOT NULL
+              AND datcollversion != '$GLIBC_VERSION'
+              AND datallowconn = true
+              AND datname NOT IN ('template0')
+            ORDER BY datname;
+          "
+
+          psql -c "$query" 2>/dev/null | grep -v '^$' || true
+        }
+
+        get_mismatched_databases() {
+          check_mismatches | while IFS='|' read -r dbname version; do
+              dbname=$(echo "$dbname" | xargs)
+              version=$(echo "$version" | xargs)
+
+              if [ "datname" != "$dbname" ] && [ -n "$dbname" ] && [ -n "$version" ]; then
+                echo "$dbname"
+              fi
+          done
+        }
+
+
+        fix_database() {
+          local dbname=$1
+          local current_version
+          current_version=$(psql --csv -c "SELECT datcollversion FROM pg_database WHERE datname = '$dbname';" | xargs)
+          if  psql -d "$dbname" -c "REINDEX DATABASE \"$dbname\";" 2>/dev/null && psql -d "$dbname" -c "ALTER DATABASE \"$dbname\" REFRESH COLLATION VERSION;" 2>/dev/null; then
+            echo "update-collation: Successfully updated collation on DB $dbname ($current_version -> $GLIBC_VERSION)"
+            return 0
+          else
+            echo "update-collation: Failed to update collation on DB $dbname"
+            return 1
+          fi
+        }
+
+        dbs=$(get_mismatched_databases)
+
+        for dbname in $dbs; do
+          echo "update-collation: Updating $dbname"
+          fix_database $dbname
+        done
+      '';
     };
     slices.postgresql = {
       description = "PostgreSQL slice";
