@@ -192,8 +192,8 @@ in
       (lib.mkIf is-auth-enabled {
         services.actual = {
           settings = {
-            # permit openid logins
-            allowedLoginMethods = [ "openid" ];
+            # only permit openid logins
+            allowedLoginMethods = lib.mkForce [ "openid" ];
             # default to openid if enabled
             loginMethod = "openid";
             # SSO config
