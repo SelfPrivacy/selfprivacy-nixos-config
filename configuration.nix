@@ -185,7 +185,7 @@ in
       fi
     '';
   nix = {
-    #package = pkgs.nixVersions.nix_2_18;
+    package = pkgs.nixVersions.nix_2_26;
     channel.enable = false;
 
     # daemonCPUSchedPolicy = "idle";
