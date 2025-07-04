@@ -34,9 +34,7 @@ let
   '';
 in
 {
-  # Here go the options you expose to the user.
   options.selfprivacy.modules.actual = {
-    # This is required and must always be named "enable"
     enable =
       (lib.mkOption {
         default = false;
@@ -48,7 +46,6 @@ in
           type = "enable";
         };
       };
-    # This is required if your service stores data on disk
     location =
       (lib.mkOption {
         type = lib.types.str;
@@ -59,7 +56,6 @@ in
           type = "location";
         };
       };
-    # This is required if your service needs a subdomain
     subdomain =
       (lib.mkOption {
         default = "actual";
@@ -74,8 +70,7 @@ in
           weight = 0;
         };
       };
-    # Other options, that user sees directly.
-    # Refer to Module options reference to learn more.
+    # service settings
     enableSso =
       (lib.mkOption {
         default = true;
@@ -102,10 +97,6 @@ in
       };
   };
 
-  # All your changes to the system must go to this config attrset.
-  # It MUST use lib.mkIf with an enable option.
-  # This makes sure your module only makes changes to the system
-  # if the module is enabled.
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
       {
@@ -116,13 +107,10 @@ in
             message = "SSO cannot be enabled for Actual when SSO is disabled globally.";
           }
         ];
-        # If your service stores data on disk, you have to mount a folder
-        # for this. useBinds is always true on modern SelfPrivacy installations
-        # but we keep this mkIf to keep migration flow possible.
+       
         fileSystems = lib.mkIf sp.useBinds {
           "/var/lib/actual" = {
             device = "/volumes/${cfg.location}/actual";
-            # Make sure that your service does not start before folder mounts
             options = [
               "bind"
               "x-systemd.required-by=actual.service"
@@ -171,13 +159,11 @@ in
               );
             };
           };
-          # Define the slice itself
           slices.actual = {
             description = "Actual server service slice";
           };
         };
 
-        # You can define a reverse proxy for your service like this
         services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
           useACMEHost = sp.domain;
           forceSSL = true;
@@ -188,6 +174,7 @@ in
           };
         };
       }
+
       # SSO config
       (lib.mkIf is-auth-enabled {
         services.actual = {
@@ -196,7 +183,7 @@ in
             allowedLoginMethods = lib.mkForce [ "openid" ];
             # default to openid if enabled
             loginMethod = "openid";
-            # SSO config
+            # service SSO config
             openId = {
               discoveryURL = oauthDiscoveryURL;
               client_id = oauthClientID;
@@ -217,7 +204,6 @@ in
 
         # OIDC for Actual is currently in beta and requires legacy cryptography algorithms
         services.kanidm.provision.systems.oauth2."${oauthClientID}".enableLegacyCrypto = true;
-        # Configure the OIDC client
         selfprivacy.auth.clients."${oauthClientID}" = {
           inherit adminsGroup usersGroup;
           imageFile = ./icon-lg.svg;
