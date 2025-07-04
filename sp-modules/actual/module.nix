@@ -182,6 +182,8 @@ in
             allowedLoginMethods = lib.mkForce [ "openid" ];
             # default to openid if enabled
             loginMethod = "openid";
+            # https://github.com/actualbudget/actual/pull/4421
+            userCreationMode = "login";
             # service SSO config
             openId = {
               discoveryURL = oauthDiscoveryURL;
