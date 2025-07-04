@@ -1,0 +1,15 @@
+[
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "modules", "auth", "enable" ],
+  [ "services", "jitsi-meet", "enable" ],
+  [ "services", "jitsi-meet", "hostName" ],
+  [ "nixpkgs", "flake", "source" ],
+  [ "services", "postgresql", "package" ],
+  [ "selfprivacy", "modules", "matrix" ],
+  [ "selfprivacy", "passthru", "auth", "mkOAuth2ClientSecretFP" ],
+  [ "selfprivacy", "passthru", "auth", "mkServiceAccountTokenFP" ],
+  [ "selfprivacy", "passthru", "auth", "oauth2-discovery-url" ],
+  [ "selfprivacy", "passthru", "auth", "oauth2-provider-name" ],
+  [ "selfprivacy", "sso", "enable" ],
+  [ "selfprivacy", "useBinds" ]
+]
