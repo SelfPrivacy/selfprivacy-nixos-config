@@ -34,8 +34,7 @@
           ];
           homepage = "https://actualbudget.org/";
           sourcePage = "https://github.com/actualbudget/actual";
-          # since this module hasn't been thoroughly tested, I'd advertise it as `experimental`, but is also a `community` class module
-          supportLevel = "experimental";
+          supportLevel = "community";
         };
     };
 }
