@@ -146,9 +146,9 @@ in
                 # override dynamic user since service from nixpkgs enables by default, but it doesn't work in the selfprivacy environment
                 DynamicUser = lib.mkForce false;
                 # use service user
-                User = "actual";
+                User = linuxUserOfService;
                 # use service group
-                Group = "actual";
+                Group = linuxGroupOfService;
               };
               environment = 
                 # tell actual to log debug info to the console if option is enabled
