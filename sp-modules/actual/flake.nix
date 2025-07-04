@@ -16,7 +16,7 @@
           svgIcon = builtins.readFile ./icon.svg;
           showUrl = true;
           primarySubdomain = "subdomain";
-          isMovable = false;
+          isMovable = true;
           isRequired = false;
           canBeBackedUp = true;
           backupDescription = "Your budgets, settings, and account secrets (where applicable).";
