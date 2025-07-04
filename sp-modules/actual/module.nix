@@ -78,7 +78,7 @@ in
     # Refer to Module options reference to learn more.
     enableSso =
       (lib.mkOption {
-        default = false;
+        default = true;
         type = lib.types.bool;
         description = "Enable Single Sign-On";
       })
