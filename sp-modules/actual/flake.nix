@@ -1,5 +1,5 @@
 {
-  description = "Flake description";
+  description = "Actual (aka Actual Budget) is a super fast and privacy-focused app for managing your finances.";
 
   outputs =
     { self }:
