@@ -16,7 +16,6 @@ let
   redirect-uri = "${full-domain}/openid/callback";
   landing-uri = "${full-domain}/login";
   oauthDiscoveryURL = auth-passthru.oauth2-discovery-url oauthClientID;
-  adminsGroup = "sp.${oauthClientID}.admins";
   usersGroup = "sp.${oauthClientID}.users";
 
   linuxUserOfService = "actual";
@@ -205,7 +204,7 @@ in
         # OIDC for Actual is currently in beta and requires legacy cryptography algorithms
         services.kanidm.provision.systems.oauth2."${oauthClientID}".enableLegacyCrypto = true;
         selfprivacy.auth.clients."${oauthClientID}" = {
-          inherit adminsGroup usersGroup;
+          inherit usersGroup;
           imageFile = ./icon-lg.svg;
           displayName = "Actual";
           subdomain = cfg.subdomain;
