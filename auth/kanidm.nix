@@ -234,7 +234,12 @@ let
     export KANIDM_URL="${cfg.provision.instanceUrl}"
     export KANIDM_SKIP_HOSTNAME_VERIFICATION="true"
     KANIDM_PASSWORD="$KANIDM_IDM_ADMIN_PASSWORD" ${cfg.package}/bin/kanidm login
+
+    # disable anonymous account because it allows to freely iterate over all users on kanidm instance.
+    ${cfg.package}/bin/kanidm service-account validity expire-at anonymous epoch
+
     ${createAndPopulateGroups}
+
     unset HOME
     unset KANIDM_NAME
     unset KANIDM_URL

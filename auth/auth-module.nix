@@ -81,9 +81,6 @@ let
             fi
         fi
 
-        # disable anonymous account because it allows to freely iterate over all users on kanidm instance.
-        $KANIDM service-account validity expire-at anonymous epoch
-
         # create a new token for kanidm
         if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountTokenName}" ${lib.strings.optionalString isRW "--rw"} --output json)"
         then
