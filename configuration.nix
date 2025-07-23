@@ -59,7 +59,10 @@ in
     '';
   };
 
-  fileSystems."/".options = [ "noatime" ];
+  fileSystems."/" = {
+    device = lib.mkIf (config.selfprivacy.server.rootPartition != null) (lib.mkForce config.selfprivacy.server.rootPartition);
+    options = [ "noatime" ];
+  };
 
   services.selfprivacy-api.enable = true;
 

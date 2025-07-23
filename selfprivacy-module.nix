@@ -97,6 +97,11 @@ with lib;
         description = "Server provider that was defined at the initial setup process.";
         type = types.str;
       };
+      rootPartition = mkOption {
+        description = "Root partition to use.";
+        type = types.nullOr types.str;
+        default = null;
+      };
     };
     #########
     #  SSH  #
