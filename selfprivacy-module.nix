@@ -102,6 +102,11 @@ with lib;
         type = types.nullOr types.str;
         default = null;
       };
+      rootPartitionName = mkOption {
+        description = "Canonical root partition name.";
+        type = types.nullOr types.str;
+        default = null;
+      };
     };
     #########
     #  SSH  #
