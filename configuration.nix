@@ -86,6 +86,8 @@ in
     };
   };
 
+  services.logrotate.checkConfig = false; # seems to be broken with hardened profile.
+
   services.do-agent.enable =
     if config.selfprivacy.server.provider == "DIGITALOCEAN" then true else false;
 
