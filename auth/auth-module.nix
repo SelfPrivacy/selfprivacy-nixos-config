@@ -252,7 +252,8 @@ in
         // rec {
           clientID = if attrs.clientID == null then name else attrs.clientID;
           displayName = if attrs.displayName == null then clientID else attrs.displayName;
-          adminsGroup = if attrs.adminsGroup == null then "sp.${clientID}.admins" else attrs.adminsGroup;
+          adminsGroupDefined = attrs.adminsGroup != null;
+          adminsGroup = attrs.adminsGroup;
           usersGroup = if attrs.usersGroup == null then "sp.${clientID}.users" else attrs.usersGroup;
           basicSecretFile = "${keys-path}/${linuxGroupOfClient}/kanidm-oauth-client-secret";
           linuxUserOfClient = if attrs.linuxUserOfClient == null then clientID else attrs.linuxUserOfClient;
@@ -327,6 +328,7 @@ in
       services.kanidm.provision = lib.mkMerge (
         lib.forEach clientsAttrsList (
           {
+            adminsGroupDefined,
             adminsGroup,
             basicSecretFile,
             claimMaps,
@@ -342,13 +344,13 @@ in
             ...
           }:
           {
-            groups = lib.mkIf (clientID != "selfprivacy-api") {
-              "${adminsGroup}".members = [ auth-passthru.admins-group ];
+            groups = lib.mkIf (clientID != "selfprivacy-api") ({
               "${usersGroup}".members = [
-                adminsGroup
                 auth-passthru.full-users-group
-              ];
-            };
+              ] ++ lib.optional adminsGroupDefined adminsGroup;
+            } // lib.optionalAttrs adminsGroupDefined {
+              "${adminsGroup}".members = [ auth-passthru.admins-group ];
+            });
             systems.oauth2.${clientID} = {
               inherit
                 basicSecretFile
