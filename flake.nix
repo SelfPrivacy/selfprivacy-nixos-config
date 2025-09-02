@@ -31,11 +31,6 @@
                 hardware-configuration
                 deployment
                 ./configuration.nix
-                ./auth/auth.nix
-                {
-                  disabledModules = [ "services/security/kanidm.nix" ];
-                  imports = [ ./auth/kanidm.nix ];
-                }
                 selfprivacy-api.nixosModules.default
                 (
                   { pkgs, lib, ... }:

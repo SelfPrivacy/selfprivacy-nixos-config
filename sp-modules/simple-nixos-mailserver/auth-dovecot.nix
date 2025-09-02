@@ -22,10 +22,12 @@ let
   runtime-folder = group;
   keysPath = auth-passthru.keys-path;
 
-  # create service account token, needed for LDAP
-  kanidmExecStartPostScript = pkgs.writeShellScript "mailserver-kanidm-ExecStartPost-script.sh" ''
+  kanidmExecStartPostScript = pkgs.writeShellScript "create-dovecot-service-account-token-for-ldap" ''
     export HOME=$RUNTIME_DIRECTORY/client_home
     readonly KANIDM="${config.services.kanidm.package}/bin/kanidm"
+    export KANIDM_NAME=idm_admin
+    export KANIDM_URL="${config.services.kanidm.provision.instanceUrl}"
+    export KANIDM_SKIP_HOSTNAME_VERIFICATION="true"
 
     # get Kanidm service account for mailserver
     KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${mailserver-service-account-name}$")"
@@ -111,7 +113,7 @@ let
   };
   oauth-client-id = "mailserver";
   oauth-client-secret-fp = "${keysPath}/${group}/kanidm-oauth-client-secret";
-  oauth-secret-ExecStartPreScript = pkgs.writeShellScript "${oauth-client-id}-kanidm-ExecStartPre-script.sh" ''
+  oauth-secret-ExecStartPreScript = pkgs.writeShellScript "${oauth-client-id}-create-client-secret.sh" ''
     set -o xtrace
     [ -f "${oauth-client-secret-fp}" ] || \
       "${lib.getExe pkgs.openssl}" rand -base64 32 | tr "\n:@/+=" "012345" > "${oauth-client-secret-fp}"
@@ -202,10 +204,10 @@ in
   };
 
   systemd.services.kanidm.serviceConfig.ExecStartPre = lib.mkBefore [
-    ("-" + oauth-secret-ExecStartPreScript)
+    oauth-secret-ExecStartPreScript
   ];
   systemd.services.kanidm.serviceConfig.ExecStartPost = lib.mkAfter [
-    ("-" + kanidmExecStartPostScript)
+    kanidmExecStartPostScript
   ];
 
   systemd.services.postfix.restartTriggers = [

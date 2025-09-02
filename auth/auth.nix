@@ -89,8 +89,21 @@ lib.mkIf config.selfprivacy.sso.enable {
     provision = {
       enable = true;
       autoRemove = true; # if false, obsolete oauth2 scopeMaps remain
-      groups.${admins-group}.present = true;
-      groups.${full-users-group}.present = true;
+      groups.${admins-group} = {
+        present = true;
+        overwriteMembers = false;
+      };
+      groups.${full-users-group} = {
+        present = true;
+        members = [
+          admins-group # admins are full users too.
+        ];
+        overwriteMembers = false;
+      };
+      groups.idm_all_persons = {
+        present = true;
+        overwriteMembers = false;
+      };
     };
     enableClient = true;
     clientSettings = {
@@ -156,11 +169,29 @@ lib.mkIf config.selfprivacy.sso.enable {
     };
   };
 
-  systemd.services.kanidm.serviceConfig.ExecStartPre =
-    # idempotent script to run on each startup only for kanidm v1.5.0
-    lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (
-      lib.mkBefore [ kanidmMigrateDbScript ]
-    );
+  systemd.services.kanidm.serviceConfig = {
+    BindPaths = [
+      keys-path
+    ];
+    # mkForce is used there to overwrite paths to secrets provisioning will use because those are created in ExecStartPre and systemd sandbox breaks. 
+    BindReadOnlyPaths = lib.mkForce [
+      "/nix/store"
+      "/run/systemd/notify" # For healthcheck notifications
+      "-/etc/resolv.conf"
+      "-/etc/nsswitch.conf"
+      "-/etc/hosts"
+      "-/etc/localtime"
+      "-/etc/passwd"
+      "-/etc/group"
+      config.services.kanidm.serverSettings.tls_chain
+      config.services.kanidm.serverSettings.tls_key
+    ];
+    ExecStartPre =
+      # idempotent script to run on each startup only for kanidm v1.5.0
+      lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (
+        lib.mkBefore [ kanidmMigrateDbScript ]
+      );
+  };
 
   selfprivacy.passthru.auth = {
     inherit

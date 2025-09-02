@@ -11,105 +11,68 @@ let
     ;
   auth-passthru = config.selfprivacy.passthru.auth;
   keys-path = auth-passthru.keys-path;
-  # generate OAuth2 client secret
-  mkKanidmExecStartPreScript =
-    oauthClientID: linuxGroup:
+
+  mkKanidmTokenCreationSnippet =
+    {
+      clientID,
+      linuxGroupOfClient,
+      isMailserver,
+      ...
+    }:
     let
-      secretFP = auth-passthru.mkOAuth2ClientSecretFP linuxGroup;
+      kanidmServiceAccountName = "sp.${clientID}.service-account";
+      kanidmServiceAccountTokenName = "${clientID}-service-account-token";
+      kanidmServiceAccountTokenFP = auth-passthru.mkServiceAccountTokenFP linuxGroupOfClient;
+      isRW = clientID == "selfprivacy-api";
     in
-    pkgs.writeShellScript "${oauthClientID}-kanidm-ExecStartPre-script.sh" ''
-      set -o pipefail
-      set -o errexit
-      if ! [ -f "${secretFP}" ]
+    ''
+      # try to get existing Kanidm service account
+      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidmServiceAccountName}$")"
+      echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
+      if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
       then
-        "${lib.getExe pkgs.openssl}" rand -base64 32 \
-        | tr "\n:@/+=" "012345" > "${secretFP}"
-        chmod 640 "${secretFP}"
+          echo "kanidm service account \"${kanidmServiceAccountName}\" is found"
+      else
+          echo "kanidm service account \"${kanidmServiceAccountName}\" is not found"
+          echo "creating new kanidm service account \"${kanidmServiceAccountName}\""
+          if $KANIDM service-account create --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountName}" idm_admin
+          then
+              echo "kanidm service account \"${kanidmServiceAccountName}\" created"
+          else
+              echo "error: cannot create kanidm service account \"${kanidmServiceAccountName}\""
+              exit 1
+          fi
       fi
+
+      # create a new token for kanidm
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountTokenName}" ${lib.strings.optionalString isRW "--rw"} --output json)"
+      then
+          echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
+          exit 1
+      fi
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN="$(echo "$KANIDM_SERVICE_ACCOUNT_TOKEN_JSON" | ${lib.getExe pkgs.jq} -r .result)"
+      then
+          echo "error: cannot get service-account API token from JSON"
+          exit 1
+      fi
+
+      if ! install --mode=640 \
+      <(printf "%s" "$KANIDM_SERVICE_ACCOUNT_TOKEN") \
+      ${kanidmServiceAccountTokenFP}
+      then
+          echo "error: cannot write token to \"${kanidmServiceAccountTokenFP}\""
+          exit 1
+      fi
+
+    ''
+    + lib.strings.optionalString isMailserver ''
+      # add Kanidm service account to `idm_mail_servers` group
+      $KANIDM group add-members idm_mail_servers "${kanidmServiceAccountName}"
+    ''
+    + lib.strings.optionalString isRW ''
+      $KANIDM group add-members idm_admins "${kanidmServiceAccountName}"
     '';
-  mkKanidmExecStartPostScript =
-    oauthClientID: linuxGroup: isMailserver:
-    let
-      kanidmServiceAccountName = "sp.${oauthClientID}.service-account";
-      kanidmServiceAccountTokenName = "${oauthClientID}-service-account-token";
-      kanidmServiceAccountTokenFP = auth-passthru.mkServiceAccountTokenFP linuxGroup;
-      isRW = oauthClientID == "selfprivacy-api";
 
-      # TODO: Copied from Forgejo module. Maybe generalize as lib. function?
-      waitForURL = url: maxRetries: delaySec: ''
-        for ((i=1; i<=${toString maxRetries}; i++))
-        do
-            if ${lib.getExe pkgs.curl} -X GET --silent --fail "${url}" > /dev/null
-            then
-                echo "${url} responds to GET HTTP request (attempt #$i)"
-                break
-            else
-                echo "${url} does not respond to GET HTTP request (attempt #$i)"
-                echo sleeping for ${toString delaySec} seconds
-            fi
-            sleep ${toString delaySec}
-        done
-        if [[ "$i" -gt "${toString maxRetries}" ]]
-        then
-            echo "error, max attempts to access "${url}" have been used unsuccessfully!"
-            exit 124
-        fi
-      '';
-    in
-    pkgs.writeShellScript "${oauthClientID}-kanidm-ExecStartPost-script.sh" (
-      ''
-        export HOME=$RUNTIME_DIRECTORY/client_home
-        readonly KANIDM="${config.services.kanidm.package}/bin/kanidm"
-
-        ${waitForURL config.services.kanidm.serverSettings.origin 10 10}
-
-        # try to get existing Kanidm service account
-        KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidmServiceAccountName}$")"
-        echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
-        if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
-        then
-            echo "kanidm service account \"${kanidmServiceAccountName}\" is found"
-        else
-            echo "kanidm service account \"${kanidmServiceAccountName}\" is not found"
-            echo "creating new kanidm service account \"${kanidmServiceAccountName}\""
-            if $KANIDM service-account create --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountName}" idm_admin
-            then
-                echo "kanidm service account \"${kanidmServiceAccountName}\" created"
-            else
-                echo "error: cannot create kanidm service account \"${kanidmServiceAccountName}\""
-                exit 1
-            fi
-        fi
-
-        # create a new token for kanidm
-        if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountTokenName}" ${lib.strings.optionalString isRW "--rw"} --output json)"
-        then
-            echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
-            exit 1
-        fi
-        if ! KANIDM_SERVICE_ACCOUNT_TOKEN="$(echo "$KANIDM_SERVICE_ACCOUNT_TOKEN_JSON" | ${lib.getExe pkgs.jq} -r .result)"
-        then
-            echo "error: cannot get service-account API token from JSON"
-            exit 1
-        fi
-
-        if ! install --mode=640 \
-        <(printf "%s" "$KANIDM_SERVICE_ACCOUNT_TOKEN") \
-        ${kanidmServiceAccountTokenFP}
-        then
-            echo "error: cannot write token to \"${kanidmServiceAccountTokenFP}\""
-            exit 1
-        fi
-
-      ''
-      + lib.strings.optionalString isMailserver ''
-        # add Kanidm service account to `idm_mail_servers` group
-        $KANIDM group add-members idm_mail_servers "${kanidmServiceAccountName}"
-      ''
-      + lib.strings.optionalString isRW ''
-        $KANIDM group add-members idm_admins "${kanidmServiceAccountName}"
-      ''
-    );
 in
 {
   options.selfprivacy.auth = {
@@ -300,28 +263,64 @@ in
       # for each OAuth2 client: scripts with Kanidm CLI commands
       systemd.services.kanidm = {
         before = lib.lists.concatMap ({ clientSystemdUnits, ... }: clientSystemdUnits) clientsAttrsList;
-        serviceConfig = lib.mkMerge (
-          lib.forEach clientsAttrsList (
-            {
-              clientID,
-              isTokenNeeded,
-              linuxGroupOfClient,
-              isMailserver,
-              ...
-            }:
-            {
-              ExecStartPre = [
-                # "-" prefix means to ignore exit code of prefixed script
-                ("-" + mkKanidmExecStartPreScript clientID linuxGroupOfClient)
-              ];
-              ExecStartPost = lib.mkIf isTokenNeeded (
-                lib.mkAfter [
-                  ("-" + mkKanidmExecStartPostScript clientID linuxGroupOfClient isMailserver)
-                ]
-              );
-            }
-          )
-        );
+        serviceConfig = {
+          ExecStartPre = [
+            (pkgs.writeShellScript "create-kanidm-client-secrets" ''
+              set -euo pipefail
+              ${lib.concatLines (
+                map (
+                  { linuxGroupOfClient, ... }:
+                  let
+                    secretPath = auth-passthru.mkOAuth2ClientSecretFP linuxGroupOfClient;
+                  in
+                  ''
+                    if ! [ -f "${secretPath}" ]
+                    then
+                      "${lib.getExe pkgs.openssl}" rand -base64 32 \
+                      | tr "\n:@/+=" "012345" > "${secretPath}"
+                      chmod 640 "${secretPath}"
+                    fi
+                  ''
+                ) clientsAttrsList
+              )}
+            '')
+          ];
+          ExecStartPost = lib.mkOrder 1300 [
+            (pkgs.writeShellScript "create-kanidm-tokens" ''
+              set -euo pipefail
+
+              readonly KANIDM="${config.services.kanidm.package}/bin/kanidm"
+              readonly CLIENT_HOME=$RUNTIME_DIRECTORY/client_home
+              mkdir -p "$CLIENT_HOME"
+              export HOME="$CLIENT_HOME"
+              export KANIDM_NAME=idm_admin
+              export KANIDM_URL="${config.services.kanidm.provision.instanceUrl}"
+              export KANIDM_SKIP_HOSTNAME_VERIFICATION="true"
+
+              if ! recover_out=$(${config.services.kanidm.package}/bin/kanidmd recover-account -c ${
+                config.environment.etc."kanidm/server.toml".source
+              } idm_admin -o json); then
+                  echo "$recover_out" >&2
+                  echo "kanidm provision: Failed to recover admin account" >&2
+                exit 1
+              fi
+              if ! KANIDM_IDM_ADMIN_PASSWORD=$(grep '{"password' <<< "$recover_out" | ${lib.getExe pkgs.jq} -r .password); then
+                echo "$recover_out" >&2
+                echo "kanidm provision: Failed to parse password for idm_admin account" >&2
+                exit 1
+              fi
+
+              KANIDM_PASSWORD="$KANIDM_IDM_ADMIN_PASSWORD" $KANIDM login
+
+              # disable anonymous account because it allows to freely iterate over all users on kanidm instance.
+              $KANIDM service-account validity expire-at anonymous epoch
+
+              ${lib.concatLines (
+                lib.map mkKanidmTokenCreationSnippet (lib.filter (x: x.isTokenNeeded) clientsAttrsList)
+              )}
+            '')
+          ];
+        };
       };
 
       # for each OAuth2 client: Kanidm provisioning options
@@ -344,13 +343,23 @@ in
             ...
           }:
           {
-            groups = lib.mkIf (clientID != "selfprivacy-api") ({
-              "${usersGroup}".members = [
-                auth-passthru.full-users-group
-              ] ++ lib.optional adminsGroupDefined adminsGroup;
-            } // lib.optionalAttrs adminsGroupDefined {
-              "${adminsGroup}".members = [ auth-passthru.admins-group ];
-            });
+            groups = lib.mkIf (clientID != "selfprivacy-api") (
+              {
+                "${usersGroup}" = {
+                  members = [
+                    auth-passthru.full-users-group
+                  ]
+                  ++ lib.optional adminsGroupDefined adminsGroup;
+                  overwriteMembers = false; # allow our api to modify group imperatively
+                };
+              }
+              // lib.optionalAttrs adminsGroupDefined {
+                "${adminsGroup}" = {
+                  members = [ auth-passthru.admins-group ];
+                  overwriteMembers = false;
+                };
+              }
+            );
             systems.oauth2.${clientID} = {
               inherit
                 basicSecretFile

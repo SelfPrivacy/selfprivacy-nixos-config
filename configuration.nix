@@ -38,6 +38,7 @@ in
 {
   imports = [
     ./selfprivacy-module.nix
+    ./auth/auth.nix
     ./auth/auth-module.nix
     ./volumes.nix
     ./users.nix

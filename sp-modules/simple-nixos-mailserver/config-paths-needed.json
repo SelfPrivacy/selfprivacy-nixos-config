@@ -25,5 +25,6 @@
   [ "services", "postfix", "user" ],
   [ "services", "redis", "servers", "rspamd" ],
   [ "services", "rspamd" ],
-  [ "services", "kanidm", "package" ]
+  [ "services", "kanidm", "package" ],
+  [ "services", "kanidm", "provision", "instanceUrl" ]
 ]

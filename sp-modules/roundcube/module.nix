@@ -22,10 +22,6 @@ let
 
   oauth-donor = config.selfprivacy.passthru.mailserver;
   oauthClientSecretFP = auth-passthru.mkOAuth2ClientSecretFP linuxGroupOfService;
-  # copy client secret from mailserver
-  kanidmExecStartPreScriptRoot = pkgs.writeShellScript "${sp-module-name}-kanidm-ExecStartPre-root-script.sh" ''
-    install -v -m640 -o kanidm -g ${linuxGroupOfService} ${oauth-donor.oauth-client-secret-fp} ${oauthClientSecretFP}
-  '';
 in
 {
   options.selfprivacy.modules.roundcube = {
@@ -121,9 +117,16 @@ in
           after = [ "dovecot2.service" ];
           requires = [ "dovecot2.service" ];
         };
-        systemd.services.kanidm.serviceConfig.ExecStartPre = lib.mkAfter [
-          ("-+" + kanidmExecStartPreScriptRoot)
-        ];
+        systemd.services.kanidm.serviceConfig = {
+          ExecStartPre = lib.mkAfter [
+            (pkgs.writeShellScript "copy-mailserver-client-secret-to-roundcube" ''
+              install -v -m640 -o kanidm -g ${linuxGroupOfService} ${oauth-donor.oauth-client-secret-fp} ${oauthClientSecretFP}
+            '')
+          ];
+          SystemCallFilter = [
+            "@chown"
+          ];
+        };
 
         selfprivacy.auth.clients."${oauth-donor.oauth-client-id}" = {
           inherit adminsGroup usersGroup;
