@@ -117,7 +117,7 @@ in
             install -C -m 0700 -o pleroma -g pleroma -d /var/lib/pleroma
 
             install -C -m 0600 -o pleroma -g pleroma -DT \
-            <(printf "%s" "$filecontents") ${secrets-exs}
+            <(printf "%s" "$filecontents") /var/lib/pleroma/secrets.exs
           '';
         };
         pleroma = {
