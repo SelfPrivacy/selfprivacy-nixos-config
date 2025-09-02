@@ -7,10 +7,8 @@
 let
   inherit (import ./common.nix config)
     admin-pass-filepath
-    db-pass-filepath
     domain
     override-config-fp
-    secrets-filepath
     sp
     ;
 
@@ -184,19 +182,13 @@ in
               serviceConfig.Type = "oneshot";
               path = with pkgs; [
                 coreutils
-                jq
               ];
               script = ''
-                databasePassword=$(jq -re '.modules.nextcloud.databasePassword' ${secrets-filepath})
-                adminPassword=$(jq -re '.modules.nextcloud.adminPassword' ${secrets-filepath})
-
-                install -C -m 0440 -o nextcloud -g nextcloud -DT \
-                <(printf "%s\n" "$databasePassword") \
-                ${db-pass-filepath}
-
-                install -C -m 0440 -o nextcloud -g nextcloud -DT \
-                <(printf "%s\n" "$adminPassword") \
-                ${admin-pass-filepath}
+                if [ ! -f "${admin-pass-filepath}" ]; then
+                  cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 32 > ${admin-pass-filepath}
+                  chown nextcloud:nextcloud ${admin-pass-filepath}
+                  chmod 440 ${admin-pass-filepath}
+                fi
               '';
             };
           };
@@ -252,7 +244,6 @@ in
             dbtype = "sqlite";
             dbuser = "nextcloud";
             dbname = "nextcloud";
-            dbpassFile = db-pass-filepath;
             # TODO review whether admin user is needed at all - admin group works
             adminpassFile = admin-pass-filepath;
             adminuser = "admin";

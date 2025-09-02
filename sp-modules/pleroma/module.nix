@@ -5,9 +5,8 @@
   ...
 }:
 let
-  secrets-filepath = "/etc/selfprivacy/secrets.json";
   cfg = config.selfprivacy.modules.pleroma;
-  inherit (import ./common.nix config) secrets-exs sp;
+  sp = config.selfprivacy;
 in
 {
   options.selfprivacy.modules.pleroma = {
@@ -106,16 +105,12 @@ in
           serviceConfig.Type = "oneshot";
           path = with pkgs; [
             coreutils
-            jq
           ];
           script = ''
             set -o nounset
 
-            password="$(jq -re '.databasePassword' ${secrets-filepath})"
             filecontents=$(cat <<- EOF
             import Config
-            config :pleroma, Pleroma.Repo,
-              password: "$password"
             EOF
             )
 
