@@ -25,9 +25,9 @@ KANIDM_ULID = ULID.from_str(getenv("KANIDM_ULID"))
 KANIDM_UUID = str(KANIDM_ULID.to_uuid())
 MAS_URL = getenv("MAS_URL")
 KANIDM_URL = getenv("KANIDM_URL")
-KANIDM_TOKEN = read_file(getenv("KANIDM_TOKEN_PATH"))
+KANIDM_TOKEN = read_file(getenv("KANIDM_TOKEN_PATH")).strip()
 CLIENT_ID = getenv("CLIENT_ID")
-CLIENT_SECRET = read_file(getenv("CLIENT_SECRET_PATH"))
+CLIENT_SECRET = read_file(getenv("CLIENT_SECRET_PATH")).strip()
 MAS_POSTGRES_URL = getenv("MAS_POSTGRES_URL")
 
 
@@ -105,7 +105,7 @@ def sync_accounts():
                     print(f"Updated user {username} ({mas_user_id})")
             elif not found_in_kanidm:
                 print(
-                    "ERROR: User {username} is in MAS, but doesn't exist in Kanidm. TODO: should we deactivate it?"
+                    f"ERROR: User {username} is in MAS, but doesn't exist in Kanidm. TODO: should we deactivate it?"
                 )
 
 
