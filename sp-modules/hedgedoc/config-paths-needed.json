@@ -1,0 +1,11 @@
+[
+  [ "selfprivacy", "domain" ],
+  [ "selfprivacy", "modules", "auth", "enable" ],
+  [ "selfprivacy", "modules", "hedgedoc" ],
+  [ "selfprivacy", "passthru", "auth", "mkOAuth2ClientSecretFP" ],
+  [ "selfprivacy", "passthru", "auth", "oauth2-discovery-url" ],
+  [ "selfprivacy", "passthru", "auth", "oauth2-provider-name" ],
+  [ "selfprivacy", "sso", "enable" ],
+  [ "selfprivacy", "useBinds" ],
+  [ "services", "kanidm", "serverSettings", "origin" ]
+]
