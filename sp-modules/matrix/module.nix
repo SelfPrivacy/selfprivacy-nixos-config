@@ -440,6 +440,7 @@ in
         after = [
           "matrix-authentication-service.service"
           "matrix-synapse-prepare-db.service"
+          "kanidm.service"
         ];
         requires = [
           "kanidm.service"
