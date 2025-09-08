@@ -27,7 +27,7 @@ let
     in
     ''
       # try to get existing Kanidm service account
-      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidmServiceAccountName}$")"
+      KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${kanidmServiceAccountName}$" || true)"
       echo KANIDM_SERVICE_ACCOUNT: "$KANIDM_SERVICE_ACCOUNT"
       if [ -n "$KANIDM_SERVICE_ACCOUNT" ]
       then
