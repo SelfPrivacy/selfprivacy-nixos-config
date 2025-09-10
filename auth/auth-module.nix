@@ -114,8 +114,8 @@ in
               description = "The origin landing of the service for OAuth2 redirects.";
             };
             originUrl = mkOption {
-              type = types.nullOr lib.types.str;
-              description = "The origin URL of the service for OAuth2 redirects.";
+              type = types.nullOr (lib.types.either lib.types.str (lib.types.listOf lib.types.str));
+              description = "The origin URL or URLs of the service for OAuth2 redirects.";
             };
             subdomain = lib.mkOption {
               type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
