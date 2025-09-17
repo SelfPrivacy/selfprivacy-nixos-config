@@ -327,6 +327,7 @@ in
       useACMEHost = sp.domain;
       forceSSL = true;
       locations."/".proxyPass = "http://127.0.0.1:8078";
+      locations."= /.well-known/matrix/client".extraConfig = mkWellKnown clientConfig;
       locations."~ ^/_matrix/client/(.*)/(login|logout|refresh)".proxyPass = "http://127.0.0.1:8068";
     };
 
@@ -342,6 +343,7 @@ in
 
       root = element-web;
 
+      locations."= /.well-known/matrix/client".extraConfig = mkWellKnown clientConfig;
       locations."= /background.png" = {
         extraConfig = ''
           alias ${backgroundImage};
