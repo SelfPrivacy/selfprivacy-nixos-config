@@ -240,6 +240,18 @@ in
           weight = 2;
         };
       };
+
+    allowToPublishRoomsIntoDirectory =
+      (lib.mkOption {
+        default = false;
+        description = "Allow all users to publish rooms into server room directory";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 3;
+        };
+      };
   };
 
   config = lib.mkIf cfg.enable {
@@ -312,6 +324,11 @@ in
           ];
         }
       ];
+      settings.room_list_publication_rules = lib.mkIf cfg.allowToPublishRoomsIntoDirectory (
+        lib.singleton {
+          action = "allow";
+        }
+      );
 
       extraConfigFiles = [
         "${synapseDataDir}/mas_secrets.yaml"
