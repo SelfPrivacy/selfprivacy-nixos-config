@@ -190,11 +190,9 @@ with lib;
         '';
       };
       headers = mkOption {
-        type = types.attrs;
-        default = { };
-        example = {
-          "x-api-key" = "token123";
-        };
+        type = types.str;
+        default = "";
+        example = "authorization=Basic ECODED";
         description = ''
           Additional headers to send with OTLP requests
         '';
