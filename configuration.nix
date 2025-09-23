@@ -61,11 +61,24 @@ in
   };
 
   fileSystems."/" = {
-    device = lib.mkIf (config.selfprivacy.server.rootPartition != null) (lib.mkForce config.selfprivacy.server.rootPartition);
+    device = lib.mkIf (config.selfprivacy.server.rootPartition != null) (
+      lib.mkForce config.selfprivacy.server.rootPartition
+    );
     options = [ "noatime" ];
   };
 
-  services.selfprivacy-api.enable = true;
+  services.selfprivacy-api = {
+    enable = true;
+    opentelemetry = {
+      enable = config.selfprivacy.telemetry.enable;
+      endpoint = config.selfprivacy.telemetry.endpoint;
+      basicAuth = {
+        username = config.selfprivacy.telemetry.basicAuth.username;
+        passwordFile = config.selfprivacy.telemetry.basicAuth.passwordFile;
+      };
+      sampleRate = 1;
+    };
+  };
 
   services.redis.package = pkgs.valkey;
 

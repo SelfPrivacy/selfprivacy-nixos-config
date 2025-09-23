@@ -175,6 +175,56 @@ with lib;
       '';
     };
     #################
+    #   Telemetry   #
+    #################
+    telemetry = {
+      enable = mkOption {
+        type = types.nullOr types.bool;
+        default = false;
+      };
+      endpoint = mkOption {
+        type = types.nullOr types.str;
+        default = "http://localhost:4317";
+        description = ''
+          OTLP gRPC endpoint URL
+        '';
+      };
+      basicAuth = {
+        username = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = ''
+            Username for basic authentication with OTLP server
+          '';
+        };
+        password = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = ''
+            Password for basic authentication with OTLP server
+          '';
+        };
+        passwordFile = mkOption {
+          type = types.nullOr types.path;
+          default = null;
+          description = ''
+            Path to file containing password for basic authentication with OTLP server.
+            Takes precedence over password option.
+          '';
+        };
+      };
+      headers = mkOption {
+        type = types.attrs;
+        default = { };
+        example = {
+          "x-api-key" = "token123";
+        };
+        description = ''
+          Additional headers to send with OTLP requests
+        '';
+      };
+    };
+    #################
     #  Workarounds  #
     #################
     workarounds = {
