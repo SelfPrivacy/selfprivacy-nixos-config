@@ -76,7 +76,7 @@ in
         username = config.selfprivacy.telemetry.basicAuth.username;
         passwordFile = config.selfprivacy.telemetry.basicAuth.passwordFile;
       };
-      sampleRate = 1;
+      sampleRate = 1.0;
     };
   };
 
