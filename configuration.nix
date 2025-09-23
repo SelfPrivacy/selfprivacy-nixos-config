@@ -73,7 +73,7 @@ in
       enable = config.selfprivacy.telemetry.enable;
       endpoint = config.selfprivacy.telemetry.endpoint;
       headers = config.selfprivacy.telemetry.headers;
-      sampleRate = 1.0;
+      instanceId = config.selfprivacy.domain;
     };
   };
 
