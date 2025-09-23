@@ -72,11 +72,6 @@ in
     opentelemetry = {
       enable = config.selfprivacy.telemetry.enable;
       endpoint = config.selfprivacy.telemetry.endpoint;
-      basicAuth = {
-        username = config.selfprivacy.telemetry.basicAuth.username;
-        password = config.selfprivacy.telemetry.basicAuth.password;
-        passwordFile = config.selfprivacy.telemetry.basicAuth.passwordFile;
-      };
       headers = config.selfprivacy.telemetry.headers;
       sampleRate = 1.0;
     };
