@@ -43,6 +43,8 @@ in
       package = pkgs.opentelemetry-collector-contrib;
 
       settings = {
+        service.telemetry.metrics.level = "none";
+
         receivers = {
           otlp.protocols.grpc.endpoint = "127.0.0.1:4317";
         };
@@ -81,7 +83,6 @@ in
         };
 
         service = {
-          telemetry.metrics.address = "127.0.0.1:9004";
           pipelines = {
             traces = {
               receivers = [ "otlp" ];
