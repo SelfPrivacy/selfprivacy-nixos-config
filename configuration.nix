@@ -71,8 +71,8 @@ in
     enable = true;
     opentelemetry = {
       enable = config.selfprivacy.telemetry.enable;
-      endpoint = config.selfprivacy.telemetry.endpoint;
-      headers = config.selfprivacy.telemetry.headers;
+      endpoint = "127.0.0.1:4317";
+      headers = "";
       instanceId = config.selfprivacy.domain;
     };
   };

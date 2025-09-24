@@ -1,4 +1,6 @@
 [
+  [ "selfprivacy", "telemetry" ],
+  [ "selfprivacy", "domain" ],
   [ "selfprivacy", "useBinds" ],
   [ "selfprivacy", "modules", "monitoring" ]
 ]

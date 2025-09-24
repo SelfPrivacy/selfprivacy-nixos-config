@@ -190,9 +190,11 @@ with lib;
         '';
       };
       headers = mkOption {
-        type = types.str;
-        default = "";
-        example = "authorization=Basic ECODED";
+        type = types.attrsOf (types.str);
+        default = {};
+        example = {
+          "authorization" = "Basic REDACTED";
+        };
         description = ''
           Additional headers to send with OTLP requests
         '';
