@@ -81,6 +81,7 @@ in
         };
 
         service = {
+          telemetry.metrics.address = "127.0.0.1:9004";
           pipelines = {
             traces = {
               receivers = [ "otlp" ];
