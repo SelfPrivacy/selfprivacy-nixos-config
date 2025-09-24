@@ -91,7 +91,7 @@ in
             metrics = {
               receivers = [ "otlp" ];
               processors = [ "memory_limiter" "batch" "attributes" ];
-              exporters = [ "prometheus" ];
+              exporters = [ "otlp" ];
             };
 
             logs = {
