@@ -47,7 +47,7 @@
                 )
                 (
                   let
-                    deepFilter =
+                    deepOptionsFilter =
                       ref: attrset:
                       builtins.foldl' (
                         acc: key:
@@ -59,7 +59,7 @@
                           acc
                           // {
                             ${key} =
-                              if builtins.isAttrs value && builtins.isAttrs refValue then deepFilter refValue value else value;
+                              if builtins.isAttrs value && builtins.isAttrs refValue then (if refValue ? _type && refValue._type == "option" then value else deepOptionsFilter refValue value) else value;
                           }
                         else
                           acc
@@ -68,7 +68,7 @@
                   { options, ... }:
                   {
                     # pass userdata (parsed from JSON) options to selfprivacy module
-                    selfprivacy = deepFilter options.selfprivacy userdata;
+                    selfprivacy = deepOptionsFilter options.selfprivacy userdata;
 
                     # embed top-level flake source folder into the build
                     environment.etc."selfprivacy/nixos-config-source".source = top-level-flake;
