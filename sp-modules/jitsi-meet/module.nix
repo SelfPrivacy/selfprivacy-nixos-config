@@ -1,8 +1,10 @@
-oldPkgs:
-{ config, lib, ... }:
+oldLegacyPackages:
+{ config, lib, pkgs, ... }:
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.jitsi-meet;
+
+  oldPkgs = oldLegacyPackages.${pkgs.system};
 in
 {
   options.selfprivacy.modules.jitsi-meet = {

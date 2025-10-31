@@ -6,7 +6,7 @@
   outputs =
     { self, nixpkgs-2405 }:
     {
-      nixosModules.default = import ./module.nix nixpkgs-2405.legacyPackages.x86_64-linux;
+      nixosModules.default = import ./module.nix nixpkgs-2405.legacyPackages;
       configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
       meta =
         { lib, ... }:

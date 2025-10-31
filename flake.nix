@@ -14,8 +14,12 @@
       self,
       nixpkgs,
       selfprivacy-api,
-    }:
-    {
+    }: let
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+    in {
       nixosConfigurations-fun =
         {
           hardware-configuration,
@@ -137,6 +141,6 @@
               ) sp-modules;
           };
         };
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
+      formatter = nixpkgs.lib.genAttrs systems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
     };
 }
