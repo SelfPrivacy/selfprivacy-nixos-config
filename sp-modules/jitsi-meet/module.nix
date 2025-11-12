@@ -1,10 +1,7 @@
-oldLegacyPackages:
 { config, lib, pkgs, ... }:
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.jitsi-meet;
-
-  oldPkgs = oldLegacyPackages.${pkgs.system};
 in
 {
   options.selfprivacy.modules.jitsi-meet = {
@@ -50,17 +47,14 @@ in
   config = lib.mkIf cfg.enable {
     nixpkgs.overlays = [
       (final: prev: {
-        jicofo = oldPkgs.jicofo;
-        jitsi-meet = oldPkgs.jitsi-meet.overrideAttrs (old: {
+        jitsi-meet = prev.jitsi-meet.overrideAttrs (old: {
           meta = old.meta // {
+            # we disable e2ee.
             knownVulnerabilities = [ ];
           };
         });
-        jitsi-videobridge = oldPkgs.jitsi-videobridge;
-        jitsi-meet-prosody = oldPkgs.jitsi-meet-prosody;
       })
     ];
-
     services.jitsi-meet = {
       enable = true;
       hostName = "${cfg.subdomain}.${domain}";

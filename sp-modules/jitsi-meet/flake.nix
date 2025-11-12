@@ -1,12 +1,10 @@
 {
-  description = "PoC SP module for Jitsi Meet video conferences server";
-
-  inputs.nixpkgs-2405.url = "github:NixOS/nixpkgs/nixos-24.05";
+  description = "SP module for Jitsi Meet video conferences server";
 
   outputs =
-    { self, nixpkgs-2405 }:
+    { self, ... }:
     {
-      nixosModules.default = import ./module.nix nixpkgs-2405.legacyPackages;
+      nixosModules.default = import ./module.nix;
       configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
       meta =
         { lib, ... }:
