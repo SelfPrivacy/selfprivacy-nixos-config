@@ -1,6 +1,6 @@
 {
   systemd.services = {
-    dovecot2 = {
+    dovecot = {
       serviceConfig = {
         CpuAccounting = true;
         CpuQuota = "20%";

@@ -27,7 +27,7 @@
           canBeBackedUp = true;
           backupDescription = "Mail boxes and filters.";
           systemdServices = [
-            "dovecot2.service"
+            "dovecot.service"
             "postfix.service"
           ];
           user = "virtualMail";
