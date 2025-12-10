@@ -1,3 +1,4 @@
+mailserverFlake:
 {
   config,
   lib,
@@ -48,7 +49,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
       };
 
       # https://nixos-mailserver.readthedocs.io/en/latest/migrations.html
-      mailserver.stateVersion = 2;
+      mailserver.stateVersion = 3;
 
       users.users = {
         virtualMail = {
@@ -127,6 +128,57 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
 
       systemd = {
         services = {
+          sp-mailserver-migration = {
+            serviceConfig.Slice = "simple_nixos_mailserver.slice";
+            requiredBy = [
+              "dovecot.service"
+              "postfix.service"
+              "rspamd.service"
+              "redis-rspamd.service"
+            ];
+            serviceConfig.Type = "oneshot";
+            script = let
+              migration3PythonScript = pkgs.writers.writePython3 "nixos-mailserver-migration-03" {
+                doCheck = false;
+              } (builtins.readFile "${mailserverFlake}/migrations/nixos-mailserver-migration-03.py");
+            in ''
+              set -euo pipefail
+
+              STATE_FILE="/etc/selfprivacy/mailserver.stateversion"
+              if  [ ! -f "$STATE_FILE" ]; then
+                echo "1" > "$STATE_FILE"
+              fi
+
+              CUR="$(<"$STATE_FILE")"
+
+              run_migration_1() {} 
+              # No action needed, we use default mailDirectory
+              run_migration_2() {                
+                ${migration3PythonScript}
+              } 
+
+              run_migration() {
+                local i="$1"
+                echo "Running mailserver migration $i..."
+                if eval "run_migration_$((i + 1))"; then
+                  echo $((i + 1)) > "$STATE_FILE"
+                  echo "Migration $i succeeded."
+                  return 0
+                else
+                  echo "Migration $i failed." >&2
+                  return 1
+                fi
+              }
+
+              for (( i = CUR; i < ${config.mailserver.stateVersion}; i++ )); do
+                if ! run_migration "$i"; then
+                  echo "Stopping at migration $i due to failure." >&2
+                  exit 1
+                fi
+              done
+
+            '';
+          };
           dovecot.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
