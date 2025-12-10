@@ -45,7 +45,7 @@ let
       fi
 
       # create a new token for kanidm
-      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountTokenName}" ${lib.strings.optionalString isRW "--rw"} --output json)"
+      if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountTokenName}" ${lib.strings.optionalString isRW "--readwrite"} --output json)"
       then
           echo "error: kanidm CLI returns an error when trying to generate service-account api-token"
           exit 1

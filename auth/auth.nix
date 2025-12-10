@@ -66,7 +66,7 @@ in
     enableServer = true;
 
     # kanidm with Rust code patches for OAuth and admin passwords provisioning
-    package = pkgs.kanidm_1_7.withSecretProvisioning;
+    package = pkgs.kanidm_1_8.withSecretProvisioning;
 
     serverSettings = {
       inherit domain;
