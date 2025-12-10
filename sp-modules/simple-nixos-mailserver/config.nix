@@ -151,16 +151,17 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
 
               CUR="$(<"$STATE_FILE")"
 
-              run_migration_1() {} 
-              # No action needed, we use default mailDirectory
+              run_migration_1() {
+                true
+              }
               run_migration_2() {                
-                ${migration3PythonScript}
+                ${migration3PythonScript} --layout default /var/vmail --execute
               } 
 
               run_migration() {
                 local i="$1"
                 echo "Running mailserver migration $i..."
-                if eval "run_migration_$((i + 1))"; then
+                if eval "run_migration_$i"; then
                   echo $((i + 1)) > "$STATE_FILE"
                   echo "Migration $i succeeded."
                   return 0
@@ -170,7 +171,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
                 fi
               }
 
-              for (( i = CUR; i < ${config.mailserver.stateVersion}; i++ )); do
+              for (( i = CUR; i < ${builtins.toString config.mailserver.stateVersion}; i++ )); do
                 if ! run_migration "$i"; then
                   echo "Stopping at migration $i due to failure." >&2
                   exit 1

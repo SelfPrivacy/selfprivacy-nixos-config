@@ -33,7 +33,7 @@ let
   serviceAccountTokenFP = auth-passthru.mkServiceAccountTokenFP linuxUserOfService;
   oauthClientSecretFP = auth-passthru.mkOAuth2ClientSecretFP linuxUserOfService;
 
-  updater-page-substitute = pkgs.runCommandNoCC "nextcloud-updater-page-substitute" { } ''
+  updater-page-substitute = pkgs.runCommand "nextcloud-updater-page-substitute" { } ''
     install -m644 ${./updater.html} -DT $out/index.html
   '';
 in

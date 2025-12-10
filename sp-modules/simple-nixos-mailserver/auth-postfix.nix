@@ -74,7 +74,7 @@ in
   };
   services.postfix = {
     # the list should be merged with other options from nixos-mailserver
-    config.virtual_mailbox_maps = [ "ldap:${ldapVirtualMailboxMapFile}" ];
+    settings.main.virtual_mailbox_maps = [ "ldap:${ldapVirtualMailboxMapFile}" ];
     inherit submissionOptions;
     submissionsOptions = submissionOptions;
   };
