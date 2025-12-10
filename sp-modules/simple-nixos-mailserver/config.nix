@@ -47,6 +47,9 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         };
       };
 
+      # https://nixos-mailserver.readthedocs.io/en/latest/migrations.html
+      mailserver.stateVersion = 2;
+
       users.users = {
         virtualMail = {
           isNormalUser = false;
