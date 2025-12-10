@@ -196,7 +196,7 @@ in
     }
   '';
   services.dovecot2.enablePAM = false;
-  systemd.services.dovecot2 = {
+  systemd.services.dovecot = {
     preStart = setPwdInLdapConfFile + "\n" + write-dovecot-oauth2-conf + "\n";
     after = [ auth-passthru.oauth2-systemd-service ];
     requires = [ auth-passthru.oauth2-systemd-service ];

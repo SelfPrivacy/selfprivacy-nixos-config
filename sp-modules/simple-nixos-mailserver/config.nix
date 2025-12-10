@@ -41,8 +41,8 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
           device = "/volumes/${sp.modules.simple-nixos-mailserver.location}/sieve";
           options = [
             "bind"
-            "x-systemd.required-by=dovecot2.service"
-            "x-systemd.before=dovecot2.service"
+            "x-systemd.required-by=dovecot.service"
+            "x-systemd.before=dovecot.service"
           ];
         };
       };
@@ -124,7 +124,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
 
       systemd = {
         services = {
-          dovecot2.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+          dovecot.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           redis-rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";

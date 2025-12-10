@@ -95,7 +95,7 @@ in
 
         systemd.slices.roundcube.description = "Roundcube service slice";
         # Roundcube depends on Dovecot and its OAuth2 client secret.
-        systemd.services.phpfpm-roundcube.after = [ "dovecot2.service" ];
+        systemd.services.phpfpm-roundcube.after = [ "dovecot.service" ];
       }
       # the following part is active only when "auth" module is enabled
       (lib.mkIf is-auth-enabled {
@@ -114,8 +114,8 @@ in
           $config['auto_create_user'] = true;
         '';
         systemd.services.roundcube = {
-          after = [ "dovecot2.service" ];
-          requires = [ "dovecot2.service" ];
+          after = [ "dovecot.service" ];
+          requires = [ "dovecot.service" ];
         };
         systemd.services.kanidm.serviceConfig = {
           ExecStartPre = lib.mkAfter [
@@ -139,7 +139,7 @@ in
           originLanding = "https://${cfg.subdomain}.${domain}/";
           useShortPreferredUsername = false;
           clientSystemdUnits = [
-            "dovecot2.service"
+            "dovecot.service"
             "phpfpm-roundcube.service"
           ];
           enablePkce = false;
