@@ -61,11 +61,21 @@ in
   };
 
   fileSystems."/" = {
-    device = lib.mkIf (config.selfprivacy.server.rootPartition != null) (lib.mkForce config.selfprivacy.server.rootPartition);
+    device = lib.mkIf (config.selfprivacy.server.rootPartition != null) (
+      lib.mkForce config.selfprivacy.server.rootPartition
+    );
     options = [ "noatime" ];
   };
 
-  services.selfprivacy-api.enable = true;
+  services.selfprivacy-api = {
+    enable = true;
+    opentelemetry = {
+      enable = config.selfprivacy.telemetry.enable;
+      endpoint = "127.0.0.1:4317";
+      headers = "";
+      instanceId = config.selfprivacy.domain;
+    };
+  };
 
   services.redis.package = pkgs.valkey;
 
