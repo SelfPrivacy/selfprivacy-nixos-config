@@ -175,6 +175,32 @@ with lib;
       '';
     };
     #################
+    #   Telemetry   #
+    #################
+    telemetry = {
+      enable = mkOption {
+        type = types.nullOr types.bool;
+        default = false;
+      };
+      endpoint = mkOption {
+        type = types.nullOr types.str;
+        default = "http://localhost:4317";
+        description = ''
+          OTLP gRPC endpoint URL
+        '';
+      };
+      headers = mkOption {
+        type = types.attrsOf (types.str);
+        default = {};
+        example = {
+          "authorization" = "Basic REDACTED";
+        };
+        description = ''
+          Additional headers to send with OTLP requests
+        '';
+      };
+    };
+    #################
     #  Workarounds  #
     #################
     workarounds = {

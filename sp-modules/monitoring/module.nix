@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.selfprivacy.modules.monitoring;
 in
@@ -37,6 +37,75 @@ in
         ];
       };
     };
+
+    services.opentelemetry-collector = {
+      enable = config.selfprivacy.telemetry.enable;
+      package = pkgs.opentelemetry-collector-contrib;
+
+      settings = {
+        service.telemetry.metrics.level = "none";
+
+        receivers = {
+          otlp.protocols.grpc.endpoint = "127.0.0.1:4317";
+        };
+
+        processors = {
+          batch = {
+            timeout = "1s";
+            send_batch_size = 1024;
+          };
+
+          memory_limiter = {
+            check_interval = "5s";
+            limit_mib = 512;
+            spike_limit_mib = 256;
+          };
+
+          attributes = {
+            actions = [
+              {
+                key = "sp.deployment.domain";
+                action = "insert";
+                value = config.selfprivacy.domain;
+              }
+            ];
+          };
+        };
+
+        exporters = {
+          otlp = {
+            endpoint = config.selfprivacy.telemetry.endpoint;
+            headers = config.selfprivacy.telemetry.headers;
+          };
+          debug = {
+            verbosity = "detailed";
+          };
+        };
+
+        service = {
+          pipelines = {
+            traces = {
+              receivers = [ "otlp" ];
+              processors = [ "memory_limiter" "batch" "attributes" ];
+              exporters = [ "otlp" ];
+            };
+
+            metrics = {
+              receivers = [ "otlp" ];
+              processors = [ "memory_limiter" "batch" "attributes" ];
+              exporters = [ "otlp" ];
+            };
+
+            logs = {
+              receivers = [ "otlp" ];
+              processors = [ "memory_limiter" "batch" "attributes" ];
+              exporters = [ "otlp" "debug" ];
+            };
+          };
+        };
+      };
+    };
+
     services.cadvisor = {
       enable = true;
       port = 9003;
