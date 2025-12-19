@@ -202,6 +202,7 @@ in
           exit 255
       fi
     '';
+  system.rebuild.enableNg = true;
   nix = {
     package = pkgs.lixPackageSets.latest.lix;
     channel.enable = false;
