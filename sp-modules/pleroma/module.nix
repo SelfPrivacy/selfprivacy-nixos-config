@@ -65,7 +65,7 @@ in
         user = "pleroma";
         group = "pleroma";
         configs = [
-          (builtins.replaceStrings [ "$DOMAIN" "$LUSER" ] [ sp.domain sp.username ] (
+          (builtins.replaceStrings [ "$DOMAIN" "$LUSER" ] [ sp.domain (if sp.username != null then sp.username else "admin") ] (
             builtins.readFile ./config.exs.in
           ))
         ];
