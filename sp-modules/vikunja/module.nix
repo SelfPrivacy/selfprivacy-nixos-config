@@ -64,13 +64,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = sp.sso.enable;
-        message = "Vikunja cannot be enabled when SSO is disabled.";
-      }
-    ];
-
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/vikunja" = {
         device = "/volumes/${cfg.location}/vikunja";

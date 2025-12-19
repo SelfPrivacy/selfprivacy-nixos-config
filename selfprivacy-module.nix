@@ -38,6 +38,7 @@ with lib;
       enable = mkOption {
         description = "Enable SSO.";
         default = true;
+        readOnly = true;
         type = types.nullOr types.bool;
       };
       debug = mkOption {
@@ -59,12 +60,14 @@ with lib;
         Username that was defined at the initial setup process
       '';
       type = types.nullOr types.str;
+      default = null;
     };
     hashedMasterPassword = mkOption {
       description = ''
         Hash of the password that was defined at the initial setup process
       '';
       type = types.nullOr types.str;
+      default = null;
     };
     sshKeys = mkOption {
       description = ''

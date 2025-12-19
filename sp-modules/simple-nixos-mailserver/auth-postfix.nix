@@ -8,7 +8,6 @@ let
   inherit (import ./common.nix nixos-args)
     appendSetting
     auth-passthru
-    is-auth-enabled
     ;
 
   cfg = config.mailserver;

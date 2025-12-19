@@ -1,10 +1,8 @@
 { config, pkgs, ... }:
-rec {
+{
   auth-passthru = config.selfprivacy.passthru.auth;
   domain = config.selfprivacy.domain;
   group = "dovecot2";
-  is-auth-enabled =
-    config.selfprivacy.modules.simple-nixos-mailserver.enableSso && config.selfprivacy.sso.enable;
 
   appendSetting =
     {

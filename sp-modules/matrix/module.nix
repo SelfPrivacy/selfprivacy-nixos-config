@@ -268,10 +268,6 @@ in
         assertion = cfg.elementSubdomain != cfg.masSubdomain;
         message = "MAS should be hosted on separate subdomain, not on Element domain";
       }
-      {
-        assertion = sp.sso.enable;
-        message = "Matrix cannot be enabled when SSO is disabled as Matrix uses OIDC for user authentication.";
-      }
     ];
 
     fileSystems = lib.mkIf sp.useBinds {

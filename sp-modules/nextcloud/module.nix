@@ -86,18 +86,6 @@ in
           weight = 1;
         };
       };
-    enableSso =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable Single Sign-On";
-      })
-      // {
-        meta = {
-          type = "bool";
-          weight = 2;
-        };
-      };
     enableSambaFeatures =
       (lib.mkOption {
         type = types.bool;
@@ -107,45 +95,39 @@ in
       // {
         meta = {
           type = "bool";
+          weight = 2;
+        };
+      };
+    debug =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable debug logging";
+      })
+      // {
+        meta = {
+          type = "bool";
           weight = 3;
         };
       };
-      debug =
-        (lib.mkOption {
-          default = false;
-          type = lib.types.bool;
-          description = "Enable debug logging";
-        })
-        // {
-          meta = {
-            type = "bool";
-            weight = 4;
-          };
+    disableMaintenanceModeAtStart =
+      (lib.mkOption {
+        type = types.bool;
+        default = false;
+        description = "Disable maintenance mode at Nextcloud service startup";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 4;
         };
-      disableMaintenanceModeAtStart =
-        (lib.mkOption {
-          type = types.bool;
-          default = false;
-          description = "Disable maintenance mode at Nextcloud service startup";
-        })
-        // {
-          meta = {
-            type = "bool";
-            weight = 5;
-          };
-        };
+      };
   };
 
   # config = lib.mkIf sp.modules.nextcloud.enable
   config = lib.mkIf sp.modules.nextcloud.enable (
     lib.mkMerge [
       {
-        assertions = [
-          {
-            assertion = cfg.enableSso -> sp.sso.enable;
-            message = "SSO cannot be enabled for Nextcloud when SSO is disabled globally.";
-          }
-        ];
         fileSystems = lib.mkIf sp.useBinds {
           "/var/lib/nextcloud" = {
             device = "/volumes/${cfg.location}/nextcloud";
@@ -160,7 +142,7 @@ in
         };
 
         # for ExecStartPost script to have access to /run/keys/*
-        users.groups.keys.members = lib.mkIf is-auth-enabled [ linuxUserOfService ];
+        users.groups.keys.members = [ linuxUserOfService ];
 
         # not needed, due to turnOffCertCheck=1 in used_ldap
         # users.groups.${config.security.acme.certs.${domain}.group}.members =
@@ -214,31 +196,29 @@ in
 
           configureRedis = true;
 
-          settings =
-            {
-              # further forces Nextcloud to use HTTPS
-              overwriteprotocol = "https";
-            }
-            // lib.attrsets.optionalAttrs is-auth-enabled {
-              loglevel = 0;
-              # log_type = "file";
-              social_login_auto_redirect = false;
+          settings = {
+            # further forces Nextcloud to use HTTPS
+            overwriteprotocol = "https";
 
-              allow_local_remote_servers = true;
-              allow_user_to_change_display_name = false;
-              lost_password_link = "disabled";
-              allow_multiple_user_backends = false;
+            loglevel = 0;
+            # log_type = "file";
+            social_login_auto_redirect = false;
 
-              updatechecker = false; # nixpkgs handles updates for us, update via web ui will fail on nixos.
+            allow_local_remote_servers = true;
+            allow_user_to_change_display_name = false;
+            lost_password_link = "disabled";
+            allow_multiple_user_backends = false;
 
-              user_oidc = {
-                single_logout = true;
-                use_pkce = true;
-                auto_provision = true;
-                soft_auto_provision = true;
-                disable_account_creation = false;
-              };
+            updatechecker = false; # nixpkgs handles updates for us, update via web ui will fail on nixos.
+
+            user_oidc = {
+              single_logout = true;
+              use_pkce = true;
+              auto_provision = true;
+              soft_auto_provision = true;
+              disable_account_creation = false;
             };
+          };
 
           config = {
             dbtype = "sqlite";
@@ -269,19 +249,7 @@ in
             '';
           };
         };
-      }
-      # enables samba features when requested
-      (lib.mkIf cfg.enableSambaFeatures {
-        # only apply cifs-utils package to this module
-        services.phpfpm.pools.nextcloud.phpEnv.PATH =
-          lib.mkForce "${pkgs.samba}/bin:${pkgs.cifs-utils}/bin:/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/usr/bin:/bin";
-        systemd.services.nextcloud-cron.path = [
-          pkgs.samba
-          pkgs.cifs-utils
-        ];
-      })
-      # the following part is active only when "auth" module is enabled
-      (lib.mkIf is-auth-enabled {
+
         systemd.services.nextcloud-setup = {
           serviceConfig = {
             Restart = "on-failure";
@@ -425,14 +393,16 @@ in
             valuesByGroup.${adminsGroup} = [ "admin" ];
           };
         };
-      })
-      (lib.mkIf (!is-auth-enabled) {
-        systemd.services.nextcloud-setup = {
-          script = ''
-            ${occ} app:disable logreader
-            ${occ} app:disable user_oidc
-          '';
-        };
+      }
+      # enables samba features when requested
+      (lib.mkIf cfg.enableSambaFeatures {
+        # only apply cifs-utils package to this module
+        services.phpfpm.pools.nextcloud.phpEnv.PATH =
+          lib.mkForce "${pkgs.samba}/bin:${pkgs.cifs-utils}/bin:/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+        systemd.services.nextcloud-cron.path = [
+          pkgs.samba
+          pkgs.cifs-utils
+        ];
       })
     ]
   );
