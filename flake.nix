@@ -19,6 +19,18 @@
         "x86_64-linux"
         "aarch64-linux"
       ];
+
+      mkTreeFmt = pkgs: pkgs.nixfmt-tree.override {
+        runtimeInputs = [
+          pkgs.black
+        ];
+        settings = {
+          formattter.python = {
+            includes = [ "*.py" ];
+            command = "black";
+          };
+        };
+      };
     in {
       nixosConfigurations-fun =
         {
@@ -141,6 +153,41 @@
               ) sp-modules;
           };
         };
-      formatter = nixpkgs.lib.genAttrs systems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+      formatter = nixpkgs.lib.genAttrs systems (system: mkTreeFmt nixpkgs.legacyPackages.${system});
+
+      checks = nixpkgs.lib.genAttrs systems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+
+          treefmt = mkTreeFmt pkgs;
+        in {
+          # nixfmt returns cryptic error when ran from read-only directory and when directory isn't a git repo:
+          # (openTempFileWithDefaultPermissions: permission denied)
+          # so we need to copy source tree inside build directory and make it r/w
+          # (inspired by https://github.com/numtide/treefmt-nix/blob/5eb7434820f549f58c12a384b87ee73359c04c7b/module-options.nix#L312)
+          fmt-check = pkgs.runCommandLocal "fmt-check" {
+            buildInputs = [
+              treefmt
+              pkgs.git
+            ];
+          } "
+            set -e
+            cp -r ${self} src
+            chmod -R a+w src
+            cd src
+            export HOME=$TMPDIR
+            git init --quiet
+            git config user.name SelfPrivacy
+            git config user.email sp@localhost
+            git add .
+            git commit -m init --quiet
+            treefmt --ci
+            touch $out
+          ";
+
+          system-eval = (import ./checks/system-eval.nix) {inherit self nixpkgs system;};
+        }
+      );
     };
 }

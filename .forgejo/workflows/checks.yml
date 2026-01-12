@@ -1,0 +1,21 @@
+name: Checks
+
+on:
+  push:
+    branches:
+      - flakes
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  flake-check:
+    runs-on:
+      - x64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run flake checks
+        run: nix flake check
