@@ -110,30 +110,30 @@ in
           weight = 3;
         };
       };
-      debug =
-        (lib.mkOption {
-          default = false;
-          type = lib.types.bool;
-          description = "Enable debug logging";
-        })
-        // {
-          meta = {
-            type = "bool";
-            weight = 4;
-          };
+    debug =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable debug logging";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 4;
         };
-      disableMaintenanceModeAtStart =
-        (lib.mkOption {
-          type = types.bool;
-          default = false;
-          description = "Disable maintenance mode at Nextcloud service startup";
-        })
-        // {
-          meta = {
-            type = "bool";
-            weight = 5;
-          };
+      };
+    disableMaintenanceModeAtStart =
+      (lib.mkOption {
+        type = types.bool;
+        default = false;
+        description = "Disable maintenance mode at Nextcloud service startup";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 5;
         };
+      };
   };
 
   # config = lib.mkIf sp.modules.nextcloud.enable
@@ -214,31 +214,30 @@ in
 
           configureRedis = true;
 
-          settings =
-            {
-              # further forces Nextcloud to use HTTPS
-              overwriteprotocol = "https";
-            }
-            // lib.attrsets.optionalAttrs is-auth-enabled {
-              loglevel = 0;
-              # log_type = "file";
-              social_login_auto_redirect = false;
+          settings = {
+            # further forces Nextcloud to use HTTPS
+            overwriteprotocol = "https";
+          }
+          // lib.attrsets.optionalAttrs is-auth-enabled {
+            loglevel = 0;
+            # log_type = "file";
+            social_login_auto_redirect = false;
 
-              allow_local_remote_servers = true;
-              allow_user_to_change_display_name = false;
-              lost_password_link = "disabled";
-              allow_multiple_user_backends = false;
+            allow_local_remote_servers = true;
+            allow_user_to_change_display_name = false;
+            lost_password_link = "disabled";
+            allow_multiple_user_backends = false;
 
-              updatechecker = false; # nixpkgs handles updates for us, update via web ui will fail on nixos.
+            updatechecker = false; # nixpkgs handles updates for us, update via web ui will fail on nixos.
 
-              user_oidc = {
-                single_logout = true;
-                use_pkce = true;
-                auto_provision = true;
-                soft_auto_provision = true;
-                disable_account_creation = false;
-              };
+            user_oidc = {
+              single_logout = true;
+              use_pkce = true;
+              auto_provision = true;
+              soft_auto_provision = true;
+              disable_account_creation = false;
             };
+          };
 
           config = {
             dbtype = "sqlite";

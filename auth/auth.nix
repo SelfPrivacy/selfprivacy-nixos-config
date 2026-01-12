@@ -173,7 +173,7 @@ lib.mkIf config.selfprivacy.sso.enable {
     BindPaths = [
       keys-path
     ];
-    # mkForce is used there to overwrite paths to secrets provisioning will use because those are created in ExecStartPre and systemd sandbox breaks. 
+    # mkForce is used there to overwrite paths to secrets provisioning will use because those are created in ExecStartPre and systemd sandbox breaks.
     BindReadOnlyPaths = lib.mkForce [
       "/nix/store"
       "/run/systemd/notify" # For healthcheck notifications

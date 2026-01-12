@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.jitsi-meet;

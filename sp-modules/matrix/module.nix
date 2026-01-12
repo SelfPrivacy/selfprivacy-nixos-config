@@ -480,7 +480,10 @@ in
           Slice = "matrix.slice";
           User = "matrix-authentication-service";
           Group = "matrix-authentication-service";
-          LoadCredential = ["kanidm-token:${serviceAccountFP}" "client-secret:${masDataDir}/sync-client-secret"];
+          LoadCredential = [
+            "kanidm-token:${serviceAccountFP}"
+            "client-secret:${masDataDir}/sync-client-secret"
+          ];
           ExecStart = pkgs.writers.writePython3 "mas-kanidm-sync" {
             doCheck = false;
             libraries = with pkgs.python3Packages; [

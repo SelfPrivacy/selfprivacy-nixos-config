@@ -14,24 +14,28 @@
       self,
       nixpkgs,
       selfprivacy-api,
-    }: let
+    }:
+    let
       systems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
 
-      mkTreeFmt = pkgs: pkgs.nixfmt-tree.override {
-        runtimeInputs = [
-          pkgs.black
-        ];
-        settings = {
-          formattter.python = {
-            includes = [ "*.py" ];
-            command = "black";
+      mkTreeFmt =
+        pkgs:
+        pkgs.nixfmt-tree.override {
+          runtimeInputs = [
+            pkgs.black
+          ];
+          settings = {
+            formattter.python = {
+              includes = [ "*.py" ];
+              command = "black";
+            };
           };
         };
-      };
-    in {
+    in
+    {
       nixosConfigurations-fun =
         {
           hardware-configuration,
@@ -42,69 +46,71 @@
         }:
         {
           default = nixpkgs.lib.nixosSystem {
-            modules =
-              [
-                hardware-configuration
-                deployment
-                ./configuration.nix
-                selfprivacy-api.nixosModules.default
-                (
-                  { pkgs, lib, ... }:
-                  {
-                    environment.etc =
-                      (lib.attrsets.mapAttrs' (name: sp-module: {
-                        name = "sp-modules/${name}";
-                        value.text = import ./lib/meta.nix { inherit pkgs sp-module; };
-                      }) sp-modules)
-                      // {
-                        suggested-sp-modules.text = builtins.toJSON (builtins.attrNames (builtins.readDir ./sp-modules));
-                      };
-                  }
-                )
-                (
-                  let
-                    deepOptionsFilter =
-                      ref: attrset:
-                      builtins.foldl' (
-                        acc: key:
-                        if builtins.hasAttr key ref then
-                          let
-                            value = attrset.${key};
-                            refValue = ref.${key};
-                          in
-                          acc
-                          // {
-                            ${key} =
-                              if builtins.isAttrs value && builtins.isAttrs refValue then (if refValue ? _type && refValue._type == "option" then value else deepOptionsFilter refValue value) else value;
-                          }
-                        else
-                          acc
-                      ) { } (builtins.attrNames attrset);
-                  in
-                  { options, ... }:
-                  {
-                    # pass userdata (parsed from JSON) options to selfprivacy module
-                    selfprivacy = deepOptionsFilter options.selfprivacy userdata;
+            modules = [
+              hardware-configuration
+              deployment
+              ./configuration.nix
+              selfprivacy-api.nixosModules.default
+              (
+                { pkgs, lib, ... }:
+                {
+                  environment.etc =
+                    (lib.attrsets.mapAttrs' (name: sp-module: {
+                      name = "sp-modules/${name}";
+                      value.text = import ./lib/meta.nix { inherit pkgs sp-module; };
+                    }) sp-modules)
+                    // {
+                      suggested-sp-modules.text = builtins.toJSON (builtins.attrNames (builtins.readDir ./sp-modules));
+                    };
+                }
+              )
+              (
+                let
+                  deepOptionsFilter =
+                    ref: attrset:
+                    builtins.foldl' (
+                      acc: key:
+                      if builtins.hasAttr key ref then
+                        let
+                          value = attrset.${key};
+                          refValue = ref.${key};
+                        in
+                        acc
+                        // {
+                          ${key} =
+                            if builtins.isAttrs value && builtins.isAttrs refValue then
+                              (if refValue ? _type && refValue._type == "option" then value else deepOptionsFilter refValue value)
+                            else
+                              value;
+                        }
+                      else
+                        acc
+                    ) { } (builtins.attrNames attrset);
+                in
+                { options, ... }:
+                {
+                  # pass userdata (parsed from JSON) options to selfprivacy module
+                  selfprivacy = deepOptionsFilter options.selfprivacy userdata;
 
-                    # embed top-level flake source folder into the build
-                    environment.etc."selfprivacy/nixos-config-source".source = top-level-flake;
+                  # embed top-level flake source folder into the build
+                  environment.etc."selfprivacy/nixos-config-source".source = top-level-flake;
 
-                    # for running "nix search nixpkgs", "nix shell nixpkgs#PKG... etc
-                    nix.registry.nixpkgs.flake = nixpkgs;
+                  # for running "nix search nixpkgs", "nix shell nixpkgs#PKG... etc
+                  nix.registry.nixpkgs.flake = nixpkgs;
 
-                    # embed commit sha1 for `nixos-version --configuration-revision`
-                    system.configurationRevision = self.rev or "@${self.lastModifiedDate}"; # for development
-                    # TODO assertion to forbid dirty builds caused by top-level-flake
+                  # embed commit sha1 for `nixos-version --configuration-revision`
+                  system.configurationRevision = self.rev or "@${self.lastModifiedDate}"; # for development
+                  # TODO assertion to forbid dirty builds caused by top-level-flake
 
-                    # reset contents of /etc/nixos to match running NixOS generation
-                    system.activationScripts.selfprivacy-nixos-config-source = ''
-                      rm -rf /etc/nixos/{*,.[!.]*}
-                      cp -r --no-preserve=all ${top-level-flake}/ -T /etc/nixos/
-                    '';
-                  }
-                )
-              ]
-              ++
+                  # reset contents of /etc/nixos to match running NixOS generation
+                  system.activationScripts.selfprivacy-nixos-config-source = ''
+                    rm -rf /etc/nixos/{*,.[!.]*}
+                    cp -r --no-preserve=all ${top-level-flake}/ -T /etc/nixos/
+                  '';
+                }
+              )
+            ]
+            ++
               # add SP modules, but constrain available config attributes for each
               # (TODO revise evaluation performance of the code below)
               nixpkgs.lib.attrsets.mapAttrsToList (
@@ -161,17 +167,21 @@
           pkgs = nixpkgs.legacyPackages.${system};
 
           treefmt = mkTreeFmt pkgs;
-        in {
+        in
+        {
           # nixfmt returns cryptic error when ran from read-only directory and when directory isn't a git repo:
           # (openTempFileWithDefaultPermissions: permission denied)
           # so we need to copy source tree inside build directory and make it r/w
           # (inspired by https://github.com/numtide/treefmt-nix/blob/5eb7434820f549f58c12a384b87ee73359c04c7b/module-options.nix#L312)
-          fmt-check = pkgs.runCommandLocal "fmt-check" {
-            buildInputs = [
-              treefmt
-              pkgs.git
-            ];
-          } "
+          fmt-check =
+            pkgs.runCommandLocal "fmt-check"
+              {
+                buildInputs = [
+                  treefmt
+                  pkgs.git
+                ];
+              }
+              "
             set -e
             cp -r ${self} src
             chmod -R a+w src
@@ -186,7 +196,7 @@
             touch $out
           ";
 
-          system-eval = (import ./checks/system-eval.nix) {inherit self nixpkgs system;};
+          system-eval = (import ./checks/system-eval.nix) { inherit self nixpkgs system; };
         }
       );
     };

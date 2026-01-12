@@ -191,7 +191,7 @@ with lib;
       };
       headers = mkOption {
         type = types.attrsOf (types.str);
-        default = {};
+        default = { };
         example = {
           "authorization" = "Basic REDACTED";
         };
