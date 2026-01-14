@@ -108,6 +108,8 @@ in
     domain = config.selfprivacy.domain;
     usePredictableInterfaceNames = false;
     firewall = {
+      # There are too many refused connections on public servers, which makes logs unreadable.
+      logRefusedConnections = false;
       allowedTCPPorts = [
         22
         25
