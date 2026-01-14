@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.selfprivacy.modules.monitoring;
 in
@@ -86,20 +91,35 @@ in
           pipelines = {
             traces = {
               receivers = [ "otlp" ];
-              processors = [ "memory_limiter" "batch" "attributes" ];
+              processors = [
+                "memory_limiter"
+                "batch"
+                "attributes"
+              ];
               exporters = [ "otlp" ];
             };
 
             metrics = {
               receivers = [ "otlp" ];
-              processors = [ "memory_limiter" "batch" "attributes" ];
+              processors = [
+                "memory_limiter"
+                "batch"
+                "attributes"
+              ];
               exporters = [ "otlp" ];
             };
 
             logs = {
               receivers = [ "otlp" ];
-              processors = [ "memory_limiter" "batch" "attributes" ];
-              exporters = [ "otlp" "debug" ];
+              processors = [
+                "memory_limiter"
+                "batch"
+                "attributes"
+              ];
+              exporters = [
+                "otlp"
+                "debug"
+              ];
             };
           };
         };

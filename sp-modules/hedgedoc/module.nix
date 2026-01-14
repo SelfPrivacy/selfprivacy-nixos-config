@@ -159,21 +159,26 @@ in
     };
 
     systemd = {
-      services.hedgedoc-secrets = let
-        hedgedoc-service-config = config.systemd.services.hedgedoc.serviceConfig;
-      in {
-        enable = true;
-        wantedBy = [ "multi-user.target" "hedgedoc.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = pkgs.writeShellScript "gen-hedgedoc-oauth2clientsecret-envfile" ''
-            mkdir -p ${secretsDir} || true
-            echo "CMD_OAUTH2_CLIENT_SECRET=$(cat ${oauthClientSecretFP})" > ${envFile}
-            chmod 400 ${envFile}
-            chown ${hedgedoc-service-config.User}:${hedgedoc-service-config.Group} ${envFile}
-          '';
+      services.hedgedoc-secrets =
+        let
+          hedgedoc-service-config = config.systemd.services.hedgedoc.serviceConfig;
+        in
+        {
+          enable = true;
+          wantedBy = [
+            "multi-user.target"
+            "hedgedoc.service"
+          ];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = pkgs.writeShellScript "gen-hedgedoc-oauth2clientsecret-envfile" ''
+              mkdir -p ${secretsDir} || true
+              echo "CMD_OAUTH2_CLIENT_SECRET=$(cat ${oauthClientSecretFP})" > ${envFile}
+              chmod 400 ${envFile}
+              chown ${hedgedoc-service-config.User}:${hedgedoc-service-config.Group} ${envFile}
+            '';
+          };
         };
-      };
       services.hedgedoc = {
         wants = [ "hedgedoc-secrets.service" ];
         unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/hedgedoc";

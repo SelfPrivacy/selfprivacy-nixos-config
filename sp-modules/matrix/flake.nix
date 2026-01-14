@@ -35,7 +35,7 @@
               group = "matrix-authentication-service";
             }
           ];
-          folders = [];
+          folders = [ ];
           postgreDatabases = [
             "matrix-synapse"
             "matrix-authentication-service"

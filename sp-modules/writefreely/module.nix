@@ -141,29 +141,32 @@ in
         path = [ pkgs.openssl ]; # OpenSSL is used by WriteFreely to generate ActivityPub federation key
         unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/writefreely";
         serviceConfig.Slice = "writefreely.slice";
-        restartTriggers = [ (
-          pkgs.writeText "writefreely-restart-trigger"
-            (builtins.toJSON config.services.writefreely.settings)
-        ) ];
+        restartTriggers = [
+          (pkgs.writeText "writefreely-restart-trigger" (
+            builtins.toJSON config.services.writefreely.settings
+          ))
+        ];
       };
 
-      services.writefreely-sqlite-init = let
-        cfgFile = "${config.services.writefreely.stateDir}/config.ini";
-      in {
-        postStart = ''
-          chmod 660 '${cfgFile}'
-          ${lib.getExe pkgs.replace-secret} "@replace_oauth_secret@" "${oauthClientSecretFP}" "${cfgFile}"
-          chmod 440 '${cfgFile}'
-        '';
+      services.writefreely-sqlite-init =
+        let
+          cfgFile = "${config.services.writefreely.stateDir}/config.ini";
+        in
+        {
+          postStart = ''
+            chmod 660 '${cfgFile}'
+            ${lib.getExe pkgs.replace-secret} "@replace_oauth_secret@" "${oauthClientSecretFP}" "${cfgFile}"
+            chmod 440 '${cfgFile}'
+          '';
 
-        unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/writefreely";
-        serviceConfig = {
-          Slice = "writefreely.slice";
-          ExecStartPre = [
-            "+${pkgs.coreutils}/bin/chown writefreely:writefreely /var/lib/writefreely"
-          ];
+          unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/writefreely";
+          serviceConfig = {
+            Slice = "writefreely.slice";
+            ExecStartPre = [
+              "+${pkgs.coreutils}/bin/chown writefreely:writefreely /var/lib/writefreely"
+            ];
+          };
         };
-      };
 
       slices.writefreely = {
         description = "WriteFreely service slice";
@@ -188,7 +191,11 @@ in
       clientSystemdUnits = [ "writefreely.service" ];
       enablePkce = false;
       scopeMaps = {
-        "${usersGroup}" = [ "email" "openid" "profile" ];
+        "${usersGroup}" = [
+          "email"
+          "openid"
+          "profile"
+        ];
       };
       linuxUserOfClient = "writefreely";
       linuxGroupOfClient = "writefreely";
