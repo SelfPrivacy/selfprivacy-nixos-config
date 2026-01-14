@@ -111,48 +111,50 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
               "redis-rspamd.service"
             ];
             serviceConfig.Type = "oneshot";
-            script = let
-              migration3PythonScript = pkgs.writers.writePython3 "nixos-mailserver-migration-03" {
-                doCheck = false;
-              } (builtins.readFile "${mailserverFlake}/migrations/nixos-mailserver-migration-03.py");
-            in ''
-              set -euo pipefail
+            script =
+              let
+                migration3PythonScript = pkgs.writers.writePython3 "nixos-mailserver-migration-03" {
+                  doCheck = false;
+                } (builtins.readFile "${mailserverFlake}/migrations/nixos-mailserver-migration-03.py");
+              in
+              ''
+                set -euo pipefail
 
-              STATE_FILE="/etc/selfprivacy/mailserver.stateversion"
-              if  [ ! -f "$STATE_FILE" ]; then
-                echo "1" > "$STATE_FILE"
-              fi
-
-              CUR="$(<"$STATE_FILE")"
-
-              run_migration_1() {
-                true
-              }
-              run_migration_2() {                
-                ${migration3PythonScript} --layout default /var/vmail --execute
-              } 
-
-              run_migration() {
-                local i="$1"
-                echo "Running mailserver migration $i..."
-                if eval "run_migration_$i"; then
-                  echo $((i + 1)) > "$STATE_FILE"
-                  echo "Migration $i succeeded."
-                  return 0
-                else
-                  echo "Migration $i failed." >&2
-                  return 1
+                STATE_FILE="/etc/selfprivacy/mailserver.stateversion"
+                if  [ ! -f "$STATE_FILE" ]; then
+                  echo "1" > "$STATE_FILE"
                 fi
-              }
 
-              for (( i = CUR; i < ${builtins.toString config.mailserver.stateVersion}; i++ )); do
-                if ! run_migration "$i"; then
-                  echo "Stopping at migration $i due to failure." >&2
-                  exit 1
-                fi
-              done
+                CUR="$(<"$STATE_FILE")"
 
-            '';
+                run_migration_1() {
+                  true
+                }
+                run_migration_2() {                
+                  ${migration3PythonScript} --layout default /var/vmail --execute
+                } 
+
+                run_migration() {
+                  local i="$1"
+                  echo "Running mailserver migration $i..."
+                  if eval "run_migration_$i"; then
+                    echo $((i + 1)) > "$STATE_FILE"
+                    echo "Migration $i succeeded."
+                    return 0
+                  else
+                    echo "Migration $i failed." >&2
+                    return 1
+                  fi
+                }
+
+                for (( i = CUR; i < ${builtins.toString config.mailserver.stateVersion}; i++ )); do
+                  if ! run_migration "$i"; then
+                    echo "Stopping at migration $i due to failure." >&2
+                    exit 1
+                  fi
+                done
+
+              '';
           };
           dovecot.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
