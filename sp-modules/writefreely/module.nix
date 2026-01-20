@@ -90,13 +90,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = sp.sso.enable;
-        message = "WriteFreely cannot be enabled when SSO is disabled.";
-      }
-    ];
-
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/writefreely" = {
         device = "/volumes/${cfg.location}/writefreely";

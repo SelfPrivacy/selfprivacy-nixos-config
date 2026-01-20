@@ -1,27 +1,35 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   cfg = config.selfprivacy;
 in
 {
-  users = {
-    mutableUsers = false;
-    allowNoPasswordLogin = true;
-    users = {
-      "${cfg.username}" = {
-        isNormalUser = true;
-        hashedPassword = cfg.hashedMasterPassword;
-        openssh.authorizedKeys.keys = cfg.sshKeys;
+
+  config = lib.mkMerge [
+    {
+      users = {
+        mutableUsers = false;
+        allowNoPasswordLogin = true;
+        users = builtins.listToAttrs (
+          map (user: {
+            name = "${user.username}";
+            value = {
+              isNormalUser = true;
+              hashedPassword = user.hashedPassword;
+              openssh.authorizedKeys.keys = (if user ? sshKeys then user.sshKeys else [ ]);
+            };
+          }) cfg.users
+        );
       };
     }
-    // builtins.listToAttrs (
-      builtins.map (user: {
-        name = "${user.username}";
-        value = {
+
+    (lib.mkIf (!isNull cfg.username) {
+      users.users = {
+        "${cfg.username}" = {
           isNormalUser = true;
-          hashedPassword = user.hashedPassword;
-          openssh.authorizedKeys.keys = (if user ? sshKeys then user.sshKeys else [ ]);
+          hashedPassword = cfg.hashedMasterPassword;
+          openssh.authorizedKeys.keys = cfg.sshKeys;
         };
-      }) cfg.users
-    );
-  };
+      };
+    })
+  ];
 }

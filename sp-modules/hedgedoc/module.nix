@@ -81,13 +81,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = sp.sso.enable;
-        message = "HedgeDoc cannot be enabled when SSO is disabled.";
-      }
-    ];
-
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/hedgedoc" = {
         device = "/volumes/${cfg.location}/hedgedoc";

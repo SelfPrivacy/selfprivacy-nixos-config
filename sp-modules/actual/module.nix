@@ -9,7 +9,6 @@ let
   sp = config.selfprivacy;
   cfg = sp.modules.actual;
 
-  is-auth-enabled = cfg.enableSso && config.selfprivacy.sso.enable;
   oauthClientID = "actual";
   auth-passthru = config.selfprivacy.passthru.auth;
   full-domain = "https://${cfg.subdomain}.${sp.domain}";
@@ -70,18 +69,6 @@ in
         };
       };
     # service settings
-    enableSso =
-      (lib.mkOption {
-        default = true;
-        type = lib.types.bool;
-        description = "Enable Single Sign-On";
-      })
-      // {
-        meta = {
-          type = "bool";
-          weight = 2;
-        };
-      };
     enableDebug =
       (lib.mkOption {
         default = false;
@@ -91,141 +78,116 @@ in
       // {
         meta = {
           type = "bool";
-          weight = 3;
+          weight = 2;
         };
       };
   };
 
-  config = lib.mkIf cfg.enable (
-    lib.mkMerge [
-      {
-        # prevent SSO from being enabled in the module config if SSO isn't available/is disabled
-        assertions = [
-          {
-            assertion = cfg.enableSso -> sp.sso.enable;
-            message = "SSO cannot be enabled for Actual when SSO is disabled globally.";
-          }
+  config = lib.mkIf cfg.enable ({
+
+    fileSystems = lib.mkIf sp.useBinds {
+      "/var/lib/actual" = {
+        device = "/volumes/${cfg.location}/actual";
+        options = [
+          "bind"
+          "x-systemd.required-by=actual.service"
+          "x-systemd.before=actual.service"
         ];
+      };
+    };
 
-        fileSystems = lib.mkIf sp.useBinds {
-          "/var/lib/actual" = {
-            device = "/volumes/${cfg.location}/actual";
-            options = [
-              "bind"
-              "x-systemd.required-by=actual.service"
-              "x-systemd.before=actual.service"
-            ];
-          };
+    # actual service config
+    services.actual = {
+      enable = true;
+      settings = {
+        port = 5006;
+        # only permit openid logins
+        allowedLoginMethods = [ "openid" ];
+        # default to openid if enabled
+        loginMethod = "openid";
+        # https://github.com/actualbudget/actual/pull/4421
+        userCreationMode = "login";
+        # service SSO config
+        openId = {
+          discoveryURL = oauthDiscoveryURL;
+          client_id = oauthClientID;
+          server_hostname = full-domain;
+          authMethod = "openid";
         };
+      };
+    };
+    # adding the user/group to be used by the service
+    users = {
+      users.actual = {
+        isSystemUser = true;
+        group = "actual";
+      };
+      groups.actual = { };
+    };
 
-        # actual service config
-        services.actual = {
-          enable = true;
-          settings = {
-            port = 5006;
-            # default to only password logins
-            allowedLoginMethods = [ "password" ];
-          };
-        };
-        # adding the user/group to be used by the service
-        users = {
-          users.actual = {
-            isSystemUser = true;
-            group = "actual";
-          };
-          groups.actual = { };
-        };
-
-        systemd = {
-          services = {
-            actual = {
-              # extra guard against the service starting before the bind has been mounted
-              unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/actual";
-              serviceConfig = {
-                Slice = "actual.slice";
-                # override dynamic user since service from nixpkgs enables by default, but it doesn't work in the selfprivacy environment
-                DynamicUser = lib.mkForce false;
-                # use service user
-                User = linuxUserOfService;
-                # use service group
-                Group = linuxGroupOfService;
-              };
-              environment =
-                # tell actual to log debug info to the console if option is enabled
-                (
-                  lib.mkIf cfg.enableDebug {
-                    DEBUG = "actual:config,actual-sensitive:config";
-                  }
-                );
-            };
-          };
-          slices.actual = {
-            description = "Actual server service slice";
-          };
-        };
-
-        services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
-          useACMEHost = sp.domain;
-          forceSSL = true;
-          locations = {
-            "/" = {
-              proxyPass = "http://127.0.0.1:5006";
-            };
-          };
-        };
-      }
-
-      # SSO config
-      (lib.mkIf is-auth-enabled {
-        services.actual = {
-          settings = {
-            # only permit openid logins
-            allowedLoginMethods = lib.mkForce [ "openid" ];
-            # default to openid if enabled
-            loginMethod = "openid";
-            # https://github.com/actualbudget/actual/pull/4421
-            userCreationMode = "login";
-            # service SSO config
-            openId = {
-              discoveryURL = oauthDiscoveryURL;
-              client_id = oauthClientID;
-              server_hostname = full-domain;
-              authMethod = "openid";
-            };
-          };
-        };
-        systemd.services.actual = {
+    systemd = {
+      services = {
+        actual = {
+          # extra guard against the service starting before the bind has been mounted
+          unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/actual";
           serviceConfig = {
+            Slice = "actual.slice";
+            # override dynamic user since service from nixpkgs enables by default, but it doesn't work in the selfprivacy environment
+            DynamicUser = lib.mkForce false;
+            # use service user
+            User = linuxUserOfService;
+            # use service group
+            Group = linuxGroupOfService;
             # run inject script with root privileges
             ExecStartPre = "+${oauthClientInjectScript}";
             # use the file generated by the inject script, even if it doesn't yet exist
             EnvironmentFile = "-${oauthSecretFile}";
             RuntimeDirectory = "actual";
           };
+          environment =
+            # tell actual to log debug info to the console if option is enabled
+            (
+              lib.mkIf cfg.enableDebug {
+                DEBUG = "actual:config,actual-sensitive:config";
+              }
+            );
         };
+      };
+      slices.actual = {
+        description = "Actual server service slice";
+      };
+    };
 
-        # OIDC for Actual is currently in beta and requires legacy cryptography algorithms
-        services.kanidm.provision.systems.oauth2."${oauthClientID}".enableLegacyCrypto = true;
-        selfprivacy.auth.clients."${oauthClientID}" = {
-          inherit usersGroup;
-          imageFile = ./icon-lg.svg;
-          displayName = "Actual";
-          subdomain = cfg.subdomain;
-          originLanding = landing-uri;
-          originUrl = redirect-uri;
-          clientSystemdUnits = [ "actual.service" ];
-          enablePkce = true;
-          linuxUserOfClient = linuxUserOfService;
-          linuxGroupOfClient = linuxGroupOfService;
-          useShortPreferredUsername = true;
-          scopeMaps.${usersGroup} = [
-            "email"
-            "openid"
-            "profile"
-          ];
+    services.nginx.virtualHosts."${cfg.subdomain}.${sp.domain}" = {
+      useACMEHost = sp.domain;
+      forceSSL = true;
+      locations = {
+        "/" = {
+          proxyPass = "http://127.0.0.1:5006";
         };
-      })
-    ]
-  );
+      };
+    };
+
+    # OIDC for Actual is currently in beta and requires legacy cryptography algorithms
+    services.kanidm.provision.systems.oauth2."${oauthClientID}".enableLegacyCrypto = true;
+    selfprivacy.auth.clients."${oauthClientID}" = {
+      inherit usersGroup;
+      imageFile = ./icon-lg.svg;
+      displayName = "Actual";
+      subdomain = cfg.subdomain;
+      originLanding = landing-uri;
+      originUrl = redirect-uri;
+      clientSystemdUnits = [ "actual.service" ];
+      enablePkce = true;
+      linuxUserOfClient = linuxUserOfService;
+      linuxGroupOfClient = linuxGroupOfService;
+      useShortPreferredUsername = true;
+      scopeMaps.${usersGroup} = [
+        "email"
+        "openid"
+        "profile"
+      ];
+    };
+  });
 
 }

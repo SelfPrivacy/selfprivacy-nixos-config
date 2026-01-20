@@ -31,7 +31,7 @@ in
   security.acme = {
     acceptTerms = true;
     defaults = {
-      email = "${cfg.username}@${cfg.domain}";
+      email = "${if cfg.username != null then cfg.username else "admin"}@${cfg.domain}";
       server =
         if cfg.dns.useStagingACME then
           "https://acme-staging-v02.api.letsencrypt.org/directory"

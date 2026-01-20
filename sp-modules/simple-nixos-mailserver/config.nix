@@ -10,7 +10,6 @@ let
   inherit (import ./common.nix { inherit config pkgs; })
     auth-passthru
     group
-    is-auth-enabled
     ;
   mailserver-service-account = {
     mailserver-service-account-name = "sp.mailserver.service-account";
@@ -21,13 +20,6 @@ in
 lib.mkIf sp.modules.simple-nixos-mailserver.enable (
   lib.mkMerge [
     {
-      assertions = [
-        {
-          assertion =
-            config.selfprivacy.modules.simple-nixos-mailserver.enableSso -> config.selfprivacy.sso.enable;
-          message = "SSO cannot be enabled for Mailserver when SSO is disabled globally.";
-        }
-      ];
       fileSystems = lib.mkIf sp.useBinds {
         "/var/vmail" = {
           device = "/volumes/${sp.modules.simple-nixos-mailserver.location}/vmail";
@@ -65,44 +57,6 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         domains = [ sp.domain ];
         localDnsResolver = false;
 
-        # A list of all login accounts. To create the password hashes, use
-        # mkpasswd -m sha-512 "super secret password"
-        loginAccounts = (
-          {
-            "${sp.username}@${sp.domain}" = {
-              hashedPassword = sp.hashedMasterPassword;
-              sieveScript = ''
-                require ["fileinto", "mailbox"];
-                if header :contains "Chat-Version" "1.0"
-                {
-                  fileinto :create "DeltaChat";
-                  stop;
-                }
-              '';
-            };
-          }
-          // builtins.listToAttrs (
-            builtins.map (user: {
-              name = "${user.username}@${sp.domain}";
-              value = {
-                hashedPassword = user.hashedPassword;
-                sieveScript = ''
-                  require ["fileinto", "mailbox"];
-                  if header :contains "Chat-Version" "1.0"
-                  {
-                    fileinto :create "DeltaChat";
-                    stop;
-                  }
-                '';
-              };
-            }) sp.users
-          )
-        );
-
-        extraVirtualAliases = {
-          "admin@${sp.domain}" = "${sp.username}@${sp.domain}";
-        };
-
         certificateScheme = "manual";
         certificateFile = "/var/lib/acme/root-${sp.domain}/fullchain.pem";
         keyFile = "/var/lib/acme/root-${sp.domain}/key.pem";
@@ -120,26 +74,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         virusScanning = false;
 
         mailDirectory = "/var/vmail";
-      };
 
-      systemd = {
-        services = {
-          dovecot2.serviceConfig.Slice = "simple_nixos_mailserver.slice";
-          postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
-          rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
-          redis-rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
-        };
-        slices."simple_nixos_mailserver" = {
-          name = "simple_nixos_mailserver.slice";
-          description = "Simple NixOS Mailserver service slice";
-        };
-      };
-    }
-    # the following parts are active only when "auth" module is enabled
-    (lib.mkIf is-auth-enabled {
-      mailserver = {
-        extraVirtualAliases = lib.mkForce { };
-        loginAccounts = lib.mkForce { };
         # LDAP is needed for Postfix to query Kanidm about email address ownership.
         # LDAP is needed for Dovecot also.
         ldap = {
@@ -158,8 +93,21 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
           uris = [ "ldaps://localhost:${toString auth-passthru.ldap-port}" ];
         };
       };
-    })
-    (lib.mkIf is-auth-enabled (import ./auth-dovecot.nix mailserver-service-account nixos-args))
-    (lib.mkIf is-auth-enabled (import ./auth-postfix.nix nixos-args))
+
+      systemd = {
+        services = {
+          dovecot2.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+          postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+          rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+          redis-rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
+        };
+        slices."simple_nixos_mailserver" = {
+          name = "simple_nixos_mailserver.slice";
+          description = "Simple NixOS Mailserver service slice";
+        };
+      };
+    }
+    (import ./auth-dovecot.nix mailserver-service-account nixos-args)
+    (import ./auth-postfix.nix nixos-args)
   ]
 )

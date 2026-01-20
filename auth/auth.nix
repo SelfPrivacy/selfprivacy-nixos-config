@@ -36,7 +36,7 @@ let
   lua_lrucache_path = "${pkgs.luajitPackages.lua-resty-lrucache}/lib/lua/5.1/?.lua";
   lua_path = "${lua_core_path};${lua_lrucache_path};";
 in
-lib.mkIf config.selfprivacy.sso.enable {
+{
   networking.hosts = {
     # Allow the services to communicate with kanidm even if
     # there is no DNS record yet
@@ -57,6 +57,10 @@ lib.mkIf config.selfprivacy.sso.enable {
       mode = "2750";
     };
   };
+
+  security.acme.certs.${domain}.reloadServices = [
+    "kanidm.service"
+  ];
 
   services.kanidm = {
     enableServer = true;
@@ -169,28 +173,34 @@ lib.mkIf config.selfprivacy.sso.enable {
     };
   };
 
-  systemd.services.kanidm.serviceConfig = {
-    BindPaths = [
-      keys-path
-    ];
-    # mkForce is used there to overwrite paths to secrets provisioning will use because those are created in ExecStartPre and systemd sandbox breaks.
-    BindReadOnlyPaths = lib.mkForce [
-      "/nix/store"
-      "/run/systemd/notify" # For healthcheck notifications
-      "-/etc/resolv.conf"
-      "-/etc/nsswitch.conf"
-      "-/etc/hosts"
-      "-/etc/localtime"
-      "-/etc/passwd"
-      "-/etc/group"
-      config.services.kanidm.serverSettings.tls_chain
-      config.services.kanidm.serverSettings.tls_key
-    ];
-    ExecStartPre =
-      # idempotent script to run on each startup only for kanidm v1.5.0
-      lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (
-        lib.mkBefore [ kanidmMigrateDbScript ]
-      );
+  systemd.services.kanidm = {
+    # for tls_chain and tls_key
+    after = [ "acme-${domain}.service" ];
+    wants = [ "acme-${domain}.service" ];
+
+    serviceConfig = {
+      BindPaths = [
+        keys-path
+      ];
+      # mkForce is used there to overwrite paths to secrets provisioning will use because those are created in ExecStartPre and systemd sandbox breaks.
+      BindReadOnlyPaths = lib.mkForce [
+        "/nix/store"
+        "/run/systemd/notify" # For healthcheck notifications
+        "-/etc/resolv.conf"
+        "-/etc/nsswitch.conf"
+        "-/etc/hosts"
+        "-/etc/localtime"
+        "-/etc/passwd"
+        "-/etc/group"
+        config.services.kanidm.serverSettings.tls_chain
+        config.services.kanidm.serverSettings.tls_key
+      ];
+      ExecStartPre =
+        # idempotent script to run on each startup only for kanidm v1.5.0
+        lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (
+          lib.mkBefore [ kanidmMigrateDbScript ]
+        );
+    };
   };
 
   selfprivacy.passthru.auth = {

@@ -16,7 +16,6 @@ let
     cfg
     domain
     group
-    is-auth-enabled
     ;
 
   runtime-folder = group;

@@ -16,7 +16,6 @@ let
   auth-passthru = config.selfprivacy.passthru.auth;
   deleteNextcloudAdmin = config.selfprivacy.workarounds.deleteNextcloudAdmin;
   cfg = sp.modules.nextcloud;
-  is-auth-enabled = cfg.enableSso && config.selfprivacy.sso.enable;
   ldap_scheme_and_host = "ldaps://${auth-passthru.ldap-host}";
 
   occ = "${config.services.nextcloud.occ}/bin/nextcloud-occ";
@@ -86,18 +85,6 @@ in
           weight = 1;
         };
       };
-    enableSso =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable Single Sign-On";
-      })
-      // {
-        meta = {
-          type = "bool";
-          weight = 2;
-        };
-      };
     enableSambaFeatures =
       (lib.mkOption {
         type = types.bool;
@@ -107,7 +94,7 @@ in
       // {
         meta = {
           type = "bool";
-          weight = 3;
+          weight = 2;
         };
       };
     debug =
@@ -119,7 +106,7 @@ in
       // {
         meta = {
           type = "bool";
-          weight = 4;
+          weight = 3;
         };
       };
     disableMaintenanceModeAtStart =
@@ -131,7 +118,7 @@ in
       // {
         meta = {
           type = "bool";
-          weight = 5;
+          weight = 4;
         };
       };
   };
@@ -140,12 +127,7 @@ in
   config = lib.mkIf sp.modules.nextcloud.enable (
     lib.mkMerge [
       {
-        assertions = [
-          {
-            assertion = cfg.enableSso -> sp.sso.enable;
-            message = "SSO cannot be enabled for Nextcloud when SSO is disabled globally.";
-          }
-        ];
+
         fileSystems = lib.mkIf sp.useBinds {
           "/var/lib/nextcloud" = {
             device = "/volumes/${cfg.location}/nextcloud";
@@ -160,7 +142,7 @@ in
         };
 
         # for ExecStartPost script to have access to /run/keys/*
-        users.groups.keys.members = lib.mkIf is-auth-enabled [ linuxUserOfService ];
+        users.groups.keys.members = [ linuxUserOfService ];
 
         # not needed, due to turnOffCertCheck=1 in used_ldap
         # users.groups.${config.security.acme.certs.${domain}.group}.members =
@@ -217,8 +199,7 @@ in
           settings = {
             # further forces Nextcloud to use HTTPS
             overwriteprotocol = "https";
-          }
-          // lib.attrsets.optionalAttrs is-auth-enabled {
+
             loglevel = 0;
             # log_type = "file";
             social_login_auto_redirect = false;
@@ -268,19 +249,7 @@ in
             '';
           };
         };
-      }
-      # enables samba features when requested
-      (lib.mkIf cfg.enableSambaFeatures {
-        # only apply cifs-utils package to this module
-        services.phpfpm.pools.nextcloud.phpEnv.PATH =
-          lib.mkForce "${pkgs.samba}/bin:${pkgs.cifs-utils}/bin:/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/usr/bin:/bin";
-        systemd.services.nextcloud-cron.path = [
-          pkgs.samba
-          pkgs.cifs-utils
-        ];
-      })
-      # the following part is active only when "auth" module is enabled
-      (lib.mkIf is-auth-enabled {
+
         systemd.services.nextcloud-setup = {
           serviceConfig = {
             Restart = "on-failure";
@@ -424,14 +393,16 @@ in
             valuesByGroup.${adminsGroup} = [ "admin" ];
           };
         };
-      })
-      (lib.mkIf (!is-auth-enabled) {
-        systemd.services.nextcloud-setup = {
-          script = ''
-            ${occ} app:disable logreader
-            ${occ} app:disable user_oidc
-          '';
-        };
+      }
+      # enables samba features when requested
+      (lib.mkIf cfg.enableSambaFeatures {
+        # only apply cifs-utils package to this module
+        services.phpfpm.pools.nextcloud.phpEnv.PATH =
+          lib.mkForce "${pkgs.samba}/bin:${pkgs.cifs-utils}/bin:/run/wrappers/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+        systemd.services.nextcloud-cron.path = [
+          pkgs.samba
+          pkgs.cifs-utils
+        ];
       })
     ]
   );
