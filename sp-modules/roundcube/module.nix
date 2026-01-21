@@ -52,8 +52,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    
-        services.roundcube = {
+
+    services.roundcube = {
       enable = true;
       # this is the url of the vhost, not necessarily the same as the fqdn of
       # the mailserver

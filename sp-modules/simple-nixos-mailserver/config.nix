@@ -21,8 +21,7 @@ in
 lib.mkIf sp.modules.simple-nixos-mailserver.enable (
   lib.mkMerge [
     {
-      
-      
+
       fileSystems = lib.mkIf sp.useBinds {
         "/var/vmail" = {
           device = "/volumes/${sp.modules.simple-nixos-mailserver.location}/vmail";
