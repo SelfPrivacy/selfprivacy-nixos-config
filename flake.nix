@@ -28,7 +28,7 @@
             pkgs.black
           ];
           settings = {
-            formattter.python = {
+            formatter.python = {
               includes = [ "*.py" ];
               command = "black";
             };

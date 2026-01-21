@@ -17,7 +17,9 @@ def getenv(name):
     try:
         return os.environ[name]
     except KeyError:
-        print(f"Missing environment variable {name}. You should NOT run this script by hand, please use systemd unit mas-kanidm-sync.service.")
+        print(
+            f"Missing environment variable {name}. You should NOT run this script by hand, please use systemd unit mas-kanidm-sync.service."
+        )
         exit(1)
 
 
