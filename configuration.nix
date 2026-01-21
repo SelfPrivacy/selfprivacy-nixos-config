@@ -204,7 +204,6 @@ in
     '';
   system.rebuild.enableNg = true;
   nix = {
-    #package = pkgs.lixPackageSets.latest.lix;
     channel.enable = false;
 
     # daemonCPUSchedPolicy = "idle";
