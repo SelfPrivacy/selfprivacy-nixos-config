@@ -29,16 +29,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1768988814,
-        "narHash": "sha256-m7dlZ04masNfJ/gbLILjsflSOpDfllqiL+GZ1d9qkd8=",
-        "ref": "nhnn/nixos-25.11",
-        "rev": "e9d0907fe026be3f610706e33ca0df23d8d59a93",
-        "revCount": 1956,
+        "lastModified": 1768995260,
+        "narHash": "sha256-v3onWNija7CjM0RrL3RNfDCPRN5W1HvbfpqrwB3karA=",
+        "ref": "refs/heads/master",
+        "rev": "ad2e872e35c1831813d6e97c8c8f263948218e2a",
+        "revCount": 1955,
         "type": "git",
         "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
       },
       "original": {
-        "ref": "nhnn/nixos-25.11",
         "type": "git",
         "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
       }
