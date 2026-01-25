@@ -166,7 +166,7 @@ let
   # jitsi pollutes pkgs causing element-web to rebuild.
   element-web =
     (import config.nixpkgs.flake.source {
-      system = pkgs.system;
+      system = pkgs.stdenv.hostPlatform.system;
     }).element-web.override
       {
         conf = elementConfig;

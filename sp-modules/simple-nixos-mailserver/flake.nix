@@ -1,21 +1,21 @@
 {
   description = "PoC SP module for the simple-nixos-mailserver";
 
-  inputs.mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-25.05";
+  inputs.mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-25.11";
 
   outputs =
-    { self, mailserver }:
+    { mailserver, ... }:
     {
       nixosModules.default = _: {
         imports = [
           mailserver.nixosModules.default
           ./options.nix
-          ./config.nix
+          (import ./config.nix mailserver)
         ];
       };
       configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
       meta =
-        { lib, ... }:
+        { ... }:
         {
           spModuleSchemaVersion = 1;
           id = "simple-nixos-mailserver";
@@ -27,7 +27,7 @@
           canBeBackedUp = true;
           backupDescription = "Mail boxes and filters.";
           systemdServices = [
-            "dovecot2.service"
+            "dovecot.service"
             "postfix.service"
           ];
           user = "virtualMail";

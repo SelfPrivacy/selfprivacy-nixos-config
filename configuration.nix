@@ -202,8 +202,8 @@ in
           exit 255
       fi
     '';
+  system.rebuild.enableNg = true;
   nix = {
-    package = pkgs.nixVersions.nix_2_26;
     channel.enable = false;
 
     # daemonCPUSchedPolicy = "idle";
