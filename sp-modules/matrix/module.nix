@@ -57,8 +57,6 @@ let
       "matrix.org"
     ];
 
-    jitsi.preffered_domain = lib.mkIf config.services.jitsi-meet.enable "https://${config.services.jitsi-meet.hostName}";
-
     branding.welcome_background_url = "https://${cfg.elementSubdomain}.${sp.domain}/background.png";
 
     setting_defaults = {
@@ -66,6 +64,8 @@ let
       "UIFeature.passwordReset" = false;
       "UIFeature.deactivate" = false;
     };
+  } // lib.optionalAttrs config.services.jitsi-meet.enable {
+    jitsi.preffered_domain = "https://${config.services.jitsi-meet.hostName}";
   };
 
   yamlFormat = pkgs.formats.yaml { };
