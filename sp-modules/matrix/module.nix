@@ -64,7 +64,8 @@ let
       "UIFeature.passwordReset" = false;
       "UIFeature.deactivate" = false;
     };
-  } // lib.optionalAttrs config.services.jitsi-meet.enable {
+  }
+  // lib.optionalAttrs config.services.jitsi-meet.enable {
     jitsi.preffered_domain = "https://${config.services.jitsi-meet.hostName}";
   };
 
