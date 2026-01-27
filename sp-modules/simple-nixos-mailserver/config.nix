@@ -71,6 +71,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         enableImapSsl = true;
         enablePop3 = false;
         enablePop3Ssl = false;
+        enableSubmission = true;
         dkimSelector = "selector";
 
         # Enable the ManageSieve protocol
@@ -129,9 +130,9 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
                 run_migration_1() {
                   true
                 }
-                run_migration_2() {                
+                run_migration_2() {
                   ${migration3PythonScript} --layout default /var/vmail --execute
-                } 
+                }
 
                 run_migration() {
                   local i="$1"
