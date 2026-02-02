@@ -98,7 +98,7 @@ in
 
     services.gotosocial = {
       enable = true;
-      environmentFile = "/var/lib/gotosocial/env";
+      environmentFile = "-/var/lib/gotosocial/env";
       setupPostgresqlDB = true;
       settings = {
         application-name = cfg.appName;
