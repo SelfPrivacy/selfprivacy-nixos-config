@@ -87,6 +87,8 @@ in
       wants = [ "kanidm.service" ];
       after = [ "kanidm.service" ];
       serviceConfig = {
+        # - is required because file doesn't exist on first start, as its populated by ExecStartPre.
+        EnvironmentFile = lib.mkForce "-/var/lib/gotosocial/env";
         ExecStartPre = "+${pkgs.writeShellScript "gts-read-oidc-client-secret" ''
           echo -n "GTS_OIDC_CLIENT_SECRET" > /var/lib/gotosocial/env
           cat ${oauthClientSecretFP} >> /var/lib/gotosocial/env
@@ -98,7 +100,6 @@ in
 
     services.gotosocial = {
       enable = true;
-      environmentFile = "-/var/lib/gotosocial/env";
       setupPostgresqlDB = true;
       settings = {
         application-name = cfg.appName;
