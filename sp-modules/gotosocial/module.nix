@@ -90,7 +90,7 @@ in
         # - is required because file doesn't exist on first start, as its populated by ExecStartPre.
         EnvironmentFile = lib.mkForce "-/var/lib/gotosocial/env";
         ExecStartPre = "+${pkgs.writeShellScript "gts-read-oidc-client-secret" ''
-          echo -n "GTS_OIDC_CLIENT_SECRET" > /var/lib/gotosocial/env
+          echo -n "GTS_OIDC_CLIENT_SECRET=" > /var/lib/gotosocial/env
           cat ${oauthClientSecretFP} >> /var/lib/gotosocial/env
           chown gotosocial:gotosocial /var/lib/gotosocial/env
           chmod 640  /var/lib/gotosocial/env
