@@ -64,6 +64,19 @@ in
           weight = 1;
         };
       };
+
+    instanceFederationSpamFilter =
+      (lib.mkOption {
+        default = false;
+        type = lib.types.bool;
+        description = "Enable spam filtering for messages entering your instance. EXPERIMENTAL SETTING, it is recommended to only enable this setting when the fediverse is in the midst of a spam wave";
+      })
+      // {
+        meta = {
+          type = "bool";
+          weight = 2;
+        };
+      };
   };
 
   config = lib.mkIf cfg.enable {
@@ -116,6 +129,8 @@ in
           "profile"
         ];
         oidc-admin-groups = [ "admin" ];
+
+        instance-federation-spam-filter = cfg.instanceFederationSpamFilter;
       };
     };
 
