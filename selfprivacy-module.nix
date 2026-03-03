@@ -13,7 +13,7 @@ with lib;
         Domain used by the server
       '';
       # see: https://regexr.com/7p7ep, https://stackoverflow.com/a/26987741
-      type = lib.types.strMatching ''^(xn--)?[a-z0-9][a-z0-9_-]{0,61}[a-z0-9]{0,1}\.(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})$'';
+      type = lib.types.strMatching ''^(xn--)?[a-z0-9][a-z0-9_-]{0,61}[a-z0-9]{0,1}\.(xn--)?([a-z0-9-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})$'';
     };
     timezone = mkOption {
       description = ''

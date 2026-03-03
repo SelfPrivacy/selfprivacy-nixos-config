@@ -100,12 +100,12 @@ in
               default = false;
             };
             adminsGroup = mkOption {
-              type = types.nullOr (lib.types.strMatching "sp\.[A-Za-z0-9]+\.admins");
+              type = types.nullOr (lib.types.strMatching "sp.[A-Za-z0-9]+.admins");
               description = "Name of admins group in Kanidm, whose members have admin level access to resources (service) associated with OAuth2 client authorization.";
               default = null;
             };
             usersGroup = mkOption {
-              type = types.nullOr (lib.types.strMatching "sp\.[A-Za-z0-9]+\.users");
+              type = types.nullOr (lib.types.strMatching "sp.[A-Za-z0-9]+.users");
               description = "Name of users group in Kanidm, whose members have user level access to resources (service) associated with OAuth2 client authorization.";
               default = null;
             };
@@ -118,7 +118,7 @@ in
               description = "The origin URL or URLs of the service for OAuth2 redirects.";
             };
             subdomain = lib.mkOption {
-              type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+              type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
               description = "Subdomain of the service.";
             };
             # when true, "name" is passed to a service instead of "name@domain"
