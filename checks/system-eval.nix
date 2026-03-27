@@ -13,38 +13,42 @@ let
     builtins.readDir ../sp-modules
   );
 in
-(self.nixosConfigurations-fun {
-  hardware-configuration = {
-    system.stateVersion = lib.trivial.release;
-    nixpkgs.hostPlatform = system;
-    boot.loader.grub.device = "/dev/sda";
-    fileSystems."/" = {
-      device = "/dev/sda1";
-      fsType = "ext4";
-    };
-  };
-  userdata = {
-    dns = {
-      provider = "CLOUDFLARE";
-      useStagingACME = false;
-    };
-    server.provider = "HETZNER";
-    domain = "dummy.site";
-    hashedMasterPassword = "$6$aaaaaaaaaaaaaaa$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    hostname = "dummysite";
-    timezone = "Etc/UTC";
-    username = "user";
-    useBinds = true;
-    sshKeys = [ ];
-    users = [ ];
-    autoUpgrade.enable = true;
-    postgresql.location = "sda";
-    modules = lib.mapAttrs (_: _: {
-      enable = true;
-      location = "sda";
-    }) sp-modules;
-  };
-  deployment = { };
-  top-level-flake = self;
-  inherit sp-modules;
-}).default.config.system.build.toplevel
+let
+  config =
+    (self.nixosConfigurations-fun {
+      hardware-configuration = {
+        system.stateVersion = lib.trivial.release;
+        nixpkgs.hostPlatform = system;
+        boot.loader.grub.device = "/dev/sda";
+        fileSystems."/" = {
+          device = "/dev/sda1";
+          fsType = "ext4";
+        };
+      };
+      userdata = {
+        dns = {
+          provider = "CLOUDFLARE";
+          useStagingACME = false;
+        };
+        server.provider = "HETZNER";
+        domain = "dummy.site";
+        hashedMasterPassword = "$6$aaaaaaaaaaaaaaa$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        hostname = "dummysite";
+        timezone = "Etc/UTC";
+        username = "user";
+        useBinds = true;
+        sshKeys = [ ];
+        users = [ ];
+        autoUpgrade.enable = true;
+        postgresql.location = "sda";
+        modules = lib.mapAttrs (_: _: {
+          enable = true;
+          location = "sda";
+        }) sp-modules;
+      };
+      deployment = { };
+      top-level-flake = self;
+      inherit sp-modules;
+    }).default;
+in
+config.config.system.build.toplevel // { config = config; }

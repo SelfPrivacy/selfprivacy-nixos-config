@@ -1,8 +1,18 @@
 { sp-module, pkgs }:
 let
   lib = pkgs.lib;
+  selfprivacy =
+    (pkgs.lib.evalModules {
+      modules = [
+        ../selfprivacy-module.nix
+        ../modules
+      ];
+    }).config.selfprivacy.passthru;
   options =
     (pkgs.lib.evalModules {
+      specialArgs = {
+        inherit selfprivacy;
+      };
       modules = [
         { _module.check = false; }
         sp-module.nixosModules.default
@@ -19,10 +29,10 @@ let
     }
   );
 in
-builtins.toJSON ({
+builtins.toJSON {
   meta = if builtins.hasAttr "meta" sp-module then sp-module.meta { inherit lib; } else null;
   configPathsNeeded = sp-module.configPathsNeeded;
   options = pkgs.lib.mapAttrs optionToMeta (
     builtins.head (lib.mapAttrsToList (name: value: value) options.selfprivacy.modules)
   );
-})
+}

@@ -49,6 +49,7 @@
             modules = [
               hardware-configuration
               deployment
+              ./modules
               ./configuration.nix
               selfprivacy-api.nixosModules.default
               (
@@ -124,6 +125,7 @@
                     args'@{ pkgs, ... }:
                     args'
                     // {
+                      selfprivacy = config.selfprivacy.passthru;
                       config =
                         # TODO use lib.attrsets.mergeAttrsList from nixpkgs 23.05
                         (
