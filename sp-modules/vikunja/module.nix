@@ -112,15 +112,13 @@ in
           local.enabled = false;
           openid = {
             enabled = true;
-            providers = [
-              {
-                name = oauth2-provider-name;
-                authurl = lib.strings.removeSuffix "/.well-known/openid-configuration" oauthDiscoveryURL;
-                clientid = oauthClientID;
-                clientsecret = ""; # There's patch for our Vikunja to make it load client secret from environment variable.
-                scope = "openid profile email";
-              }
-            ];
+            providers.kanidm = {
+              name = oauth2-provider-name;
+              authurl = lib.strings.removeSuffix "/.well-known/openid-configuration" oauthDiscoveryURL;
+              clientid = oauthClientID;
+              clientsecret = "empty"; # There's patch for our Vikunja to make it load client secret from environment variable.
+              scope = "openid profile email";
+            };
           };
         };
       };
