@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -175,17 +176,8 @@ let
 in
 {
   options.selfprivacy.modules.matrix = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable Matrix";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
+    enable = selfprivacy.types.enableOption "Matrix";
+
     location =
       (lib.mkOption {
         type = lib.types.str;
@@ -197,50 +189,18 @@ in
         };
       };
 
-    subdomain =
-      (lib.mkOption {
-        default = "synapse";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Matrix server subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 0;
-        };
-      };
+    subdomain = selfprivacy.types.subdomainOption "synapse" {
+      option.description = "Matrix server subdomain";
+    };
 
-    elementSubdomain =
-      (lib.mkOption {
-        default = "element";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Element client subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 1;
-        };
-      };
-
-    masSubdomain =
-      (lib.mkOption {
-        default = "mas";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Matrix Authentication Service subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 2;
-        };
-      };
+    elementSubdomain = selfprivacy.types.subdomainOption "element" {
+      option.description = "Element client subdomain";
+      meta.weight = 1;
+    };
+    masSubdomain = selfprivacy.types.subdomainOption "mas" {
+      option.description = "Matrix Authentication Service subdomain";
+      meta.weight = 2;
+    };
 
     allowToPublishRoomsIntoDirectory =
       (lib.mkOption {
