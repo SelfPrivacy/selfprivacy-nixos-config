@@ -200,14 +200,14 @@ in
     subdomain =
       (lib.mkOption {
         default = "synapse";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
         description = "Matrix server subdomain";
       })
       // {
         meta = {
           widget = "subdomain";
           type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
           weight = 0;
         };
       };
@@ -215,14 +215,14 @@ in
     elementSubdomain =
       (lib.mkOption {
         default = "element";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
         description = "Element client subdomain";
       })
       // {
         meta = {
           widget = "subdomain";
           type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
           weight = 1;
         };
       };
@@ -230,14 +230,14 @@ in
     masSubdomain =
       (lib.mkOption {
         default = "mas";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
         description = "Matrix Authentication Service subdomain";
       })
       // {
         meta = {
           widget = "subdomain";
           type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
           weight = 2;
         };
       };
