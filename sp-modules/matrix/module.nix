@@ -178,16 +178,7 @@ in
   options.selfprivacy.modules.matrix = {
     enable = selfprivacy.types.enableOption "Matrix";
 
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Matrix location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
+    location = selfprivacy.types.locationOption;
 
     subdomain = selfprivacy.types.subdomainOption "synapse" {
       option.description = "Matrix server subdomain";

@@ -1,26 +1,11 @@
-{ lib, ... }:
+{
+  lib,
+  selfprivacy,
+  ...
+}:
 {
   options.selfprivacy.modules.simple-nixos-mailserver = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable mail server";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
+    enable = selfprivacy.types.enableOption "mail server";
+    location = selfprivacy.types.locationOption;
   };
 }

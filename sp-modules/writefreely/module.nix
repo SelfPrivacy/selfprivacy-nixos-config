@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -16,41 +17,11 @@ let
 in
 {
   options.selfprivacy.modules.writefreely = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable WriteFreely";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "WriteFreely location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
-    subdomain =
-      (lib.mkOption {
-        default = "writefreely";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Subdomain (changing subdomain after enabling the federation will cause its breakage!)";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 0;
-        };
-      };
+    enable = selfprivacy.types.enableOption "WriteFreely";
+    location = selfprivacy.types.locationOption;
+    subdomain = selfprivacy.types.subdomainOption "writefreely" {
+      option.description = "Subdomain (changing subdomain after enabling the federation will cause its breakage!)";
+    };
     appName =
       (lib.mkOption {
         default = "WriteFreely";

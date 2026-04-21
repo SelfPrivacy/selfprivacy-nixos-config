@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -35,41 +36,9 @@ let
 in
 {
   options.selfprivacy.modules.gitea = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable Forgejo";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Forgejo location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
-    subdomain =
-      (lib.mkOption {
-        default = "git";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 0;
-        };
-      };
+    enable = selfprivacy.types.enableOption "Forgejo";
+    location = selfprivacy.types.locationOption;
+    subdomain = selfprivacy.types.subdomainOption "git";
     appName =
       (lib.mkOption {
         default = "SelfPrivacy git Service";

@@ -27,27 +27,8 @@ let
 in
 {
   options.selfprivacy.modules.vikunja = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable Vikunja";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Vikunja location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
+    enable = selfprivacy.types.enableOption "Vikunja";
+    location = selfprivacy.types.locationOption;
     subdomain = selfprivacy.types.subdomainOption "vikunja";
   };
 

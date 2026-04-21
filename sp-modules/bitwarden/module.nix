@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -12,41 +13,9 @@ let
 in
 {
   options.selfprivacy.modules.bitwarden = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable Vaultwarden";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Vaultwarden location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
-    subdomain =
-      (lib.mkOption {
-        default = "password";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 0;
-        };
-      };
+    enable = selfprivacy.types.enableOption "Vaultwarden";
+    location = selfprivacy.types.locationOption;
+    subdomain = selfprivacy.types.subdomainOption "password";
     signupsAllowed =
       (lib.mkOption {
         default = true;

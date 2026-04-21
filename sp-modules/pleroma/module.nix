@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -10,41 +11,9 @@ let
 in
 {
   options.selfprivacy.modules.pleroma = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
-    subdomain =
-      (lib.mkOption {
-        default = "social";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 0;
-        };
-      };
+    enable = selfprivacy.types.enableOption "Pleroma";
+    location = selfprivacy.types.locationOption;
+    subdomain = selfprivacy.types.subdomainOption "social";
   };
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {

@@ -5,7 +5,12 @@ let
     (lib.mkOption optionDef)
     // {
       __functor =
-        _: { option ? {}, meta ? {} }: overridableOptionDefinition (optionDef // option) (metaDef // meta);
+        _:
+        {
+          option ? { },
+          meta ? { },
+        }:
+        overridableOptionDefinition (optionDef // option) (metaDef // meta);
     };
 in
 {
@@ -22,7 +27,7 @@ in
         {
           widget = "subdomain";
           type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]";
+          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
           weight = 0;
         };
 
@@ -36,6 +41,16 @@ in
         }
         {
           type = "enable";
+        };
+
+    locationOption =
+      overridableOptionDefinition
+        {
+          type = lib.types.str;
+          description = "Data location";
+        }
+        {
+          type = "location";
         };
   };
 }

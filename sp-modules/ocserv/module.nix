@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  selfprivacy,
+  ...
+}:
 let
   domain = config.selfprivacy.domain;
   cert = "${config.security.acme.certs.${domain}.directory}/fullchain.pem";
@@ -7,17 +12,7 @@ let
 in
 {
   options.selfprivacy.modules.ocserv = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
+    enable = selfprivacy.types.enableOption "OpenConnect VPN";
   };
 
   config = lib.mkIf cfg.enable {
