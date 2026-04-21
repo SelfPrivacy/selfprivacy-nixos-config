@@ -188,6 +188,7 @@ in
       option.description = "Element client subdomain";
       meta.weight = 1;
     };
+
     masSubdomain = selfprivacy.types.subdomainOption "mas" {
       option.description = "Matrix Authentication Service subdomain";
       meta.weight = 2;
