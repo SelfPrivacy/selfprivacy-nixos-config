@@ -4,6 +4,7 @@ let
     optionDef: metaDef:
     (lib.mkOption optionDef)
     // {
+      meta = metaDef;
       __functor =
         _:
         {
