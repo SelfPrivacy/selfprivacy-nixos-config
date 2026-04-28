@@ -20,6 +20,11 @@ let
       DESEC_PROPAGATION_TIMEOUT=180
       DESEC_TTL=3600
     '';
+    PORKBUN = ''
+      PORKBUN_API_KEY=$TOKEN_ID
+      PORKBUN_SECRET_API_KEY=$TOKEN
+      PORKBUN_POLLING_INTERVAL=30
+    '';
   };
   dnsCredentialsTemplate = dnsCredentialsTemplates.${cfg.dns.provider};
   acme-env-filepath = "/var/lib/selfprivacy/acme-env";
@@ -69,7 +74,11 @@ in
     script = ''
       set -o nounset
 
-      TOKEN="$(jq -re '.dns.apiKey' ${secrets-filepath})"
+      TOKEN="$(jq -re '.dns.token // .dns.apiKey' ${secrets-filepath})"
+      TOKEN_ID="$(jq -re '.dns.tokenId // "none"' ${secrets-filepath})"
+      URL="$(jq -re '.dns.url // "none"' ${secrets-filepath})"
+      TENANT="$(jq -re '.dns.tenant // "none"' ${secrets-filepath})"
+      SECONDARY_TOKEN="$(jq -re '.dns.secondaryToken // "none"' ${secrets-filepath})"
       filecontents=$(cat <<- EOF
       ${dnsCredentialsTemplate}
       EOF
