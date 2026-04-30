@@ -130,6 +130,7 @@ in
     virtualHosts.${auth-fqdn} = {
       useACMEHost = domain;
       forceSSL = true;
+      locations."/scim".return = 403; # GHSA-r5fr-9gmv-jggh: Unauthenticated process abort via SCIM filter stack exhaustion
       locations."/" = {
         extraConfig = lib.mkIf config.selfprivacy.sso.debug ''
           access_log /var/log/nginx/kanidm.log kanidm;
