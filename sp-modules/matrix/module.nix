@@ -409,16 +409,18 @@ in
                 if [ ! -f ${masDataDir}/secrets.yaml ]; then
                   mas-cli config generate > ${masDataDir}/secrets.yaml
                 fi
-                cat ${masDataDir}/secrets.yaml | yq --arg matrixtoken "$(cat ${masDataDir}/matrix-token)" --arg syncclientsecret "$(cat ${masDataDir}/sync-client-secret)" --slurpfile template ${experimentalMsc3861Template} '{
+                yq --arg matrixtoken "$(cat ${masDataDir}/matrix-token)" --arg syncclientsecret "$(cat ${masDataDir}/sync-client-secret)" --slurpfile template ${experimentalMsc3861Template} '{
                   secrets: .secrets,
                   matrix: {secret: .matrix.secret},
                   clients: [
                     { client_id: "${synapseUlid}", client_auth_method: "client_secret_basic", client_secret: $matrixtoken },
                     { client_id: "${masKanidmSyncClientId}", client_auth_method: "client_secret_basic", client_secret: $syncclientsecret }
                   ]
-                }' > ${masDataDir}/secrets.yaml
-                cat ${upstreamOauth2Template} | yq --rawfile clientsecret ${oauthClientSecretFP} '{upstream_oauth2: {providers: [ . * {client_secret: $clientsecret}]}}' > ${masDataDir}/oauth2_secrets.yaml
-                cat ${masDataDir}/secrets.yaml | yq --slurpfile template ${experimentalMsc3861Template} '{experimental_features: {msc3861: ($template[0] * {client_secret: .clients[0].client_secret, admin_token: .matrix.secret })}}' > ${synapseDataDir}/mas_secrets.yaml
+                }' < ${masDataDir}/secrets.yaml > ${masDataDir}/secrets.yaml.tmp
+                mv ${masDataDir}/secrets.yaml.tmp ${masDataDir}/secrets.yaml
+                yq --rawfile clientsecret ${oauthClientSecretFP} '{upstream_oauth2: {providers: [ . * {client_secret: $clientsecret}]}}' < ${upstreamOauth2Template} > ${masDataDir}/oauth2_secrets.yaml
+                yq --slurpfile template ${experimentalMsc3861Template} '{experimental_features: {msc3861: ($template[0] * {client_secret: .clients[0].client_secret, admin_token: .matrix.secret })}}' < ${masDataDir}/secrets.yaml > ${synapseDataDir}/mas_secrets.yaml.tmp
+                mv ${synapseDataDir}/mas_secrets.yaml.tmp ${synapseDataDir}/mas_secrets.yaml
                 chown matrix-authentication-service:matrix-authentication-service ${masDataDir} -R
                 chmod 640 ${masDataDir}/*
                 chown matrix-synapse:matrix-synapse ${synapseDataDir}
