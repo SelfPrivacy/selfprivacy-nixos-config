@@ -406,7 +406,7 @@ in
                   MATRIX_TOKEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 50)
                   echo -n "$MATRIX_TOKEN" > ${masDataDir}/matrix-token
                 fi
-                if [ ! -f ${masDataDir}/secrets.yaml ]; then
+                if [ ! -s ${masDataDir}/secrets.yaml ] || ! yq -e '.matrix.secret' < ${masDataDir}/secrets.yaml > /dev/null 2>&1; then
                   mas-cli config generate > ${masDataDir}/secrets.yaml
                 fi
                 yq --arg matrixtoken "$(cat ${masDataDir}/matrix-token)" --arg syncclientsecret "$(cat ${masDataDir}/sync-client-secret)" --slurpfile template ${experimentalMsc3861Template} '{
