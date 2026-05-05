@@ -223,6 +223,9 @@ in
       "nix-command"
       "flakes"
     ];
+    allowed-users = [
+      "root"
+    ];
     # auto-optimise-store = true;
 
     # evaluation restrictions:
