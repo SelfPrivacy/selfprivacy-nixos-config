@@ -19,3 +19,10 @@ jobs:
 
       - name: Run flake checks
         run: nix flake check
+
+      - name: Upload cache
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+        run: |
+          attic login --set-default selfprivacy https://cache.selfprivacy.org "$ATTIC_TOKEN"
+          nix build .#checks.x86_64-linux.system-eval --no-link --print-out-paths -L | xargs attic push selfprivacy:nixos
