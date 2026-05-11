@@ -119,6 +119,7 @@
                 args@{ config, pkgs, ... }:
                 let
                   lib = nixpkgs.lib;
+                  # workaround for infinite recursion because mailserver defines selfprivacy.xxx options but also depends on selfprivacy argument for OIDC helpers.
                   selfprivacyModuleArg = {
                     inherit ((import ./modules/types.nix { inherit lib; }).selfprivacy.passthru) types;
                   };
