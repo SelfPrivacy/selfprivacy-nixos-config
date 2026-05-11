@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 with lib;
 {
@@ -215,5 +215,9 @@ with lib;
         default = false;
       };
     };
+  };
+
+  config = {
+    _module.args.selfprivacy = config.selfprivacy.passthru;
   };
 }

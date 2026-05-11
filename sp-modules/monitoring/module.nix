@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -9,27 +10,8 @@ let
 in
 {
   options.selfprivacy.modules.monitoring = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable monitoring service";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Monitoring data location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
+    enable = selfprivacy.types.enableOption "monitoring service";
+    location = selfprivacy.types.locationOption;
   };
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf config.selfprivacy.useBinds {

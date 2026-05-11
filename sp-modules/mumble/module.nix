@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -11,41 +12,9 @@ let
 in
 {
   options.selfprivacy.modules.mumble = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable Mumble";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    subdomain =
-      (lib.mkOption {
-        default = "mumble";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 0;
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "Location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
+    enable = selfprivacy.types.enableOption "Mumble";
+    subdomain = selfprivacy.types.subdomainOption "mumble";
+    location = selfprivacy.types.locationOption;
     appName =
       (lib.mkOption {
         default = "SelfPrivacy Mumble Service";

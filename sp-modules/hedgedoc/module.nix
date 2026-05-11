@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  selfprivacy,
   ...
 }:
 let
@@ -19,41 +20,9 @@ let
 in
 {
   options.selfprivacy.modules.hedgedoc = {
-    enable =
-      (lib.mkOption {
-        default = false;
-        type = lib.types.bool;
-        description = "Enable HedgeDoc";
-      })
-      // {
-        meta = {
-          type = "enable";
-        };
-      };
-    location =
-      (lib.mkOption {
-        type = lib.types.str;
-        description = "HedgeDoc location";
-      })
-      // {
-        meta = {
-          type = "location";
-        };
-      };
-    subdomain =
-      (lib.mkOption {
-        default = "hedgedoc";
-        type = lib.types.strMatching "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-        description = "Subdomain";
-      })
-      // {
-        meta = {
-          widget = "subdomain";
-          type = "string";
-          regex = "[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]";
-          weight = 0;
-        };
-      };
+    enable = selfprivacy.types.enableOption "HedgeDoc";
+    location = selfprivacy.types.locationOption;
+    subdomain = selfprivacy.types.subdomainOption "hedgedoc";
     allowAnonymous =
       (lib.mkOption {
         default = false;

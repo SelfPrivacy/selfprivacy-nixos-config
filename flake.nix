@@ -49,6 +49,7 @@
             modules = [
               hardware-configuration
               deployment
+              ./modules
               ./configuration.nix
               selfprivacy-api.nixosModules.default
               (
@@ -118,12 +119,17 @@
                 args@{ config, pkgs, ... }:
                 let
                   lib = nixpkgs.lib;
+                  # workaround for infinite recursion because mailserver defines selfprivacy.xxx options but also depends on selfprivacy argument for OIDC helpers.
+                  selfprivacyModuleArg = {
+                    inherit ((import ./modules/types.nix { inherit lib; }).selfprivacy.passthru) types;
+                  };
                   configPathsNeeded =
                     sp-module.configPathsNeeded or (abort "allowed config paths not set for module \"${name}\"");
                   constrainConfigArgs =
                     args'@{ pkgs, ... }:
                     args'
                     // {
+                      selfprivacy = selfprivacyModuleArg;
                       config =
                         # TODO use lib.attrsets.mergeAttrsList from nixpkgs 23.05
                         (
