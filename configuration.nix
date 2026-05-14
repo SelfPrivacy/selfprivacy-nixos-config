@@ -226,6 +226,12 @@ in
     allowed-users = [
       "root"
     ];
+    substituters = [
+      "https://cache.selfprivacy.org/nixos"
+    ];
+    trusted-public-keys = [
+      "nixos:XI4AhGwIOTvDIfKg8fr4p6PfVRske/5kHluWnc9cvfs="
+    ];
     # auto-optimise-store = true;
 
     # evaluation restrictions:
