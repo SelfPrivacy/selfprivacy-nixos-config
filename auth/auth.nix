@@ -66,7 +66,16 @@ in
     enableServer = true;
 
     # kanidm with Rust code patches for OAuth and admin passwords provisioning
-    package = pkgs.kanidm_1_8.withSecretProvisioning;
+    package =
+      pkgs.callPackage
+        (import "${pkgs.path}/pkgs/servers/kanidm/generic.nix" {
+          version = "1.9.4";
+          hash = "sha256-sz4jbnaRU+mUCBwxODMGkKnk9DMAmD6cyPyCbYp6aOQ=";
+          cargoHash = "sha256-1U262qRtYzRTQZLNF027LlCASCvbxmuBvZJpDPnI/vU=";
+        })
+        {
+          enableSecretProvisioning = true;
+        };
 
     serverSettings = {
       inherit domain;
@@ -130,7 +139,6 @@ in
     virtualHosts.${auth-fqdn} = {
       useACMEHost = domain;
       forceSSL = true;
-      locations."/scim".return = 403; # GHSA-r5fr-9gmv-jggh: Unauthenticated process abort via SCIM filter stack exhaustion
       locations."/" = {
         extraConfig = lib.mkIf config.selfprivacy.sso.debug ''
           access_log /var/log/nginx/kanidm.log kanidm;

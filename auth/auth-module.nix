@@ -297,14 +297,14 @@ in
               export KANIDM_URL="${config.services.kanidm.provision.instanceUrl}"
               export KANIDM_SKIP_HOSTNAME_VERIFICATION="true"
 
-              if ! recover_out=$(${config.services.kanidm.package}/bin/kanidmd recover-account -c ${
+              if ! recover_out=$(${config.services.kanidm.package}/bin/kanidmd scripting recover-account -c ${
                 config.environment.etc."kanidm/server.toml".source
-              } idm_admin -o json); then
+              } idm_admin); then
                   echo "$recover_out" >&2
                   echo "kanidm provision: Failed to recover admin account" >&2
                 exit 1
               fi
-              if ! KANIDM_IDM_ADMIN_PASSWORD=$(grep '{"password' <<< "$recover_out" | ${lib.getExe pkgs.jq} -r .password); then
+              if ! KANIDM_IDM_ADMIN_PASSWORD=$(grep '{"output' <<< "$recover_out" | ${lib.getExe pkgs.jq} -r .output); then
                 echo "$recover_out" >&2
                 echo "kanidm provision: Failed to parse password for idm_admin account" >&2
                 exit 1
