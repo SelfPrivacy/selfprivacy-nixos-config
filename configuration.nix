@@ -56,7 +56,10 @@ in
       { flakeURL }: let
         sp-module = builtins.getFlake flakeURL;
         pkgs = import ${pkgs.path} {};
-      in (import ${./lib/meta.nix}) { inherit pkgs sp-module; }
+      in (import ${./lib/meta.nix}) {
+        selfprivacyConfig = ${./.};
+        inherit pkgs sp-module;
+      }
     '';
   };
 

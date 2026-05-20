@@ -58,7 +58,10 @@
                   environment.etc =
                     (lib.attrsets.mapAttrs' (name: sp-module: {
                       name = "sp-modules/${name}";
-                      value.text = import ./lib/meta.nix { inherit pkgs sp-module; };
+                      value.text = import ./lib/meta.nix {
+                        selfprivacyConfig = ./.;
+                        inherit pkgs sp-module;
+                      };
                     }) sp-modules)
                     // {
                       suggested-sp-modules.text = builtins.toJSON (builtins.attrNames (builtins.readDir ./sp-modules));

@@ -1,11 +1,15 @@
-{ sp-module, pkgs }:
+{
+  selfprivacyConfig,
+  sp-module,
+  pkgs,
+}:
 let
   lib = pkgs.lib;
   selfprivacy =
     (pkgs.lib.evalModules {
       modules = [
-        ../selfprivacy-module.nix
-        ../modules
+        (selfprivacyConfig + "/selfprivacy-module.nix")
+        (selfprivacyConfig + "/modules")
       ];
     }).config.selfprivacy.passthru;
   options =
