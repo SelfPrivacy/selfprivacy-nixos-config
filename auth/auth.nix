@@ -66,16 +66,7 @@ in
     enableServer = true;
 
     # kanidm with Rust code patches for OAuth and admin passwords provisioning
-    package =
-      pkgs.callPackage
-        (import "${pkgs.path}/pkgs/servers/kanidm/generic.nix" {
-          version = "1.9.4";
-          hash = "sha256-sz4jbnaRU+mUCBwxODMGkKnk9DMAmD6cyPyCbYp6aOQ=";
-          cargoHash = "sha256-1U262qRtYzRTQZLNF027LlCASCvbxmuBvZJpDPnI/vU=";
-        })
-        {
-          enableSecretProvisioning = true;
-        };
+    package = pkgs.kanidmWithSecretProvisioning_1_10;
 
     serverSettings = {
       inherit domain;
@@ -101,6 +92,7 @@ in
     };
     provision = {
       enable = true;
+      instanceUrl = "https://" + auth-fqdn;
       autoRemove = true; # if false, obsolete oauth2 scopeMaps remain
       groups.${admins-group} = {
         present = true;
@@ -121,8 +113,7 @@ in
     enableClient = true;
     clientSettings = {
       uri = "https://" + auth-fqdn;
-      verify_ca = false; # FIXME
-      verify_hostnames = false; # FIXME
+      verify_ca = false; # keep this because new server might not have new certificates if acme fails, and we don't want kanidm to fail in such case.
     };
   };
 
@@ -201,6 +192,8 @@ in
         "-/etc/localtime"
         "-/etc/passwd"
         "-/etc/group"
+        "-/etc/ssl"
+        "-/etc/static/ssl"
         config.services.kanidm.serverSettings.tls_chain
         config.services.kanidm.serverSettings.tls_key
       ];
