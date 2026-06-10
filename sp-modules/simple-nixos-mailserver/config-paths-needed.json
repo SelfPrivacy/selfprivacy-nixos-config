@@ -26,5 +26,5 @@
   [ "services", "redis", "servers", "rspamd" ],
   [ "services", "rspamd" ],
   [ "services", "kanidm", "package" ],
-  [ "services", "kanidm", "provision", "instanceUrl" ]
+  [ "services", "kanidm", "provision", "instanceUrl" ],
 ]

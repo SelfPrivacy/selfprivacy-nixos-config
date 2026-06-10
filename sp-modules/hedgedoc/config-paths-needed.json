@@ -7,6 +7,6 @@
   [ "selfprivacy", "passthru", "auth", "oauth2-provider-name" ],
   [ "selfprivacy", "sso", "enable" ],
   [ "selfprivacy", "useBinds" ],
-  [ "services", "kanidm", "serverSettings", "origin" ],
+  [ "services", "kanidm", "server", "settings", "origin" ],
   [ "systemd", "services", "hedgedoc", "serviceConfig" ]
 ]

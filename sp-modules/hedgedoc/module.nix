@@ -11,7 +11,7 @@ let
 
   oauthClientID = "hedgedoc";
   auth-passthru = config.selfprivacy.passthru.auth;
-  oauth2-provider-origin = config.services.kanidm.serverSettings.origin;
+  oauth2-provider-origin = config.services.kanidm.server.settings.origin;
   usersGroup = "sp.hedgedoc.users";
   oauthClientSecretFP = auth-passthru.mkOAuth2ClientSecretFP oauthClientID;
 

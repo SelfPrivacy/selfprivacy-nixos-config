@@ -23,11 +23,11 @@ let
 
   kanidmMigrateDbScript = pkgs.writeShellScript "kanidm-db-migration-script" ''
     # handle a case when kanidm database is not yet created (the first startup)
-    if [ -f ${config.services.kanidm.serverSettings.db_path} ]
+    if [ -f ${config.services.kanidm.server.settings.db_path} ]
     then
         set -o xtrace
         # since it's the last command, it produces an exit code for systemd as well
-        ${lib.getExe pkgs.sqlite} ${config.services.kanidm.serverSettings.db_path} < ${./kanidm-db-migration.sql}
+        ${lib.getExe pkgs.sqlite} ${config.services.kanidm.server.settings.db_path} < ${./kanidm-db-migration.sql}
     fi
   '';
 
@@ -63,12 +63,12 @@ in
   ];
 
   services.kanidm = {
-    enableServer = true;
+    server.enable = true;
 
     # kanidm with Rust code patches for OAuth and admin passwords provisioning
     package = pkgs.kanidmWithSecretProvisioning_1_10;
 
-    serverSettings = {
+    server.settings = {
       inherit domain;
       # The origin for webauthn. This is the url to the server, with the port
       # included if it is non-standard (any port except 443). This must match or
@@ -82,11 +82,11 @@ in
 
       # nginx should proxy requests to it
       bindaddress = kanidm-bind-address;
+      http_client_address_info = {
+        "x-forward-for" = [ "127.0.0.1" ];
+      };
 
       ldapbindaddress = "${ldap-host}:${toString ldap-port}";
-
-      # kanidm is behind a proxy
-      trust_x_forward_for = true;
 
       log_level = if config.selfprivacy.sso.debug then "trace" else "info";
     };
@@ -110,8 +110,8 @@ in
         overwriteMembers = false;
       };
     };
-    enableClient = true;
-    clientSettings = {
+    client.enable = true;
+    client.settings = {
       uri = "https://" + auth-fqdn;
       verify_ca = false; # keep this because new server might not have new certificates if acme fails, and we don't want kanidm to fail in such case.
     };
@@ -194,8 +194,8 @@ in
         "-/etc/group"
         "-/etc/ssl"
         "-/etc/static/ssl"
-        config.services.kanidm.serverSettings.tls_chain
-        config.services.kanidm.serverSettings.tls_key
+        config.services.kanidm.server.settings.tls_chain
+        config.services.kanidm.server.settings.tls_key
       ];
       ExecStartPre =
         # idempotent script to run on each startup only for kanidm v1.5.0
