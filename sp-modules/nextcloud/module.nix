@@ -99,6 +99,7 @@ in
 
         fileSystems = lib.mkIf sp.useBinds {
           "/var/lib/nextcloud" = {
+            fsType = "auto";
             device = "/volumes/${cfg.location}/nextcloud";
             options = [
               "bind"

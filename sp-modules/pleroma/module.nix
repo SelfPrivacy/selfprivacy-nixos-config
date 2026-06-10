@@ -18,6 +18,7 @@ in
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/pleroma" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/pleroma";
         options = [
           "bind"

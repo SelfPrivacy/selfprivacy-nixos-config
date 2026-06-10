@@ -51,6 +51,7 @@ in
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/gotosocial" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/gotosocial";
         options = [ "bind" ];
       };

@@ -57,6 +57,7 @@ in
   config = lib.mkIf config.selfprivacy.modules.bitwarden.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/bitwarden" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/bitwarden";
         options = [
           "bind"
@@ -69,6 +70,7 @@ in
         ];
       };
       "/var/lib/bitwarden_rs" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/bitwarden_rs";
         options = [
           "bind"

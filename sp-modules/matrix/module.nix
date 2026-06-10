@@ -225,10 +225,12 @@ in
 
     fileSystems = lib.mkIf sp.useBinds {
       ${synapseDataDir} = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/matrix-synapse";
         options = [ "bind" ];
       };
       ${masDataDir} = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/matrix-authentication-service";
         options = [ "bind" ];
       };
@@ -457,7 +459,7 @@ in
           "matrix-synapse-prepare-db.service"
         ];
         unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/matrix-synapse";
-        serviceConfig.Slice = "matrix.slice";
+        serviceConfig.Slice = lib.mkForce "matrix.slice";
       };
       slices.matrix = {
         description = "Matrix server";

@@ -63,6 +63,7 @@ in
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/writefreely" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/writefreely";
         options = [ "bind" ];
       };

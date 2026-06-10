@@ -52,10 +52,11 @@ in
       };
   };
 
-  config = lib.mkIf cfg.enable ({
+  config = lib.mkIf cfg.enable {
 
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/actual" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/actual";
         options = [
           "bind"
@@ -157,6 +158,6 @@ in
         "profile"
       ];
     };
-  });
+  };
 
 }

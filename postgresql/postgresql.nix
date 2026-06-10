@@ -36,6 +36,7 @@ in
   ];
   fileSystems = lib.mkIf enable {
     "/var/lib/postgresql" = {
+      fsType = "auto";
       device = "/volumes/${location}/postgresql";
       options = [
         "bind"
@@ -46,6 +47,7 @@ in
       ];
     };
     "/var/lib/postgresql-dumps" = {
+      fsType = "auto";
       device = "/volumes/${location}/postgresql-dumps";
       options = [ "bind" ];
     };

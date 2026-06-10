@@ -40,6 +40,7 @@ in
       (lib.mkIf cfg.enable {
         fileSystems = lib.mkIf config.selfprivacy.useBinds {
           "/var/lib/prometheus2" = {
+            fsType = "auto";
             device = "/volumes/${cfg.location}/prometheus";
             options = [
               "bind"
@@ -85,6 +86,7 @@ in
       (lib.mkIf (cfg.enable && telemetryCfg.enable) {
         fileSystems = lib.mkIf config.selfprivacy.useBinds {
           "/var/lib/private/opentelemetry-collector" = {
+            fsType = "auto";
             device = "/volumes/${cfg.location}/opentelemetry-collector";
             options = [
               "bind"

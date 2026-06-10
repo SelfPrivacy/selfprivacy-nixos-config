@@ -24,6 +24,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
 
       fileSystems = lib.mkIf sp.useBinds {
         "/var/vmail" = {
+          fsType = "auto";
           device = "/volumes/${sp.modules.simple-nixos-mailserver.location}/vmail";
           options = [
             "bind"
@@ -32,6 +33,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
           ];
         };
         "/var/sieve" = {
+          fsType = "auto";
           device = "/volumes/${sp.modules.simple-nixos-mailserver.location}/sieve";
           options = [
             "bind"

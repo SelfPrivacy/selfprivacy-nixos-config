@@ -129,6 +129,7 @@ in
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/gitea" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/gitea";
         options = [ "bind" ];
       };

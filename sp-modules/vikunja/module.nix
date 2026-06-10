@@ -35,6 +35,7 @@ in
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/vikunja" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/vikunja";
         options = [ "bind" ];
       };

@@ -44,6 +44,7 @@ in
   config = lib.mkIf cfg.enable {
     fileSystems = lib.mkIf sp.useBinds {
       "/var/lib/murmur" = {
+        fsType = "auto";
         device = "/volumes/${cfg.location}/murmur";
         options = [
           "bind"
