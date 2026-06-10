@@ -50,7 +50,7 @@ in
         domain = "*.${cfg.domain}";
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
-        credentialsFile = acme-env-filepath;
+        environmentFile = acme-env-filepath;
         dnsPropagationCheck =
           !(
             (lib.elem cfg.dns.provider dnsPropagationCheckExceptions) || cfg.dns.forceDisableDnsPropagationCheck
