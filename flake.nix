@@ -2,7 +2,7 @@
   description = "SelfPrivacy NixOS configuration flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     selfprivacy-api.url = "git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git";
     # make selfprivacy-api use the same shared nixpkgs
@@ -46,6 +46,11 @@
         }:
         {
           default = nixpkgs.lib.nixosSystem {
+            specialArgs = {
+              selfprivacy = {
+                inherit ((import ./modules/types.nix { lib = nixpkgs.lib; }).selfprivacy.passthru) types;
+              };
+            };
             modules = [
               hardware-configuration
               deployment
@@ -72,24 +77,25 @@
                 let
                   deepOptionsFilter =
                     ref: attrset:
-                    builtins.foldl' (
-                      acc: key:
-                      if builtins.hasAttr key ref then
-                        let
-                          value = attrset.${key};
-                          refValue = ref.${key};
-                        in
-                        acc
-                        // {
-                          ${key} =
-                            if builtins.isAttrs value && builtins.isAttrs refValue then
-                              (if refValue ? _type && refValue._type == "option" then value else deepOptionsFilter refValue value)
-                            else
-                              value;
-                        }
-                      else
-                        acc
-                    ) { } (builtins.attrNames attrset);
+                    nixpkgs.lib.attrsets.mergeAttrsList (
+                      map (
+                        key:
+                        if builtins.hasAttr key ref then
+                          let
+                            value = attrset.${key};
+                            refValue = ref.${key};
+                          in
+                          {
+                            ${key} =
+                              if builtins.isAttrs value && builtins.isAttrs refValue then
+                                (if refValue ? _type && refValue._type == "option" then value else deepOptionsFilter refValue value)
+                              else
+                                value;
+                          }
+                        else
+                          { }
+                      ) (builtins.attrNames attrset)
+                    );
                 in
                 { options, ... }:
                 {
@@ -122,44 +128,37 @@
                 args@{ config, pkgs, ... }:
                 let
                   lib = nixpkgs.lib;
-                  # workaround for infinite recursion because mailserver defines selfprivacy.xxx options but also depends on selfprivacy argument for OIDC helpers.
-                  selfprivacyModuleArg = {
-                    inherit ((import ./modules/types.nix { inherit lib; }).selfprivacy.passthru) types;
-                  };
                   configPathsNeeded =
                     sp-module.configPathsNeeded or (abort "allowed config paths not set for module \"${name}\"");
+                  mergeAttrsListRecursive =
+                    attrsList:
+                    lib.attrsets.zipAttrsWith (
+                      _: values:
+                      if builtins.all builtins.isAttrs values then
+                        mergeAttrsListRecursive values
+                      else
+                        lib.lists.last values
+                    ) attrsList;
                   constrainConfigArgs =
                     args'@{ pkgs, ... }:
                     args'
                     // {
-                      selfprivacy = selfprivacyModuleArg;
-                      config =
-                        # TODO use lib.attrsets.mergeAttrsList from nixpkgs 23.05
-                        (
-                          builtins.foldl' lib.attrsets.recursiveUpdate { } (
-                            map (p: lib.attrsets.setAttrByPath p (lib.attrsets.getAttrFromPath p config)) configPathsNeeded
-                          )
-                        );
+                      config = mergeAttrsListRecursive (
+                        map (p: lib.attrsets.setAttrByPath p (lib.attrsets.getAttrFromPath p config)) configPathsNeeded
+                      );
                     };
+                  applyConstrainedModule =
+                    m: args':
+                    let
+                      imported = if builtins.isPath m then import m else m;
+                    in
+                    if builtins.isFunction imported then imported (constrainConfigArgs args') else imported;
                   constrainImportsArgsRecursive = lib.attrsets.mapAttrsRecursive (
                     p: v:
                     # TODO traverse only imports and imports of imports, etc
                     # without traversing all attributes
                     if lib.lists.last p == "imports" then
-                      map (
-                        m:
-                        (
-                          args'@{ pkgs, ... }:
-                          constrainImportsArgsRecursive (
-                            if builtins.isPath m then
-                              import m (constrainConfigArgs args')
-                            else if builtins.isFunction m then
-                              m (constrainConfigArgs args')
-                            else
-                              m
-                          )
-                        )
-                      ) v
+                      map (m: (args'@{ pkgs, ... }: constrainImportsArgsRecursive (applyConstrainedModule m args'))) v
                     else
                       v
                   );

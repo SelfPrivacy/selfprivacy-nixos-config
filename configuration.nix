@@ -51,6 +51,8 @@ in
     "${modulesPath}/profiles/hardened.nix"
   ];
 
+  services.dbus.implementation = config.selfprivacy.workarounds.dbusImplementation;
+
   environment.etc."sp-fetch-remote-module.nix" = {
     text = ''
       { flakeURL }: let
@@ -205,7 +207,7 @@ in
           exit 255
       fi
     '';
-  system.rebuild.enableNg = true;
+
   nix = {
     channel.enable = false;
 

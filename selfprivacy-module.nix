@@ -229,10 +229,16 @@ with lib;
         type = types.bool;
         default = false;
       };
+      dbusImplementation = mkOption {
+        description = ''
+          Which DBus implementation to use, required because changing DBus implementation requires reboot
+        '';
+        type = types.enum [
+          "dbus"
+          "broker"
+        ];
+        default = "dbus"; # legacy
+      };
     };
-  };
-
-  config = {
-    _module.args.selfprivacy = config.selfprivacy.passthru;
   };
 }
