@@ -20,11 +20,15 @@
   [ "selfprivacy", "useBinds" ],
   [ "selfprivacy", "username" ],
   [ "selfprivacy", "users" ],
-  [ "services", "dovecot2", "user" ],
+  [ "services", "dovecot2", "settings", "default_internal_user" ],
+  [ "services", "dovecot2", "package" ],
   [ "services", "postfix", "group" ],
   [ "services", "postfix", "user" ],
+  [ "services", "postfix", "package" ],
   [ "services", "redis", "servers", "rspamd" ],
   [ "services", "rspamd" ],
   [ "services", "kanidm", "package" ],
   [ "services", "kanidm", "provision", "instanceUrl" ],
+  [ "networking", "domain" ],
+  [ "security", "pki" ]
 ]

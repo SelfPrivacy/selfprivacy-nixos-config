@@ -82,28 +82,30 @@ let
   dovecot-ldap-config = pkgs.writeTextFile {
     name = "dovecot-ldap.conf.ext.template";
     text = ''
-      ldap_version = 3
-      uris = ${lib.concatStringsSep " " config.mailserver.ldap.uris}
+      ldap_uris = ${lib.concatStringsSep " " config.mailserver.ldap.uris}
       ${lib.optionalString config.mailserver.ldap.startTls ''
-        tls = yes
+        ldap_starttls = yes
       ''}
-      tls_require_cert = hard
-      tls_ca_cert_file = ${config.mailserver.ldap.tlsCAFile}
-      dn = ${config.mailserver.ldap.bind.dn}
-      sasl_bind = no
-      auth_bind = no
-      base = ${config.mailserver.ldap.searchBase}
-      scope = ${mkLdapSearchScope config.mailserver.ldap.searchScope}
-      ${lib.optionalString (config.mailserver.ldap.dovecot.userAttrs != null) ''
-        user_attrs = ${config.mailserver.ldap.dovecot.userAttrs}
-      ''}
-      user_filter = ${config.mailserver.ldap.dovecot.userFilter}
+      ssl_client_require_valid_cert = yes
+      ssl_client_ca_file = ${config.mailserver.ldap.caFile}
+      ldap_auth_dn = ${config.mailserver.ldap.bind.dn}
+      ldap_base = ${config.mailserver.ldap.base}
+      ldap_scope = ${mkLdapSearchScope config.mailserver.ldap.scope}
+
+      userdb ldap {
+        filter = ${config.mailserver.ldap.dovecot.userFilter}
+        fields {
+          home = /var/vmail/${domain}/%{user}
+          uid = ${toString config.mailserver.storage.uid}
+          gid = ${toString config.mailserver.storage.gid}
+        }
+      }
     '';
   };
   setPwdInLdapConfFile = appendSetting {
     name = "ldap-conf-file";
     file = dovecot-ldap-config;
-    prefix = ''dnpass = "'';
+    prefix = ''ldap_auth_dn_password = "'';
     suffix = ''"'';
     passwordFile = config.mailserver.ldap.bind.passwordFile;
     destination = ldapConfFile;
@@ -119,18 +121,18 @@ let
   write-dovecot-oauth2-conf = appendSetting {
     name = "oauth2-conf-file";
     file = builtins.toFile "dovecot-oauth2.conf.ext.template" ''
-      introspection_mode = post
-      username_attribute = username
-      scope = email profile openid
-      tls_ca_cert_file = /etc/ssl/certs/ca-certificates.crt
-      active_attribute = active
-      active_value = true
-      openid_configuration_url = ${auth-passthru.oauth2-discovery-url oauth-client-id}
-      debug = "no"
+      oauth2 {
+        introspection_mode = post
+        username_attribute = username
+        scope = email profile openid
+        ssl_client_ca_file = /etc/ssl/certs/ca-certificates.crt
+        active_attribute = active
+        active_value = true
+        openid_configuration_url = ${auth-passthru.oauth2-discovery-url oauth-client-id}
     '';
     prefix =
-      ''introspection_url = "'' + (auth-passthru.oauth2-introspection-url-prefix oauth-client-id);
-    suffix = auth-passthru.oauth2-introspection-url-postfix + ''"'';
+      "  introspection_url = \"" + (auth-passthru.oauth2-introspection-url-prefix oauth-client-id);
+    suffix = auth-passthru.oauth2-introspection-url-postfix + "\"\n      }\n";
     passwordFile = oauth-client-secret-fp;
     destination = dovecot-oauth2-conf-fp;
   };
@@ -144,54 +146,46 @@ in
     mode = "2750";
   };
 
-  mailserver.ldap = {
-    # note: in `ldapsearch` first comes filter, then attributes
-    dovecot.userAttrs = "+"; # all operational attributes
-    # TODO: investigate whether "mail=%u" is better than:
-    # dovecot.userFilter = "(&(class=person)(uid=%n))";
-  };
+  services.dovecot2.includeFiles = [
+    ldapConfFile
+    dovecot-oauth2-conf-fp
+  ];
 
-  services.dovecot2.extraConfig = ''
-    auth_mechanisms = xoauth2 oauthbearer plain login
+  services.dovecot2.settings = {
+    auth_mechanisms = [
+      "xoauth2"
+      "oauthbearer"
+      "plain"
+      "login"
+    ];
 
-    passdb {
-      driver = oauth2
-      mechanisms = xoauth2 oauthbearer
-      args = ${dovecot-oauth2-conf-fp}
-    }
+    "userdb static" = {
+      fields = {
+        uid = "virtualMail";
+        gid = "virtualMail";
+        home = "/var/vmail/${domain}/%{user}";
+      };
+    };
 
-    userdb {
-      driver = static
-      args = uid=virtualMail gid=virtualMail home=/var/vmail/${domain}/%u
-    }
-
-    # provide SASL via unix socket to postfix
-    service auth {
-      unix_listener /var/lib/postfix/private-auth {
-        mode = 0660
-        user = postfix
-        group = postfix
-      }
-    }
-    service auth {
-      unix_listener auth-userdb {
-        mode = 0660
-        user = ${config.services.dovecot2.user}
-      }
-      unix_listener dovecot-auth {
-        mode = 0660
+    "service auth" = {
+      # provide SASL via unix socket to postfix
+      "unix_listener /var/lib/postfix/private-auth" = {
+        mode = "0660";
+        user = "postfix";
+        group = "postfix";
+      };
+      "unix_listener auth-userdb" = {
+        mode = "0660";
+        user = config.services.dovecot2.settings.default_internal_user;
+      };
+      "unix_listener dovecot-auth" = {
+        mode = "0660";
         # Assuming the default Postfix user and group
-        user = postfix
-        group = postfix
-      }
-    }
-
-    userdb {
-      driver = ldap
-      args = ${ldapConfFile}
-      default_fields = home=/var/vmail/${domain}/%u uid=${toString config.mailserver.vmailUID} gid=${toString config.mailserver.vmailUID}
-    }
-  '';
+        user = "postfix";
+        group = "postfix";
+      };
+    };
+  };
   services.dovecot2.enablePAM = false;
   systemd.services.dovecot = {
     preStart = setPwdInLdapConfFile + "\n" + write-dovecot-oauth2-conf + "\n";

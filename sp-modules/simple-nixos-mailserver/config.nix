@@ -44,7 +44,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
       };
 
       # https://nixos-mailserver.readthedocs.io/en/latest/migrations.html
-      mailserver.stateVersion = 3;
+      mailserver.stateVersion = 5;
 
       users.users = {
         virtualMail = {
@@ -64,9 +64,8 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         domains = [ sp.domain ];
         localDnsResolver = false;
 
-        certificateScheme = "manual";
-        certificateFile = "/var/lib/acme/root-${sp.domain}/fullchain.pem";
-        keyFile = "/var/lib/acme/root-${sp.domain}/key.pem";
+        x509.certificateFile = "/var/lib/acme/root-${sp.domain}/fullchain.pem";
+        x509.privateKeyFile = "/var/lib/acme/root-${sp.domain}/key.pem";
 
         # Enable IMAP and POP3
         enableImap = true;
@@ -74,14 +73,14 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         enablePop3 = false;
         enablePop3Ssl = false;
         enableSubmission = true;
-        dkimSelector = "selector";
+        dkim.defaults.selector = "selector";
 
         # Enable the ManageSieve protocol
         enableManageSieve = true;
 
         virusScanning = false;
 
-        mailDirectory = "/var/vmail";
+        storage.path = "/var/vmail";
 
         # LDAP is needed for Postfix to query Kanidm about email address ownership.
         # LDAP is needed for Dovecot also.
@@ -94,8 +93,8 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
           # TODO change in this file should trigger system restart dovecot
           bind.passwordFile = mailserver-service-account.mailserver-service-account-token-fp;
 
-          # searchBase = "ou=persons," + ldap_base_dn;
-          searchBase = auth-passthru.ldap-base-dn; # TODO refine this
+          # base = "ou=persons," + ldap_base_dn;
+          base = auth-passthru.ldap-base-dn; # TODO refine this
 
           # NOTE: 127.0.0.1 instead of localhost doesn't work (maybe because of TLS)
           uris = [ "ldaps://localhost:${toString auth-passthru.ldap-port}" ];
@@ -112,12 +111,26 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
               "rspamd.service"
               "redis-rspamd.service"
             ];
+            before = [
+              "dovecot.service"
+              "postfix.service"
+              "rspamd.service"
+              "redis-rspamd.service"
+            ];
+            unitConfig.RequiresMountsFor = [
+              "/var/vmail"
+              "/var/sieve"
+            ];
             serviceConfig.Type = "oneshot";
+            serviceConfig.RemainAfterExit = true;
             script =
               let
                 migration3PythonScript = pkgs.writers.writePython3 "nixos-mailserver-migration-03" {
                   doCheck = false;
                 } (builtins.readFile "${mailserverFlake}/migrations/nixos-mailserver-migration-03.py");
+                migration5PythonScript = pkgs.writers.writePython3 "nixos-mailserver-migration-05-sp" {
+                  doCheck = false;
+                } (builtins.readFile ./nixos-mailserver-migration-05-sp.py);
               in
               ''
                 set -euo pipefail
@@ -135,6 +148,15 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
                 run_migration_2() {
                   ${migration3PythonScript} --layout default /var/vmail --execute
                 }
+                run_migration_3() {
+                  # not applicable, we're not using mailserver.ldap and doing our own thing.
+                  true
+                }
+                run_migration_4() {
+                  if [ -d /var/sieve ]; then
+                    DOMAIN=${lib.escapeShellArg sp.domain} ${migration5PythonScript} --execute /var/sieve
+                  fi
+                }
 
                 run_migration() {
                   local i="$1"
@@ -149,7 +171,7 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
                   fi
                 }
 
-                for (( i = CUR; i < ${builtins.toString config.mailserver.stateVersion}; i++ )); do
+                for (( i = CUR; i < ${toString config.mailserver.stateVersion}; i++ )); do
                   if ! run_migration "$i"; then
                     echo "Stopping at migration $i due to failure." >&2
                     exit 1

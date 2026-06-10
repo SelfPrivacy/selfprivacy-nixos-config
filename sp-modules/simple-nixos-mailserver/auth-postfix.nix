@@ -18,11 +18,11 @@ let
     server_host = ${lib.concatStringsSep " " cfg.ldap.uris}
     start_tls = ${if cfg.ldap.startTls then "yes" else "no"}
     version = 3
-    tls_ca_cert_file = ${cfg.ldap.tlsCAFile}
+    tls_ca_cert_file = ${cfg.ldap.caFile}
     tls_require_cert = yes
 
-    search_base = ${cfg.ldap.searchBase}
-    scope = ${cfg.ldap.searchScope}
+    search_base = ${cfg.ldap.base}
+    scope = ${cfg.ldap.scope}
 
     bind = yes
     bind_dn = ${cfg.ldap.bind.dn}
@@ -30,7 +30,7 @@ let
   ldapSenderLoginMap = pkgs.writeText "ldap-sender-login-map.cf" ''
     ${commonLdapConfig}
     query_filter = ${cfg.ldap.postfix.filter}
-    result_attribute = ${cfg.ldap.postfix.mailAttribute}
+    result_attribute = ${cfg.ldap.attributes.mail}
   '';
   appendPwdInSenderLoginMap = appendSetting {
     name = "ldap-sender-login-map";
@@ -43,7 +43,7 @@ let
   ldapVirtualMailboxMap = pkgs.writeText "ldap-virtual-mailbox-map.cf" ''
     ${commonLdapConfig}
     query_filter = ${cfg.ldap.postfix.filter}
-    result_attribute = ${cfg.ldap.postfix.uidAttribute}
+    result_attribute = ${cfg.ldap.attributes.username}
   '';
   ldapVirtualMailboxMapFile = "/run/postfix/ldap-virtual-mailbox-map.cf";
   appendPwdInVirtualMailboxMap = appendSetting {
@@ -55,9 +55,9 @@ let
   };
 in
 {
-  mailserver.ldap = {
-    postfix.mailAttribute = "mail";
-    postfix.uidAttribute = "uid";
+  mailserver.ldap.attributes = {
+    mail = "mail";
+    username = "uid";
   };
   systemd.services.postfix-setup = {
     preStart = ''
