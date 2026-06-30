@@ -17,6 +17,7 @@
           isMovable = false;
           isRequired = false;
           backupDescription = "Secrets that are used to encrypt the communication.";
+          systemdSlice = "jitsi_meet.slice";
           systemdServices = [
             "prosody.service"
             "jitsi-videobridge2.service"

@@ -26,6 +26,7 @@
           isRequired = true;
           canBeBackedUp = true;
           backupDescription = "Mail boxes and filters.";
+          systemdSlice = "simple_nixos_mailserver.slice";
           systemdServices = [
             "dovecot.service"
             "postfix.service"
