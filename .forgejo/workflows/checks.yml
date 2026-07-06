@@ -18,9 +18,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run flake checks
-        run: nix flake check -Lv --show-trace
+        run: nix flake check -L --show-trace
 
       - name: Upload cache
+        if: github.repository == 'SelfPrivacy/selfprivacy-nixos-config'
         env:
           ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
         run: |
