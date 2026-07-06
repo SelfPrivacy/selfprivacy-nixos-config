@@ -46,7 +46,12 @@ in
 
     systemd.slices.roundcube.description = "Roundcube service slice";
     # Roundcube depends on Dovecot and its OAuth2 client secret.
-    systemd.services.phpfpm-roundcube.after = [ "dovecot.service" ];
+    systemd.services.phpfpm-roundcube = {
+      serviceConfig.Slice = lib.mkForce "roundcube.slice";
+      after = [ "dovecot.service" ];
+      requires = [ "dovecot.service" ];
+    };
+    systemd.services.roundcube-setup.serviceConfig.Slice = "roundcube.slice";
 
     services.roundcube.extraConfig = ''
       # starttls needed for authentication, so the fqdn required to match
@@ -68,10 +73,6 @@ in
       $config['oauth_login_redirect'] = true;
       $config['auto_create_user'] = true;
     '';
-    systemd.services.roundcube = {
-      after = [ "dovecot.service" ];
-      requires = [ "dovecot.service" ];
-    };
     systemd.services.kanidm.serviceConfig = {
       ExecStartPre = lib.mkAfter [
         (pkgs.writeShellScript "copy-mailserver-client-secret-to-roundcube" ''
