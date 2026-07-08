@@ -2,7 +2,7 @@
   description = "PoC SP module for nextcloud";
 
   outputs =
-    { self }:
+    { ... }:
     {
       nixosModules.default = _: {
         imports = [

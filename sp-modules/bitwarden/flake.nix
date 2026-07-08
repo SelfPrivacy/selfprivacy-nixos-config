@@ -2,7 +2,7 @@
   description = "PoC SP module for Bitwarden password management solution";
 
   outputs =
-    { self }:
+    { ... }:
     {
       nixosModules.default = _: {
         imports = [

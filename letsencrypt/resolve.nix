@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, ... }:
 let
   domain = config.selfprivacy.domain;
 in

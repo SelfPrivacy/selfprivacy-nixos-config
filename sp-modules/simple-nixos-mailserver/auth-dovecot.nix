@@ -13,7 +13,6 @@ let
   inherit (import ./common.nix nixos-args)
     appendSetting
     auth-passthru
-    cfg
     domain
     group
     ;

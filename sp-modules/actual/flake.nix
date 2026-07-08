@@ -2,7 +2,7 @@
   description = "Actual (aka Actual Budget) is a super fast and privacy-focused app for managing your finances.";
 
   outputs =
-    { self }:
+    { ... }:
     {
       nixosModules.default = import ./module.nix;
       configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);

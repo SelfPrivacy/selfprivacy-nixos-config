@@ -37,6 +37,6 @@ builtins.toJSON {
   meta = if builtins.hasAttr "meta" sp-module then sp-module.meta { inherit lib; } else null;
   configPathsNeeded = sp-module.configPathsNeeded;
   options = pkgs.lib.mapAttrs optionToMeta (
-    builtins.head (lib.mapAttrsToList (name: value: value) options.selfprivacy.modules)
+    builtins.head (lib.mapAttrsToList (_name: value: value) options.selfprivacy.modules)
   );
 }

@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   selfprivacy,
   ...
 }:
@@ -29,7 +28,7 @@ in
 
   config = lib.mkIf cfg.enable {
     nixpkgs.overlays = [
-      (final: prev: {
+      (_final: prev: {
         jitsi-meet = prev.jitsi-meet.overrideAttrs (old: {
           meta = old.meta // {
             # we disable e2ee.
