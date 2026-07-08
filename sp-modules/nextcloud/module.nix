@@ -325,6 +325,7 @@ in
               --no-interaction \
               --mapping-groups=groups \
               --group-provisioning=1 \
+              --group-whitelist-regex='^admin$' \
               -vvv
 
             ''
