@@ -185,6 +185,21 @@ with lib;
         type = types.nullOr types.bool;
         default = false;
       };
+      uploadSystemLogs = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Enable export of system journal over OTLP
+        '';
+      };
+      uploadSystemMetrics = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Enable export of system metrics (disk usage, memory usage,
+          per-systemd-slice resource usage, etc) over OTLP
+        '';
+      };
       endpoint = mkOption {
         type = types.nullOr types.str;
         default = "http://localhost:4317";

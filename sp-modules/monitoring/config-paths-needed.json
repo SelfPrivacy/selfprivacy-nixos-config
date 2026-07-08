@@ -2,5 +2,6 @@
   [ "selfprivacy", "telemetry" ],
   [ "selfprivacy", "domain" ],
   [ "selfprivacy", "useBinds" ],
-  [ "selfprivacy", "modules", "monitoring" ]
+  [ "selfprivacy", "modules", "monitoring" ],
+  [ "services", "prometheus", "scrapeConfigs" ]
 ]
