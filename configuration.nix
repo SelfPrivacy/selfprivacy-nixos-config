@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  modulesPath,
   ...
 }:
 let
@@ -47,8 +46,8 @@ in
     ./webserver/nginx.nix
     ./webserver/memcached.nix
     ./postgresql/postgresql.nix
+    ./modules/hardening.nix
     # ./resources/limits.nix
-    "${modulesPath}/profiles/hardened.nix"
   ];
 
   services.dbus.implementation = config.selfprivacy.workarounds.dbusImplementation;
@@ -256,26 +255,4 @@ in
       size = 2048;
     }
   ];
-
-  systemd.enableEmergencyMode = false;
-  systemd.coredump.enable = false;
-
-  environment.memoryAllocator.provider = "libc"; # Scudo has problems with PHP, which may cause PHP to segfault...
-
-  security.sudo.enable = false;
-
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1; # TODO why is it here by default, for VPN only?
-    "kernel.core_pattern" = "|${pkgs.coreutils}/bin/false"; # Ignore coredumps
-    "kernel.yama.ptrace_scope" = "3"; # Disable ptrace()
-    "kernel.io_uring_disabled" = "2"; # io_uring has huge attack surface and is not used by any module in SelfPrivacy.
-
-    "dev.tty.ldisc_autoload" = "0";
-
-    "kernel.kexec_load_disabled" = "1";
-    "kernel.unprivileged_bpf_disabled" = "1"; # Only systemd uses eBPF.
-    "kernel.kptr_restrict" = "2"; # Hide kernel pointer locations.
-
-    "vm.unprivileged_userfaultfd" = "0"; # Reduce attack surface
-  };
 }
