@@ -47,6 +47,7 @@ in
     ./webserver/memcached.nix
     ./postgresql/postgresql.nix
     ./modules/hardening.nix
+    ./modules/bootloader.nix
     # ./resources/limits.nix
   ];
 

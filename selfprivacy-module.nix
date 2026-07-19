@@ -110,6 +110,29 @@ with lib;
         type = types.nullOr types.str;
         default = null;
       };
+      bootloader = mkOption {
+        description = "Bootloader configuration.";
+        default = {
+          type = "none";
+        };
+        type = types.submodule {
+          options = {
+            type = mkOption {
+              type = types.enum [
+                "none"
+                "grub-mbr"
+              ];
+              description = "Bootloader type.";
+            };
+
+            device = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Bootloader installation target";
+            };
+          };
+        };
+      };
     };
     #########
     #  SSH  #
