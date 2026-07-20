@@ -58,6 +58,11 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         "virtualMail"
       ];
 
+      security.acme.certs."root-${sp.domain}".reloadServices = [
+        "dovecot.service"
+        "postfix.service"
+      ];
+
       mailserver = {
         enable = true;
         fqdn = sp.domain;
