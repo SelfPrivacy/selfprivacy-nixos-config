@@ -121,6 +121,7 @@ with lib;
               type = types.enum [
                 "none"
                 "grub-mbr"
+                "systemd-boot-efi"
               ];
               description = "Bootloader type.";
             };

@@ -21,5 +21,22 @@ in
         device = lib.mkForce bootloader.device;
       };
     })
+
+    (lib.mkIf (bootloader.type == "systemd-boot-efi") {
+      assertions = [
+        {
+          assertion = bootloader.device == null;
+          # we just need mounted /boot, infect takes care of that.
+          message = "selfprivacy.server.bootloader.device is not valid for systemd-boot-efi.";
+        }
+      ];
+
+      boot.loader.grub.enable = lib.mkForce false;
+
+      boot.loader = {
+        systemd-boot.enable = true;
+        efi.canTouchEfiVariables = true;
+      };
+    })
   ];
 }
