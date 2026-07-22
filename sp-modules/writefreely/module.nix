@@ -73,6 +73,7 @@ in
       enable = true;
       database.type = "sqlite3";
       host = "${cfg.subdomain}.${sp.domain}";
+      package = pkgs.callPackage ./package.nix { };
       settings = {
         server.port = 8081;
         app = {
@@ -145,6 +146,7 @@ in
         "/" = {
           proxyPass = "http://127.0.0.1:8081";
         };
+        "/auth/signup".extraConfig = "deny all;";
       };
     };
 
