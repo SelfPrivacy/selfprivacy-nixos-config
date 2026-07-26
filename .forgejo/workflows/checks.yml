@@ -21,7 +21,10 @@ jobs:
         run: nix flake check -L --show-trace
 
       - name: Upload cache
-        if: github.repository == 'SelfPrivacy/selfprivacy-nixos-config'
+        if: >
+          github.repository == 'SelfPrivacy/selfprivacy-nixos-config' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
         env:
           ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
         run: |
