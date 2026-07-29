@@ -111,12 +111,6 @@
                   # embed commit sha1 for `nixos-version --configuration-revision`
                   system.configurationRevision = self.rev or "@${self.lastModifiedDate}"; # for development
                   # TODO assertion to forbid dirty builds caused by top-level-flake
-
-                  # reset contents of /etc/nixos to match running NixOS generation
-                  system.activationScripts.selfprivacy-nixos-config-source = ''
-                    rm -rf /etc/nixos/{*,.[!.]*}
-                    cp -r --no-preserve=all ${top-level-flake}/ -T /etc/nixos/
-                  '';
                 }
               )
             ]

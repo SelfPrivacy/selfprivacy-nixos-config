@@ -4,12 +4,7 @@
   outputs =
     { ... }:
     {
-      nixosModules.default = _: {
-        imports = [
-          ./module.nix
-          ./cleanup-module.nix
-        ];
-      };
+      nixosModules.default = import ./module.nix;
       configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
       meta =
         { lib, ... }:
