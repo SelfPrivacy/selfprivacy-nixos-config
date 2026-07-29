@@ -263,6 +263,17 @@ with lib;
         ];
         default = "dbus"; # legacy
       };
+      # Should be removed after NixOS 26.11
+      initrdImplementation = mkOption {
+        description = ''
+          Which initrd implementation to use
+        '';
+        type = types.enum [
+          "legacy"
+          "systemd"
+        ];
+        default = "systemd";
+      };
     };
   };
 }

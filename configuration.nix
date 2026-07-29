@@ -52,6 +52,7 @@ in
   ];
 
   services.dbus.implementation = config.selfprivacy.workarounds.dbusImplementation;
+  boot.initrd.systemd.enable = config.selfprivacy.workarounds.initrdImplementation == "systemd";
 
   environment.etc."sp-fetch-remote-module.nix" = {
     text = ''
