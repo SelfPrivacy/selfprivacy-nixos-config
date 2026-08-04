@@ -114,6 +114,7 @@ let
       homeserver = sp.domain;
       endpoint = "http://127.0.0.1:8078";
     };
+    oauth.device_code_user_code_auto_fill_enabled = true;
     passwords = {
       enabled = true;
       schemes = [
@@ -297,6 +298,15 @@ in
       locations."/".proxyPass = "http://127.0.0.1:8078";
       locations."= /.well-known/matrix/client".extraConfig = mkWellKnown clientConfig;
       locations."~ ^/_matrix/client/(.*)/(login|logout|refresh)".proxyPass = "http://127.0.0.1:8068";
+      locations."~ ^/_synapse/client/rendezvous/" = {
+        proxyPass = "http://127.0.0.1:8078";
+        extraConfig = ''
+          gzip off;
+          proxy_cache off;
+          proxy_buffering off;
+          proxy_request_buffering off;
+        '';
+      };
     };
 
     services.nginx.virtualHosts."${cfg.masSubdomain}.${sp.domain}" = {
@@ -373,7 +383,7 @@ in
                 }' < ${masDataDir}/secrets.yaml > ${masDataDir}/secrets.yaml.tmp
                 mv ${masDataDir}/secrets.yaml.tmp ${masDataDir}/secrets.yaml
                 yq --rawfile clientsecret ${oauthClientSecretFP} '{upstream_oauth2: {providers: [ . * {client_secret: $clientsecret}]}}' < ${upstreamOauth2Template} > ${masDataDir}/oauth2_secrets.yaml
-                yq --slurpfile template ${experimentalMsc3861Template} '{experimental_features: {msc3861: ($template[0] * {client_secret: .clients[0].client_secret, admin_token: .matrix.secret })}}' < ${masDataDir}/secrets.yaml > ${synapseDataDir}/mas_secrets.yaml.tmp
+                yq --slurpfile template ${experimentalMsc3861Template} '{experimental_features: {msc4108_enabled: true, msc3861: ($template[0] * {client_secret: .clients[0].client_secret, admin_token: .matrix.secret })}}' < ${masDataDir}/secrets.yaml > ${synapseDataDir}/mas_secrets.yaml.tmp
                 mv ${synapseDataDir}/mas_secrets.yaml.tmp ${synapseDataDir}/mas_secrets.yaml
                 chown matrix-authentication-service:matrix-authentication-service ${masDataDir} -R
                 chmod 640 ${masDataDir}/*
