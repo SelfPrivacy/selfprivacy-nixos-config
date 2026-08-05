@@ -6,6 +6,7 @@
 }:
 let
   cfg = config.selfprivacy;
+  domain = cfg.domain;
   dnsCredentialsTemplates = {
     DIGITALOCEAN = "DO_AUTH_TOKEN=$TOKEN";
     CLOUDFLARE = ''
@@ -33,10 +34,11 @@ let
 in
 {
   users.groups.acmereceivers.members = [ "nginx" ];
+
   security.acme = {
     acceptTerms = true;
     defaults = {
-      email = "${if cfg.username != null then cfg.username else "admin"}@${cfg.domain}";
+      email = "${if cfg.username != null then cfg.username else "admin"}@${domain}";
       server =
         if cfg.dns.useStagingACME then
           "https://acme-staging-v02.api.letsencrypt.org/directory"
@@ -46,8 +48,8 @@ in
       dnsResolver = "8.8.8.8:53";
     };
     certs = {
-      "${cfg.domain}" = {
-        domain = "*.${cfg.domain}";
+      "${domain}" = {
+        domain = "*.${domain}";
         group = "acmereceivers";
         dnsProvider = lib.strings.toLower cfg.dns.provider;
         environmentFile = acme-env-filepath;
@@ -56,36 +58,47 @@ in
             (lib.elem cfg.dns.provider dnsPropagationCheckExceptions) || cfg.dns.forceDisableDnsPropagationCheck
           );
       };
-      "root-${cfg.domain}" = {
-        domain = cfg.domain;
+      "root-${domain}" = {
+        domain = domain;
         group = "acmereceivers";
         webroot = "/var/lib/acme/acme-challenge";
       };
     };
   };
-  systemd.services.acme-secrets = {
-    before = [ "acme-${cfg.domain}.service" ];
-    requiredBy = [ "acme-${cfg.domain}.service" ];
-    serviceConfig.Type = "oneshot";
-    path = with pkgs; [
-      coreutils
-      jq
-    ];
-    script = ''
-      set -o nounset
 
-      TOKEN="$(jq -re '.dns.token // .dns.apiKey' ${secrets-filepath})"
-      TOKEN_ID="$(jq -re '.dns.tokenId // "none"' ${secrets-filepath})"
-      URL="$(jq -re '.dns.url // "none"' ${secrets-filepath})"
-      TENANT="$(jq -re '.dns.tenant // "none"' ${secrets-filepath})"
-      SECONDARY_TOKEN="$(jq -re '.dns.secondaryToken // "none"' ${secrets-filepath})"
-      filecontents=$(cat <<- EOF
-      ${dnsCredentialsTemplate}
-      EOF
-      )
+  systemd = {
+    services = {
+      acme-secrets = {
+        before = [ "acme-${domain}.service" ];
+        requiredBy = [ "acme-${domain}.service" ];
+        serviceConfig.Type = "oneshot";
+        path = with pkgs; [
+          coreutils
+          jq
+        ];
+        script = ''
+          set -o nounset
 
-      install -m 0440 -o root -g acmereceivers -DT \
-      <(printf "%s\n" "$filecontents") ${acme-env-filepath}
-    '';
+          TOKEN="$(jq -re '.dns.token // .dns.apiKey' ${secrets-filepath})"
+          TOKEN_ID="$(jq -re '.dns.tokenId // "none"' ${secrets-filepath})"
+          URL="$(jq -re '.dns.url // "none"' ${secrets-filepath})"
+          TENANT="$(jq -re '.dns.tenant // "none"' ${secrets-filepath})"
+          SECONDARY_TOKEN="$(jq -re '.dns.secondaryToken // "none"' ${secrets-filepath})"
+          filecontents=$(cat <<- EOF
+          ${dnsCredentialsTemplate}
+          EOF
+          )
+
+          install -m 0440 -o root -g acmereceivers -DT \
+          <(printf "%s\n" "$filecontents") ${acme-env-filepath}
+        '';
+      };
+
+      "acme-${domain}".serviceConfig = {
+        StartLimitBurst = 5;
+        StartLimitIntervalSec = 5;
+        Restart = "on-failure";
+      };
+    };
   };
 }

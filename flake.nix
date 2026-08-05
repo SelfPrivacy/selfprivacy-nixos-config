@@ -48,13 +48,13 @@
           default = nixpkgs.lib.nixosSystem {
             specialArgs = {
               selfprivacy = {
-                inherit ((import ./modules/types.nix { lib = nixpkgs.lib; }).selfprivacy.passthru) types;
+                inherit ((import ./nixos/types.nix { lib = nixpkgs.lib; }).selfprivacy.passthru) types;
               };
             };
             modules = [
               hardware-configuration
               deployment
-              ./modules
+              ./nixos
               ./configuration.nix
               selfprivacy-api.nixosModules.default
               (

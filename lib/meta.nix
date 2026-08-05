@@ -9,7 +9,7 @@ let
     (pkgs.lib.evalModules {
       modules = [
         (selfprivacyConfig + "/selfprivacy-module.nix")
-        (selfprivacyConfig + "/modules")
+        (selfprivacyConfig + "/nixos/types.nix")
       ];
     }).config.selfprivacy.passthru;
   options =

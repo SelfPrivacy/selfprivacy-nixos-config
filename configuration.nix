@@ -41,13 +41,9 @@ in
     ./auth/auth-module.nix
     ./volumes.nix
     ./users.nix
-    ./letsencrypt/acme.nix
-    ./letsencrypt/resolve.nix
     ./webserver/nginx.nix
     ./webserver/memcached.nix
     ./postgresql/postgresql.nix
-    ./modules/hardening.nix
-    ./modules/bootloader.nix
     # ./resources/limits.nix
   ];
 
