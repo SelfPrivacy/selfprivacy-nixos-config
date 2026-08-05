@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  flake-check:
+  fmt-check:
     runs-on:
       - x64
 
@@ -17,8 +17,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run flake checks
-        run: nix flake check -L --show-trace
+      - name: Run fmt check
+        run: nix build .#checks.x86_64-linux.fmt-check -L --show-trace
+
+  system-build-x64:
+    runs-on:
+      - x64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build SelfPrivacy system for x86_64
+        run: nix build .#checks.x86_64-linux.system-eval -L --show-trace
 
       - name: Upload cache
         if: >
@@ -30,3 +41,15 @@ jobs:
         run: |
           attic login --set-default selfprivacy https://cache.selfprivacy.org "$ATTIC_TOKEN"
           nix build .#checks.x86_64-linux.system-eval --no-link --print-out-paths | xargs attic push selfprivacy:nixos
+
+  # We don't have arm64 linux runners yet, so let's just check that evaluation is fine for now.
+  system-eval-arm64:
+    runs-on:
+      - x64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Eval SelfPrivacy system for aarch64
+        run: nix eval .#checks.aarch64-linux.system-eval -L --show-trace
