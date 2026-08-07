@@ -37,7 +37,7 @@ let
         echo "creating new kanidm service account \"${mailserver-service-account-name}\""
         if $KANIDM service-account create --name idm_admin ${mailserver-service-account-name} ${mailserver-service-account-name} idm_admin
         then
-            "kanidm service account \"${mailserver-service-account-name}\" created"
+            echo "kanidm service account \"${mailserver-service-account-name}\" created"
         else
             echo "error: cannot create kanidm service account \"${mailserver-service-account-name}\""
             exit 1
