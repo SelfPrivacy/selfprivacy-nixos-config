@@ -10,7 +10,7 @@
   };
 
   outputs =
-    {
+    inputs@{
       self,
       nixpkgs,
       selfprivacy-api,
@@ -49,6 +49,10 @@
             specialArgs = {
               selfprivacy = {
                 inherit ((import ./nixos/types.nix { lib = nixpkgs.lib; }).selfprivacy.passthru) types;
+                modules = sp-modules;
+                topLevelFlake = top-level-flake;
+                config.source = self;
+                config.inputs = inputs;
               };
             };
             modules = [
@@ -57,22 +61,6 @@
               ./nixos
               ./configuration.nix
               selfprivacy-api.nixosModules.default
-              (
-                { pkgs, lib, ... }:
-                {
-                  environment.etc =
-                    (lib.attrsets.mapAttrs' (name: sp-module: {
-                      name = "sp-modules/${name}";
-                      value.text = import ./lib/meta.nix {
-                        selfprivacyConfig = ./.;
-                        inherit pkgs sp-module;
-                      };
-                    }) sp-modules)
-                    // {
-                      suggested-sp-modules.text = builtins.toJSON (builtins.attrNames (builtins.readDir ./sp-modules));
-                    };
-                }
-              )
               (
                 let
                   deepOptionsFilter =
@@ -101,16 +89,6 @@
                 {
                   # pass userdata (parsed from JSON) options to selfprivacy module
                   selfprivacy = deepOptionsFilter options.selfprivacy userdata;
-
-                  # embed top-level flake source folder into the build
-                  environment.etc."selfprivacy/nixos-config-source".source = top-level-flake;
-
-                  # for running "nix search nixpkgs", "nix shell nixpkgs#PKG... etc
-                  nix.registry.nixpkgs.flake = nixpkgs;
-
-                  # embed commit sha1 for `nixos-version --configuration-revision`
-                  system.configurationRevision = self.rev or "@${self.lastModifiedDate}"; # for development
-                  # TODO assertion to forbid dirty builds caused by top-level-flake
                 }
               )
             ]
@@ -161,6 +139,7 @@
               ) sp-modules;
           };
         };
+
       formatter = nixpkgs.lib.genAttrs systems (system: mkTreeFmt nixpkgs.legacyPackages.${system});
 
       checks = nixpkgs.lib.genAttrs systems (

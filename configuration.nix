@@ -47,20 +47,12 @@ in
     # ./resources/limits.nix
   ];
 
+  system.stateVersion = lib.mkIf (
+    config.selfprivacy.stateVersion != null
+  ) config.selfprivacy.stateVersion;
+
   services.dbus.implementation = config.selfprivacy.workarounds.dbusImplementation;
   boot.initrd.systemd.enable = config.selfprivacy.workarounds.initrdImplementation == "systemd";
-
-  environment.etc."sp-fetch-remote-module.nix" = {
-    text = ''
-      { flakeURL }: let
-        sp-module = builtins.getFlake flakeURL;
-        pkgs = import ${pkgs.path} {};
-      in (import ${./lib/meta.nix}) {
-        selfprivacyConfig = ${./.};
-        inherit pkgs sp-module;
-      }
-    '';
-  };
 
   fileSystems."/" = {
     device = lib.mkIf (config.selfprivacy.server.rootPartition != null) (
@@ -176,9 +168,6 @@ in
     "R! /old-root"
     "d /etc/selfprivacy/dump 0700 0700 selfprivacy-api selfprivacy-api"
   ];
-  system.stateVersion = lib.mkIf (
-    config.selfprivacy.stateVersion != null
-  ) config.selfprivacy.stateVersion;
   system.autoUpgrade = {
     enable = config.selfprivacy.autoUpgrade.enable;
     allowReboot = config.selfprivacy.autoUpgrade.allowReboot;
@@ -204,43 +193,6 @@ in
           exit 255
       fi
     '';
-
-  nix = {
-    channel.enable = false;
-
-    # daemonCPUSchedPolicy = "idle";
-    # daemonIOSchedClass = "idle";
-    # daemonIOSchedPriority = 7;
-    # this is superseded by nix.settings.auto-optimise-store.
-    # optimise.automatic = true;
-
-    gc = {
-      automatic = true; # TODO it's debatable, because of IO&CPU load
-      options = "--delete-older-than 7d";
-    };
-  };
-  nix.settings = {
-    sandbox = true;
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
-    allowed-users = [
-      "root"
-    ];
-    substituters = [
-      "https://cache.selfprivacy.org/nixos"
-    ];
-    trusted-public-keys = [
-      "nixos:XI4AhGwIOTvDIfKg8fr4p6PfVRske/5kHluWnc9cvfs="
-    ];
-    # auto-optimise-store = true;
-
-    # evaluation restrictions:
-    # restrict-eval = true;
-    # allowed-uris = [];
-    allow-dirty = false;
-  };
   nixpkgs.overlays = [
     (import ./overlay.nix config.nixpkgs.hostPlatform.system)
   ];
