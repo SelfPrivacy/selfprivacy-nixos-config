@@ -13,7 +13,7 @@
           (import ./config.nix mailserver)
         ];
       };
-      configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
+
       meta =
         { ... }:
         {

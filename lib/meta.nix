@@ -54,7 +54,6 @@ let
 in
 builtins.toJSON {
   meta = moduleMeta;
-  configPathsNeeded = sp-module.configPathsNeeded;
   options = lib.mapAttrs optionToMeta (
     builtins.head (lib.mapAttrsToList (_name: value: value) options.selfprivacy.modules)
   );

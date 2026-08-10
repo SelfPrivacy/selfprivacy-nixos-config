@@ -1,6 +1,0 @@
-[
-  [ "selfprivacy", "domain" ],
-  [ "selfprivacy", "username" ],
-  [ "selfprivacy", "useBinds" ],
-  [ "selfprivacy", "modules", "pleroma" ]
-]

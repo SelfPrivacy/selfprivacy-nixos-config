@@ -5,7 +5,7 @@
     { ... }:
     {
       nixosModules.default = import ./module.nix;
-      configPathsNeeded = builtins.fromJSON (builtins.readFile ./config-paths-needed.json);
+
       meta =
         { lib, ... }:
         {
