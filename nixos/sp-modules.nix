@@ -8,6 +8,8 @@ let
   sp-modules = selfprivacy.modules;
 in
 {
+  imports = lib.mapAttrsToList (_: module: module.nixosModules.default) sp-modules;
+
   environment.etc =
     (lib.attrsets.mapAttrs' (name: sp-module: {
       name = "sp-modules/${name}";
