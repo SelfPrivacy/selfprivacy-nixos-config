@@ -42,6 +42,21 @@ jobs:
           attic login --set-default selfprivacy https://cache.selfprivacy.org "$ATTIC_TOKEN"
           nix build .#checks.x86_64-linux.system-eval --no-link --print-out-paths | xargs attic push selfprivacy:nixos
 
+  system-first-boot-x64:
+    needs:
+      - system-build-x64
+
+    runs-on:
+      - kvm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run SelfPrivacy first boot tests
+        run: nix build .#checks.x86_64-linux.first-boot -L --show-trace
+
+
   # We don't have arm64 linux runners yet, so let's just check that evaluation is fine for now.
   system-eval-arm64:
     runs-on:

@@ -94,7 +94,23 @@
             touch $out
           ";
 
-          system-eval = (import ./checks/system-eval.nix) { inherit self nixpkgs system; };
+          system-eval = (import ./checks/system-eval.nix) {
+            inherit
+              inputs
+              self
+              nixpkgs
+              system
+              ;
+          };
+
+          first-boot = (import ./checks/first-boot.nix) {
+            inherit
+              inputs
+              self
+              nixpkgs
+              system
+              ;
+          };
         }
       );
     };
