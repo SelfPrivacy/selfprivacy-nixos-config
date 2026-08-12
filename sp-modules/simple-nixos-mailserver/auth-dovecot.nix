@@ -24,7 +24,6 @@ let
     export HOME=$RUNTIME_DIRECTORY/client_home
     readonly KANIDM="${config.services.kanidm.package}/bin/kanidm"
     export KANIDM_NAME=idm_admin
-    export KANIDM_URL="${config.services.kanidm.provision.instanceUrl}"
 
     # get Kanidm service account for mailserver
     KANIDM_SERVICE_ACCOUNT="$($KANIDM service-account list --name idm_admin | grep -E "^name: ${mailserver-service-account-name}$")"

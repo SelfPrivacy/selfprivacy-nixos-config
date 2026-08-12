@@ -92,7 +92,6 @@ in
     };
     provision = {
       enable = true;
-      instanceUrl = "https://" + auth-fqdn;
       autoRemove = true; # if false, obsolete oauth2 scopeMaps remain
       groups.${admins-group} = {
         present = true;
@@ -112,8 +111,9 @@ in
     };
     client.enable = true;
     client.settings = {
-      uri = "https://" + auth-fqdn;
-      verify_ca = false; # keep this because new server might not have new certificates if acme fails, and we don't want kanidm to fail in such case.
+      uri = config.services.kanidm.provision.instanceUrl;
+      verify_ca = false;
+      verify_hostnames = false;
     };
   };
 

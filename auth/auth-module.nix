@@ -294,7 +294,6 @@ in
               mkdir -p "$CLIENT_HOME"
               export HOME="$CLIENT_HOME"
               export KANIDM_NAME=idm_admin
-              export KANIDM_URL="${config.services.kanidm.provision.instanceUrl}"
 
               if ! recover_out=$(${config.services.kanidm.package}/bin/kanidmd scripting recover-account -c ${
                 config.environment.etc."kanidm/server.toml".source
