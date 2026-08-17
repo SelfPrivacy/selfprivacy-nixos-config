@@ -65,6 +65,18 @@
           pkgs = nixpkgs.legacyPackages.${system};
 
           treefmt = mkTreeFmt pkgs;
+
+          mkFirstBoot =
+            testHooks:
+            import ./checks/first-boot.nix {
+              inherit
+                inputs
+                self
+                nixpkgs
+                system
+                testHooks
+                ;
+            };
         in
         {
           # nixfmt returns cryptic error when ran from read-only directory and when directory isn't a git repo:
@@ -103,13 +115,17 @@
               ;
           };
 
-          first-boot = (import ./checks/first-boot.nix) {
-            inherit
-              inputs
-              self
-              nixpkgs
-              system
-              ;
+          first-boot-no-legacy-unix-user = mkFirstBoot {
+            userdataOverrides = { };
+            testScript = ''machine.fail("getent passwd legacy-user")'';
+          };
+
+          first-boot-legacy-unix-user = mkFirstBoot {
+            userdataOverrides = {
+              username = "legacy-user";
+              hashedMasterPassword = "$6$aaaaaaaaaaaaaaa$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+            };
+            testScript = ''machine.succeed("getent passwd legacy-user")'';
           };
         }
       );

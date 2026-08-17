@@ -63,10 +63,8 @@ in
       };
       server.provider = "HETZNER";
       domain = "dummy.site";
-      hashedMasterPassword = "$6$aaaaaaaaaaaaaaa$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
       hostname = "dummysite";
       timezone = "Etc/UTC";
-      username = "user";
       useBinds = true;
       sshKeys = [ ];
       users = [ ];

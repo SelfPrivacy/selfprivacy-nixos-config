@@ -3,6 +3,7 @@
   nixpkgs,
   self,
   system,
+  testHooks ? { },
 }:
 let
   lib = nixpkgs.lib;
@@ -179,11 +180,14 @@ let
   systemParts = testLib.mkTestSystem {
     inherit system;
     spModules = testLib.baseSpModules;
-    userdata = testLib.mkTestUserdata {
-      modules.nextcloud.enable = false;
-      domain = domain;
-      hostname = "first-boot";
-    };
+    userdata = testLib.mkTestUserdata (
+      {
+        modules.nextcloud.enable = false;
+        domain = domain;
+        hostname = "first-boot";
+      }
+      // (testHooks.userdataOverrides or { })
+    );
     extraModules = [
       (
         { config, ... }:
@@ -274,5 +278,7 @@ pkgs.testers.runNixOSTest {
     for node in machines:
       failed_units = node.succeed("systemctl list-units --failed --no-legend --plain")
       assert not failed_units.strip(), f"Failed systemd units on {node.name}:\n{failed_units}"
+
+    ${testHooks.testScript or ""}
   '';
 }

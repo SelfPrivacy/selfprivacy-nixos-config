@@ -53,9 +53,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run SelfPrivacy first boot tests
-        run: nix build .#checks.x86_64-linux.first-boot -L --show-trace
+      - name: Run SelfPrivacy first boot tests with admin user
+        run: nix build .#checks.x86_64-linux.first-boot-legacy-unix-user -L --show-trace
 
+      - name: Run SelfPrivacy first boot tests without admin user
+        run: nix build .#checks.x86_64-linux.first-boot-no-legacy-unix-user -L --show-trace
 
   # We don't have arm64 linux runners yet, so let's just check that evaluation is fine for now.
   system-eval-arm64:
