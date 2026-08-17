@@ -73,7 +73,6 @@ let
   yamlFormat = pkgs.formats.yaml { };
 
   kanidmUlid = "01G65Z755AFWAKHE12NY0CQ9FH";
-  synapseUlid = "0000000000000000000SYNAPSE";
   masKanidmSyncClientId = "01JZQSK4HXHXR2QATT40Y7497J";
 
   masConfig = {
@@ -137,15 +136,6 @@ let
       pkce_method = "always";
 
       claims_imports.email.action = "force";
-    }
-  );
-
-  experimentalMsc3861Template = pkgs.writeText "experimental_msc3861_template" (
-    builtins.toJSON {
-      enabled = true;
-      issuer = "http://localhost:8068";
-      client_id = synapseUlid;
-      client_auth_method = "client_secret_basic";
     }
   );
 
@@ -366,24 +356,19 @@ in
                   SYNC_CLIENT_SECRET=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 50)
                   echo -n "$SYNC_CLIENT_SECRET" > ${masDataDir}/sync-client-secret
                 fi
-                if [ ! -f ${masDataDir}/matrix-token ]; then
-                  MATRIX_TOKEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 50)
-                  echo -n "$MATRIX_TOKEN" > ${masDataDir}/matrix-token
-                fi
                 if [ ! -s ${masDataDir}/secrets.yaml ] || ! yq -e '.matrix.secret' < ${masDataDir}/secrets.yaml > /dev/null 2>&1; then
                   mas-cli config generate > ${masDataDir}/secrets.yaml
                 fi
-                yq --arg matrixtoken "$(cat ${masDataDir}/matrix-token)" --arg syncclientsecret "$(cat ${masDataDir}/sync-client-secret)" --slurpfile template ${experimentalMsc3861Template} '{
+                yq --arg syncclientsecret "$(cat ${masDataDir}/sync-client-secret)" '{
                   secrets: .secrets,
                   matrix: {secret: .matrix.secret},
                   clients: [
-                    { client_id: "${synapseUlid}", client_auth_method: "client_secret_basic", client_secret: $matrixtoken },
                     { client_id: "${masKanidmSyncClientId}", client_auth_method: "client_secret_basic", client_secret: $syncclientsecret }
                   ]
                 }' < ${masDataDir}/secrets.yaml > ${masDataDir}/secrets.yaml.tmp
                 mv ${masDataDir}/secrets.yaml.tmp ${masDataDir}/secrets.yaml
                 yq --rawfile clientsecret ${oauthClientSecretFP} '{upstream_oauth2: {providers: [ . * {client_secret: $clientsecret}]}}' < ${upstreamOauth2Template} > ${masDataDir}/oauth2_secrets.yaml
-                yq --slurpfile template ${experimentalMsc3861Template} '{experimental_features: {msc4108_enabled: true, msc3861: ($template[0] * {client_secret: .clients[0].client_secret, admin_token: .matrix.secret })}}' < ${masDataDir}/secrets.yaml > ${synapseDataDir}/mas_secrets.yaml.tmp
+                yq '{experimental_features: {msc4108_enabled: true}, matrix_authentication_service: {enabled: true, endpoint: "http://127.0.0.1:8068", secret: .matrix.secret}}' < ${masDataDir}/secrets.yaml > ${synapseDataDir}/mas_secrets.yaml.tmp
                 mv ${synapseDataDir}/mas_secrets.yaml.tmp ${synapseDataDir}/mas_secrets.yaml
                 chown matrix-authentication-service:matrix-authentication-service ${masDataDir} -R
                 chmod 640 ${masDataDir}/*
