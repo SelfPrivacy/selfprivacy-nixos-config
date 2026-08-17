@@ -179,7 +179,7 @@ let
 
   systemParts = testLib.mkTestSystem {
     inherit system;
-    spModules = testLib.baseSpModules;
+    spModules = testHooks.spModules or testLib.baseSpModules;
     userdata = testLib.mkTestUserdata (
       {
         modules.nextcloud.enable = false;
@@ -226,7 +226,8 @@ let
           };
         }
       )
-    ];
+    ]
+    ++ (testHooks.extraModules or [ ]);
   };
 in
 pkgs.testers.runNixOSTest {
@@ -245,6 +246,12 @@ pkgs.testers.runNixOSTest {
 
   testScript = ''
     import json
+
+    def wait_for_https(subdomain, path="/"):
+      return machine.wait_until_succeeds(
+        f"curl --fail --silent --show-error --cacert ${testCertificates}/root_ca.crt https://{subdomain}.${domain}{path}",
+        timeout=120,
+      )
 
     acme.start()
     acme.wait_for_unit("bind.service")
@@ -275,10 +282,10 @@ pkgs.testers.runNixOSTest {
     }, graphql_response
     assert graphql_response["data"]["system"]["settings"]["timezone"] == "Etc/UTC", graphql_response
 
+    ${testHooks.testScript or ""}
+
     for node in machines:
       failed_units = node.succeed("systemctl list-units --failed --no-legend --plain")
       assert not failed_units.strip(), f"Failed systemd units on {node.name}:\n{failed_units}"
-
-    ${testHooks.testScript or ""}
   '';
 }

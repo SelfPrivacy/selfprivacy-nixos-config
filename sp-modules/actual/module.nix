@@ -96,6 +96,19 @@ in
     };
 
     systemd = {
+      tmpfiles.settings.actual = {
+        "${config.services.actual.settings.serverFiles}".d = {
+          mode = "0700";
+          user = linuxUserOfService;
+          group = linuxGroupOfService;
+        };
+        "${config.services.actual.settings.userFiles}".d = {
+          mode = "0700";
+          user = linuxUserOfService;
+          group = linuxGroupOfService;
+        };
+      };
+
       services = {
         actual = {
           # extra guard against the service starting before the bind has been mounted

@@ -15,7 +15,7 @@ in
       name = "sp-modules/${name}";
       value.text = import ../lib/meta.nix {
         selfprivacyConfig = selfprivacy.config.source;
-        inherit pkgs sp-module;
+        inherit pkgs selfprivacy sp-module;
       };
     }) sp-modules)
     // {

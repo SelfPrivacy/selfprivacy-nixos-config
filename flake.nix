@@ -66,6 +66,8 @@
 
           treefmt = mkTreeFmt pkgs;
 
+          testLib = import ./lib/nixos-test.nix { inherit inputs nixpkgs self; };
+
           mkFirstBoot =
             testHooks:
             import ./checks/first-boot.nix {
@@ -126,6 +128,42 @@
               hashedMasterPassword = "$6$aaaaaaaaaaaaaaa$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
             };
             testScript = ''machine.succeed("getent passwd legacy-user")'';
+          };
+
+          first-boot-with-all-modules = mkFirstBoot {
+            userdataOverrides = {
+              modules = nixpkgs.lib.recursiveUpdate testLib.allModulesConfiguration {
+                nextcloud.enable = false;
+                pleroma.enable = false;
+              };
+            };
+            spModules = testLib.spModules;
+            extraModules = [
+              {
+                virtualisation.memorySize = 6096;
+                virtualisation.cores = 3;
+              }
+            ];
+            testScript = ''
+              synapse_versions = json.loads(wait_for_https("synapse", "/_matrix/client/versions"))
+              assert synapse_versions["versions"], synapse_versions
+
+              assert "A painless, self-hosted Git service" in wait_for_https("git")
+              assert json.loads(wait_for_https("git", "/api/healthz"))["status"] == "pass"
+
+              wait_for_https("password", "/alive")
+              wait_for_https("actual")
+              assert "uri" in json.loads(wait_for_https("gts", "/api/v1/instance"))
+              wait_for_https("hedgedoc", "/status")
+              assert "Jitsi Meet" in wait_for_https("meet")
+              assert "version" in json.loads(wait_for_https("vikunja", "/api/v1/info"))
+              assert "WriteFreely" in wait_for_https("writefreely")
+
+              machine.wait_until_succeeds(
+                "curl --fail --silent --show-error http://localhost:9001/-/ready",
+                timeout=120,
+              )
+            '';
           };
         }
       );

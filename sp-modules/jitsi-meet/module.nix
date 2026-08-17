@@ -7,8 +7,27 @@
 let
   domain = config.selfprivacy.domain;
   cfg = config.selfprivacy.modules.jitsi-meet;
+
+  jitsiMeetModule =
+    { pkgs, ... }@args:
+    import "${selfprivacy.config.inputs.nixpkgs}/nixos/modules/services/web-apps/jitsi-meet.nix" (
+      args
+      // {
+        pkgs = pkgs // {
+          jitsi-meet = pkgs.jitsi-meet.overrideAttrs (old: {
+            meta = old.meta // {
+              # The insecure marking concerns libolm-based E2EE, which we disable.
+              knownVulnerabilities = [ ];
+            };
+          });
+        };
+      }
+    );
 in
 {
+  disabledModules = [ "services/web-apps/jitsi-meet.nix" ];
+  imports = [ jitsiMeetModule ];
+
   options.selfprivacy.modules.jitsi-meet = {
     enable = selfprivacy.types.enableOption "JitsiMeet";
     subdomain = selfprivacy.types.subdomainOption "meet";
@@ -27,16 +46,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    nixpkgs.overlays = [
-      (_final: prev: {
-        jitsi-meet = prev.jitsi-meet.overrideAttrs (old: {
-          meta = old.meta // {
-            # we disable e2ee.
-            knownVulnerabilities = [ ];
-          };
-        });
-      })
-    ];
     services.jitsi-meet = {
       enable = true;
       hostName = "${cfg.subdomain}.${domain}";

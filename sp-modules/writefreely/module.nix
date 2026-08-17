@@ -155,7 +155,7 @@ in
       subdomain = cfg.subdomain;
       originLanding = "https://${cfg.subdomain}.${sp.domain}/";
       originUrl = "https://${cfg.subdomain}.${sp.domain}/oauth/callback/generic";
-      clientSystemdUnits = [ "writefreely.service" ];
+      clientSystemdUnits = [ "writefreely-sqlite-init.service" ];
       enablePkce = false;
       scopeMaps = {
         "${usersGroup}" = [

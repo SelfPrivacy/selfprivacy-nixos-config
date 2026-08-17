@@ -143,6 +143,8 @@ in
           };
         };
       services.hedgedoc = {
+        after = [ "postgresql.target" ];
+        requires = [ "postgresql.target" ];
         wants = [ "hedgedoc-secrets.service" ];
         unitConfig.RequiresMountsFor = lib.mkIf sp.useBinds "/volumes/${cfg.location}/hedgedoc";
         serviceConfig.Slice = "hedgedoc.slice";

@@ -59,6 +59,9 @@ jobs:
       - name: Run SelfPrivacy first boot tests without admin user
         run: nix build .#checks.x86_64-linux.first-boot-no-legacy-unix-user -L --show-trace
 
+      - name: Run SelfPrivacy first boot tests with all modules enabled
+        run: nix build .#checks.x86_64-linux.first-boot-with-all-modules -L --show-trace
+
   # We don't have arm64 linux runners yet, so let's just check that evaluation is fine for now.
   system-eval-arm64:
     runs-on:

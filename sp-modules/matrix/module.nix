@@ -156,14 +156,9 @@ let
   synapseDataDir = "/var/lib/matrix-synapse";
   masDataDir = "/var/lib/matrix-authentication-service";
 
-  # jitsi pollutes pkgs causing element-web to rebuild.
-  element-web =
-    (import config.nixpkgs.flake.source {
-      system = pkgs.stdenv.hostPlatform.system;
-    }).element-web.override
-      {
-        conf = elementConfig;
-      };
+  element-web = pkgs.element-web.override {
+    conf = elementConfig;
+  };
 in
 {
   options.selfprivacy.modules.matrix = {
@@ -328,13 +323,11 @@ in
     systemd = {
       services.matrix-authentication-service = {
         after = [
-          "postgresql.service"
+          "postgresql.target"
           "kanidm.service"
         ];
-        wants = [
-          "postgresql.service"
-          "kanidm.service"
-        ];
+        requires = [ "postgresql.target" ];
+        wants = [ "kanidm.service" ];
         wantedBy = [ "multi-user.target" ];
         path = [
           pkgs.matrix-authentication-service
@@ -387,8 +380,8 @@ in
       };
       services.matrix-synapse-prepare-db = {
         description = "Create Synapse database";
-        after = [ "postgresql.service" ];
-        requires = [ "postgresql.service" ];
+        after = [ "postgresql.target" ];
+        requires = [ "postgresql.target" ];
         serviceConfig = {
           Slice = "matrix.slice";
           User = "postgres";
@@ -416,6 +409,7 @@ in
         wantedBy = [ "multi-user.target" ];
         environment = {
           PYTHONUNBUFFERED = "1";
+          SSL_CERT_FILE = config.security.pki.caBundle;
           KANIDM_TOKEN_PATH = "%d/kanidm-token";
           MAS_URL = "https://${cfg.masSubdomain}.${sp.domain}";
           KANIDM_URL = "https://auth.${sp.domain}";
