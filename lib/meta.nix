@@ -7,8 +7,7 @@
 let
   lib = pkgs.lib;
 
-  spModuleMeta = if sp-module ? meta then sp-module.meta { inherit lib; } else null;
-  spModuleId = if spModuleMeta != null then spModuleMeta.id else "module";
+  moduleMeta = sp-module.meta { inherit lib; };
 
   fallbackSelfprivacy =
     let
@@ -22,7 +21,7 @@ let
     {
       types =
         (import (selfprivacyConfig + "/nixos/types.nix") { inherit lib; }).selfprivacy.passthru.types;
-      modules.${spModuleId} = sp-module;
+      modules.${moduleMeta.id} = sp-module;
       topLevelFlake = selfFlake;
       config = {
         source = selfprivacyConfig;
@@ -47,14 +46,14 @@ let
   # Transform a Nix option to a JSON structure with metadata
   optionToMeta = name: option: {
     name = name;
-    description = if builtins.hasAttr "description" option then option.description else null;
+    description = if option ? description then option.description else null;
     loc = option.loc;
-    meta = if builtins.hasAttr "meta" option then option.meta else null;
-    default = if builtins.hasAttr "default" option then option.default else null;
+    meta = if option ? meta then option.meta else null;
+    default = if option ? default then option.default else null;
   };
 in
 builtins.toJSON {
-  meta = spModuleMeta;
+  meta = moduleMeta;
   configPathsNeeded = sp-module.configPathsNeeded;
   options = lib.mapAttrs optionToMeta (
     builtins.head (lib.mapAttrsToList (_name: value: value) options.selfprivacy.modules)
