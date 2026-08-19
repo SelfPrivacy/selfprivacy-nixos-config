@@ -212,6 +212,7 @@ let
           networking.extraHosts = "${acmeIp} acme";
           networking.firewall.allowedTCPPorts = [ 80 ];
           security.pki.certificateFiles = [ "${testCertificates}/root_ca.crt" ];
+          mailserver.ldap.caFile = lib.mkForce config.security.pki.caBundle;
           security.acme = {
             defaults = {
               server = lib.mkForce "https://acme:8443/acme/acme/directory";

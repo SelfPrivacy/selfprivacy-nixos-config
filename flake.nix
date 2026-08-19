@@ -130,6 +130,31 @@
             testScript = ''machine.succeed("getent passwd legacy-user")'';
           };
 
+          mail =
+            let
+              mailIntegrationTest = pkgs.writers.writePython3Bin "mail-integration-test" {
+                libraries = with pkgs.python3Packages; [
+                  pyotp
+                  requests
+                ];
+                flakeIgnore = [
+                  "E501"
+                ];
+              } (builtins.readFile ./checks/mail-integration.py);
+            in
+            mkFirstBoot {
+              extraModules = [
+                {
+                  environment.systemPackages = [ mailIntegrationTest ];
+                  virtualisation.memorySize = 2048;
+                  virtualisation.cores = 2;
+                }
+              ];
+              testScript = ''
+                machine.succeed("mail-integration-test")
+              '';
+            };
+
           first-boot-with-all-modules = mkFirstBoot {
             userdataOverrides = {
               modules = nixpkgs.lib.recursiveUpdate testLib.allModulesConfiguration {
