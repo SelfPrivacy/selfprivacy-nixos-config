@@ -31,6 +31,10 @@ let
     fi
   '';
 
+  kanidmReindexDbScript = pkgs.writeShellScript "kanidm-reindex-db" ''
+    ${config.services.kanidm.package}/bin/kanidmd database reindex -c /etc/kanidm/server.toml
+  '';
+
   # lua stuff for nginx for debugging only
   lua_core_path = "${pkgs.luajitPackages.lua-resty-core}/lib/lua/5.1/?.lua";
   lua_lrucache_path = "${pkgs.luajitPackages.lua-resty-lrucache}/lib/lua/5.1/?.lua";
@@ -66,7 +70,7 @@ in
     server.enable = true;
 
     # kanidm with Rust code patches for OAuth and admin passwords provisioning
-    package = pkgs.kanidmWithSecretProvisioning_1_10;
+    package = pkgs.kanidmWithSecretProvisioning_1_11;
 
     server.settings = {
       inherit domain;
@@ -197,11 +201,16 @@ in
         config.services.kanidm.server.settings.tls_chain
         config.services.kanidm.server.settings.tls_key
       ];
-      ExecStartPre =
+      ExecStartPre = lib.mkMerge [
         # idempotent script to run on each startup only for kanidm v1.5.0
-        lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (
+        (lib.mkIf (lib.versionAtLeast config.services.kanidm.package.version "1.5.0") (
           lib.mkBefore [ kanidmMigrateDbScript ]
-        );
+        ))
+        # https://github.com/kanidm/kanidm/releases/tag/v1.11.1
+        (lib.mkIf (config.services.kanidm.package.version == "1.11.1") (
+          lib.mkBefore [ kanidmReindexDbScript ]
+        ))
+      ];
     };
   };
 
