@@ -11,7 +11,7 @@
         {
           spModuleSchemaVersion = 1;
           id = "jitsi-meet";
-          name = "JitsiMeet";
+          name = "Jitsi Meet";
           description = "Jitsi Meet is a free and open-source video conferencing solution.";
           svgIcon = builtins.readFile ./icon.svg;
           isMovable = false;
