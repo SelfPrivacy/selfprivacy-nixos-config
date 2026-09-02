@@ -8,7 +8,7 @@ let
   redis-sp-api-srv-name = "sp-api";
   sp-print-api-token = pkgs.writeShellApplication {
     name = "sp-print-api-token";
-    runtimeInputs = with pkgs; [ redis ];
+    runtimeInputs = with pkgs; [ valkey ];
     text = ''
       hash_token="$(redis-cli -s /run/redis-${redis-sp-api-srv-name}/redis.sock keys "token_repo:tokens:*" | head -n 1)"
       hash_token="''${hash_token#"token_repo:tokens:"}"
