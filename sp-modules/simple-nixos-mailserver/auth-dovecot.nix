@@ -176,6 +176,7 @@ in
       "unix_listener auth-userdb" = {
         mode = "0660";
         user = config.services.dovecot2.settings.default_internal_user;
+        group = "virtualMail";
       };
       "unix_listener dovecot-auth" = {
         mode = "0660";
