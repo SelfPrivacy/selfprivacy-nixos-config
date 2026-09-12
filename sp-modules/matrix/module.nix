@@ -115,13 +115,7 @@ let
     };
     oauth.device_code_user_code_auto_fill_enabled = true;
     passwords = {
-      enabled = true;
-      schemes = [
-        {
-          version = 1;
-          algorithm = "argon2id";
-        }
-      ];
+      enabled = false;
     };
   };
 
