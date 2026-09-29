@@ -150,7 +150,7 @@ in
         };
         services.nextcloud = {
           enable = true;
-          package = pkgs.nextcloud33;
+          package = pkgs.nextcloud34;
           inherit hostName;
 
           # Use HTTPS for links
