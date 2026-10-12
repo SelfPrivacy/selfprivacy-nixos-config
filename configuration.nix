@@ -175,12 +175,11 @@ in
     flake = "/etc/nixos#default";
   };
   systemd.services.nixos-upgrade.serviceConfig.WorkingDirectory = "/etc/nixos";
-  # TODO parameterize URL somehow; run nix flake update as non-root user
+  # TODO: run nix flake update as non-root user
   systemd.services.nixos-upgrade.serviceConfig.ExecCondition =
     pkgs.writeShellScript "flake-update-script" ''
       set -o xtrace
-      if ${config.nix.package.out}/bin/nix flake update \
-      --override-input selfprivacy-nixos-config git+https://git.selfprivacy.org/SelfPrivacy/selfprivacy-nixos-config.git?ref=flakes
+      if ${config.nix.package.out}/bin/nix flake update
       then
           if ${pkgs.diffutils}/bin/diff -u -r /etc/selfprivacy/nixos-config-source/ /etc/nixos/
           then
