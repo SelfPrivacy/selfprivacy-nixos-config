@@ -6,6 +6,5 @@
     ./acme.nix
     ./sp-modules.nix
     ./nix.nix
-    ./phpfpm-hotfix.nix
   ];
 }
