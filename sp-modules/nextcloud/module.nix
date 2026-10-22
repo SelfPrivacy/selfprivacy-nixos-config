@@ -17,6 +17,19 @@ let
   auth-passthru = config.selfprivacy.passthru.auth;
   deleteNextcloudAdmin = config.selfprivacy.workarounds.deleteNextcloudAdmin;
   cfg = sp.modules.nextcloud;
+  currentVersion = "34";
+  versions = [
+    currentVersion
+    "33"
+    "32"
+  ];
+  requestedVersion = if cfg.packageVersion == "latest" then currentVersion else cfg.packageVersion;
+  requestedPackage = pkgs.${"nextcloud${requestedVersion}"} or null;
+  packageAvailable = builtins.tryEval (lib.isDerivation requestedPackage);
+  unknownVersion =
+    !(lib.elem requestedVersion versions) || !packageAvailable.success || !packageAvailable.value;
+  selectedPackage = if unknownVersion then pkgs.${"nextcloud${currentVersion}"} else requestedPackage;
+  insecurePackage = (selectedPackage.meta.knownVulnerabilities or [ ]) != [ ];
   ldap_scheme_and_host = "ldaps://${auth-passthru.ldap-host}";
 
   occ = "${config.services.nextcloud.occ}/bin/nextcloud-occ";
@@ -38,10 +51,36 @@ let
   '';
 in
 {
+  options.nixpkgs.config = lib.mkOption {
+    apply =
+      packageConfig:
+      packageConfig
+      // {
+        permittedInsecurePackages =
+          (packageConfig.permittedInsecurePackages or [ ])
+          ++ lib.optional (cfg.enable && insecurePackage) selectedPackage.name;
+      };
+  };
+
   options.selfprivacy.modules.nextcloud = with lib; {
     enable = selfprivacy.types.enableOption "Nextcloud";
     location = selfprivacy.types.locationOption;
     subdomain = selfprivacy.types.subdomainOption "cloud";
+    packageVersion =
+      (lib.mkOption {
+        type = types.str;
+        default = "latest";
+        description = ''
+          Nextcloud version. Use it if you skipped a major version to fix Nextcloud. Upgrade one version at a time. Don't forget to select 'latest' after.
+        '';
+      })
+      // {
+        meta = {
+          type = "enum";
+          options = [ "latest" ] ++ versions;
+          weight = 5;
+        };
+      };
     enableImagemagick =
       (lib.mkOption {
         type = types.bool;
@@ -96,6 +135,9 @@ in
   config = lib.mkIf sp.modules.nextcloud.enable (
     lib.mkMerge [
       {
+        warnings =
+          lib.optional unknownVersion "Nextcloud package version '${cfg.packageVersion}' is unavailable; using the current version ${currentVersion}."
+          ++ lib.optional insecurePackage "Nextcloud package ${selectedPackage.name} is marked insecure and is permitted for intermediate upgrades. Upgrade one major version at a time, then select latest.";
 
         fileSystems = lib.mkIf sp.useBinds {
           "/var/lib/nextcloud" = {
@@ -150,7 +192,7 @@ in
         };
         services.nextcloud = {
           enable = true;
-          package = pkgs.nextcloud34;
+          package = selectedPackage;
           inherit hostName;
 
           # Use HTTPS for links
