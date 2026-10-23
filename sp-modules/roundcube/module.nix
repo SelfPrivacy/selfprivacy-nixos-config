@@ -37,6 +37,9 @@ in
       # the mailserver
       hostName = "${cfg.subdomain}.${config.selfprivacy.domain}";
     };
+    services.phpfpm.pools.roundcube.phpOptions = ''
+      session.upload_progress.enabled = Off
+    '';
 
     services.nginx.virtualHosts."${cfg.subdomain}.${domain}" = {
       forceSSL = true;

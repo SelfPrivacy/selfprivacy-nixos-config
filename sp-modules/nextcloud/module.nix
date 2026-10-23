@@ -205,6 +205,7 @@ in
 
           phpOptions.display_errors = "Off";
           phpOptions."opcache.interned_strings_buffer" = "32";
+          phpOptions."session.upload_progress.enabled" = "Off";
 
           configureRedis = true;
 
