@@ -36,6 +36,10 @@
     "kernel.kptr_restrict" = "2"; # Hide kernel pointer locations.
 
     "vm.unprivileged_userfaultfd" = "0"; # Reduce attack surface
+
+    # https://www.anthropic.com/research/discovering-vulnerabilities-with-claude#5-zero-click-remote-code-execution-in-linux
+    "net.mptcp.enabled" = "0";
+    "net.ipv4.tcp_migrate_req" = "0";
   };
 
   # https://github.com/NixOS/nixpkgs/commit/16ac0cd8f4ebfa760f843348bb8c6d5037ea0333
