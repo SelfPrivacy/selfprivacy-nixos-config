@@ -17,6 +17,7 @@ let
       clientID,
       linuxGroupOfClient,
       isMailserver,
+      serviceAccountGroups,
       ...
     }:
     let
@@ -43,6 +44,10 @@ let
               exit 1
           fi
       fi
+
+      ${lib.concatMapStringsSep "\n" (group: ''
+        $KANIDM group add-members ${lib.escapeShellArg group} ${lib.escapeShellArg kanidmServiceAccountName}
+      '') serviceAccountGroups}
 
       # create a new token for kanidm
       if ! KANIDM_SERVICE_ACCOUNT_TOKEN_JSON="$($KANIDM service-account api-token generate --name idm_admin "${kanidmServiceAccountName}" "${kanidmServiceAccountTokenName}" ${lib.strings.optionalString isRW "--readwrite"} --output json)"
@@ -141,6 +146,11 @@ in
               description = "Whether a read-only needs to be generated for LDAP access.";
               type = types.bool;
               default = false;
+            };
+            serviceAccountGroups = mkOption {
+              description = "Kanidm groups to which the client's service account should be added.";
+              type = types.listOf types.str;
+              default = [ ];
             };
             clientSystemdUnits = mkOption {
               description = "A list of systemd services, which depend on OAuth service";
