@@ -457,6 +457,7 @@ in
       inherit adminsGroup usersGroup;
       subdomain = cfg.masSubdomain;
       isTokenNeeded = true;
+      serviceAccountGroups = [ "idm_people_pii_read" ];
       originLanding = "https://${cfg.masSubdomain}.${sp.domain}/";
       originUrl = "https://${cfg.masSubdomain}.${sp.domain}/upstream/callback/${kanidmUlid}";
       clientSystemdUnits = [ "matrix-authentication-service.service" ];
