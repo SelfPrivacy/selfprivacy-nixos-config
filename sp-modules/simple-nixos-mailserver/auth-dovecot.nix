@@ -158,14 +158,6 @@ in
       "login"
     ];
 
-    "userdb static" = {
-      fields = {
-        uid = "virtualMail";
-        gid = "virtualMail";
-        home = "/var/vmail/${domain}/%{user}";
-      };
-    };
-
     "service auth" = {
       # provide SASL via unix socket to postfix
       "unix_listener /var/lib/postfix/private-auth" = {

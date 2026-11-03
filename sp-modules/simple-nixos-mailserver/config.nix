@@ -21,6 +21,10 @@ in
 lib.mkIf sp.modules.simple-nixos-mailserver.enable (
   lib.mkMerge [
     {
+      assertions = map (email: {
+        assertion = (builtins.match "[^@]+\\.[^@]+" email.name) != null;
+        message = "Service email names must use the local-part format 'name.service' without a domain.";
+      }) (lib.attrsToList sp.emails);
 
       fileSystems = lib.mkIf sp.useBinds {
         "/var/vmail" = {
@@ -46,12 +50,6 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
       # https://nixos-mailserver.readthedocs.io/en/latest/migrations.html
       mailserver.stateVersion = 5;
 
-      users.users = {
-        virtualMail = {
-          isNormalUser = false;
-        };
-      };
-
       users.groups.acmereceivers.members = [
         "dovecot2"
         "postfix"
@@ -67,6 +65,13 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
         enable = true;
         fqdn = sp.domain;
         domains = [ sp.domain ];
+        accounts = lib.mapAttrs' (
+          name: email:
+          lib.nameValuePair "${name}@${sp.domain}" {
+            passwordFile = email.passwordFile;
+            inherit (email) sendOnly;
+          }
+        ) sp.emails;
         localDnsResolver = false;
 
         x509.certificateFile = "/var/lib/acme/root-${sp.domain}/fullchain.pem";
@@ -189,7 +194,54 @@ lib.mkIf sp.modules.simple-nixos-mailserver.enable (
           postfix.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
           redis-rspamd.serviceConfig.Slice = "simple_nixos_mailserver.slice";
-        };
+
+          generate-email-passwords = {
+            enable = true;
+            wantedBy = [ "multi-user.target" ];
+            requiredBy = [ "dovecot.service" ];
+            restartIfChanged = true;
+            serviceConfig.Slice = "simple_nixos_mailserver.slice";
+            path = with pkgs; [
+              coreutils
+              pwgen
+            ];
+            script = ''
+              set -euo pipefail
+              umask 0077
+              install -d -m 0711 -o root -g root /run/sp-mailboxes
+              ${lib.concatStringsSep "\n" (
+                lib.mapAttrsToList (_: email: ''
+                  install -d -m 0700 \
+                    -o ${lib.escapeShellArg email.user} -g ${lib.escapeShellArg email.group} \
+                    ${lib.escapeShellArg (builtins.dirOf email.passwordFile)}
+                  if [ ! -s ${lib.escapeShellArg email.passwordFile} ]; then
+                    tmp=$(mktemp ${lib.escapeShellArg "${email.passwordFile}.XXXXXX"})
+                    pwgen -s 64 1 > "$tmp"
+                    chown ${lib.escapeShellArg "${email.user}:${email.group}"} "$tmp"
+                    chmod 0400 "$tmp"
+                    mv "$tmp" ${lib.escapeShellArg email.passwordFile}
+                  fi
+                  chown ${lib.escapeShellArg "${email.user}:${email.group}"} ${lib.escapeShellArg email.passwordFile}
+                  chmod 0400 ${lib.escapeShellArg email.passwordFile}
+                '') sp.emails
+              )}
+            '';
+          };
+        }
+        // (lib.pipe sp.emails [
+          (lib.attrsets.mapAttrsToList (_: value: value.systemdServices))
+          lib.flatten
+          (x: x ++ [ "dovecot" ])
+          (map (
+            x:
+            lib.nameValuePair x {
+              wants = [ "generate-email-passwords.service" ];
+              after = [ "generate-email-passwords.service" ];
+            }
+          ))
+          lib.listToAttrs
+        ]);
+
         slices."simple_nixos_mailserver" = {
           name = "simple_nixos_mailserver.slice";
           description = "Simple NixOS Mailserver service slice";
