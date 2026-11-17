@@ -77,6 +77,11 @@ in
         jicofo.serviceConfig.Slice = "jitsi_meet.slice";
         jitsi-videobridge2.serviceConfig.Slice = "jitsi_meet.slice";
         prosody.serviceConfig.Slice = "jitsi_meet.slice";
+      }
+      // lib.optionalAttrs config.nixpkgs.hostPlatform.isx86_64 {
+        # https://calif.io/java4shell
+        jicofo.environment.JAVA_TOOL_OPTIONS = "-XX:UseAVX=2";
+        jitsi-videobridge2.environment.JAVA_TOOL_OPTIONS = "-XX:UseAVX=2";
       };
       slices.jitsi_meet = {
         description = "Jitsi Meet service slice";
