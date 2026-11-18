@@ -3,6 +3,19 @@ let
   domain = config.selfprivacy.domain;
 in
 {
+  imports = [
+    {
+      # Disable HTTP/2 for all virtual hosts until CVE-2026-123007 and CVE-2026-123633 are patched.
+      options.services.nginx.virtualHosts = lib.mkOption {
+        type = lib.types.attrsOf (
+          lib.types.submodule {
+            http2 = lib.mkForce false;
+          }
+        );
+      };
+    }
+  ];
+
   services.nginx = {
     enable = true;
     recommendedGzipSettings = true;

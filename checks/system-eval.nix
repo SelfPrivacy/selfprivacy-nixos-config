@@ -31,4 +31,7 @@ let
       inherit sp-modules;
     }).default;
 in
+assert lib.assertMsg (lib.all (vhost: !vhost.http2) (
+  lib.attrValues config.config.services.nginx.virtualHosts
+)) "HTTP/2 must remain disabled until the nginx2root mitigation is removed";
 config.config.system.build.toplevel // { config = config; }
