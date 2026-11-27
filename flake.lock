@@ -2,11 +2,11 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1793294725,
-        "narHash": "sha256-loLMnbbS4KhmG2ln9EY6f0YMNCA273Yx02oWYQ9IMeE=",
+        "lastModified": 1795370043,
+        "narHash": "sha256-s/0jq8usZtLVOolYBwmyUmd3JsfAu7w3FU+a0dgMqSY=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "6f06d204d8f2d8761d9da78778745974a3216381",
+        "rev": "0dc498bfe49baeb18b0f9891e800b53bb2603193",
         "type": "github"
       },
       "original": {
@@ -29,11 +29,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793639474,
-        "narHash": "sha256-6w9NrsF5RRGiU2b52jANtSkBF4TTCvTprGyeXv7cCSY=",
-        "ref": "refs/tags/3.9.1",
-        "rev": "899ad18ec4f72ccfe82040c2ca87a62facc910ce",
-        "revCount": 2096,
+        "lastModified": 1795691034,
+        "narHash": "sha256-3mA0qIIejXGYCykWWQnXPtQ2k692C+HU6rDolPJ1kLI=",
+        "ref": "refs/tags/3.9.2",
+        "rev": "ad0fdab3a5309385f0859afb31489798e704661b",
+        "revCount": 2102,
         "type": "git",
         "url": "https://git.selfprivacy.org/SelfPrivacy/selfprivacy-rest-api.git"
       },
